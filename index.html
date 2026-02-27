@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CX Portal — Tickets Dashboard</title>
+  <meta name="description" content="Customer Experience Ticketing Portal (Demo UI) — Ready for Microsoft integration." />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --bg2:#0e1630;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --muted2: rgba(255,255,255,.48);
+      --brand: #6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --chip:#111a35;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 26px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    [data-theme="light"]{
+      --bg: #f7f8ff;
+      --bg2:#eef2ff;
+      --card: rgba(10,20,60,.04);
+      --card2: rgba(10,20,60,.06);
+      --stroke: rgba(10,20,60,.10);
+      --text: rgba(10,20,60,.92);
+      --muted: rgba(10,20,60,.65);
+      --muted2: rgba(10,20,60,.50);
+      --chip:#f1f5ff;
+      --shadow: 0 10px 25px rgba(10,20,60,.12);
+      --brand: #0ea5e9;
+      --brand2:#7c3aed;
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font-family: var(--font);
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(110,231,255,.20), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(167,139,250,.20), transparent 55%),
+        radial-gradient(900px 600px at 50% 95%, rgba(52,211,153,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--text);
+      overflow-x:hidden;
+    }
+    a{ color:inherit; text-decoration:none }
+    .app{
+      display:grid;
+      grid-template-columns: 290px 1fr;
+      min-height:100vh;
+    }
+    .sidebar{
+      position:sticky; top:0; height:100vh;
+      padding:18px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-right: 1px solid var(--stroke);
+      backdrop-filter: blur(14px);
+    }
+    .brandRow{
+      display:flex; align-items:center; gap:12px;
+      padding:10px 10px 16px 10px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+      display:grid; place-items:center;
+      color:#061026; font-weight:900;
+    }
+    .brandText .t{ font-weight:800; letter-spacing:.2px; }
+    .brandText .s{ font-size:12px; color: var(--muted); margin-top:2px }
+    .nav{
+      margin-top:8px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .nav button{
+      width:100%;
+      border:1px solid var(--stroke);
+      background: transparent;
+      color: var(--text);
+      padding:11px 12px;
+      border-radius: 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .nav button:hover{ transform: translateY(-1px); background: var(--card) }
+    .nav button.active{
+      background: linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
+      border-color: rgba(110,231,255,.30);
+    }
+    .nav .left{ display:flex; align-items:center; gap:10px }
+    .icon{
+      width:28px; height:28px; border-radius:10px;
+      background: var(--card);
+      display:grid; place-items:center;
+      border:1px solid var(--stroke);
+      font-size:14px;
+    }
+    .pill{
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      background: var(--card);
+      border:1px solid var(--stroke);
+      color: var(--muted);
+    }
+    .sidebarFooter{
+      position:absolute; left:14px; right:14px; bottom:14px;
+      padding:12px;
+      border-radius: 16px;
+      background: var(--card);
+      border:1px solid var(--stroke);
+    }
+    .tinyRow{ display:flex; align-items:center; justify-content:space-between; gap:10px }
+    .toggleRow{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+    .btn{
+      border:1px solid var(--stroke);
+      background: var(--card);
+      color: var(--text);
+      padding:9px 10px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: var(--card2) }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(110,231,255,.20), rgba(167,139,250,.18));
+      border-color: rgba(110,231,255,.28);
+    }
+
+    .main{
+      padding:18px 18px 28px 18px;
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:14px 14px;
+      border-radius: var(--radius2);
+      background: var(--card);
+      border:1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    .topbar .title{
+      display:flex; flex-direction:column;
+    }
+    .topbar .title .h{ font-weight:850; font-size:18px }
+    .topbar .title .p{ color: var(--muted); font-size:13px; margin-top:2px }
+    .topActions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .search{
+      display:flex; align-items:center; gap:10px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      padding:9px 12px;
+      border-radius: 14px;
+      min-width: 320px;
+      max-width: 420px;
+    }
+    [data-theme="light"] .search{ background: rgba(10,20,60,.03) }
+    .search input{
+      width:100%;
+      border:none; outline:none;
+      background:transparent;
+      color: var(--text);
+      font-size:14px;
+    }
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    .card{
+      border:1px solid var(--stroke);
+      background: var(--card);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+    .cardHeader{
+      padding:14px 14px 10px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    [data-theme="light"] .cardHeader{ border-bottom:1px solid rgba(10,20,60,.08) }
+    .cardHeader .h{ font-weight:850; }
+    .cardHeader .s{ color: var(--muted); font-size:13px }
+    .cardBody{ padding:14px; }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    .kpi{
+      padding:14px;
+      border-radius: 18px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      display:flex; flex-direction:column; gap:6px;
+    }
+    [data-theme="light"] .kpi{ background: rgba(10,20,60,.03) }
+    .kpi .v{ font-size:22px; font-weight:900 }
+    .kpi .l{ color: var(--muted); font-size:12px }
+    .kpi .trend{ color: var(--muted2); font-size:12px }
+
+    .ticketsLayout{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    .list{
+      border-radius: var(--radius2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+      min-height: 520px;
+    }
+    [data-theme="light"] .list{ background: rgba(10,20,60,.02) }
+    .listTop{
+      padding:12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    [data-theme="light"] .listTop{ border-bottom:1px solid rgba(10,20,60,.08) }
+    select, .chipInput{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding:9px 10px;
+      border-radius: 14px;
+      outline:none;
+      font-size:13px;
+    }
+    [data-theme="light"] select,[data-theme="light"] .chipInput{ background: rgba(10,20,60,.03) }
+    .rows{ max-height: 620px; overflow:auto; }
+    .row{
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      cursor:pointer;
+      transition: background .12s ease, transform .12s ease;
+      display:flex; justify-content:space-between; gap:10px;
+    }
+    [data-theme="light"] .row{ border-bottom:1px solid rgba(10,20,60,.08) }
+    .row:hover{ background: rgba(255,255,255,.04) }
+    [data-theme="light"] .row:hover{ background: rgba(10,20,60,.03) }
+    .row.active{
+      background: linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
+      border-bottom-color: rgba(110,231,255,.22);
+    }
+    .row .meta{
+      display:flex; flex-direction:column; gap:6px;
+      min-width:0;
+    }
+    .row .meta .t{
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis;
+      max-width: 360px;
+    }
+    .row .meta .b{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      color: var(--muted); font-size:12px;
+    }
+    .badge{
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+    }
+    .badge.good{ border-color: rgba(52,211,153,.35); color: rgba(52,211,153,.95) }
+    .badge.warn{ border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95) }
+    .badge.bad{ border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95) }
+    .rightMeta{
+      display:flex; flex-direction:column; align-items:flex-end; gap:6px;
+      color: var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .detail{
+      border-radius: var(--radius2);
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+      min-height: 520px;
+    }
+    [data-theme="light"] .detail{ background: rgba(10,20,60,.02) }
+    .detailHead{
+      padding:12px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      align-items:center;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .detailHead .left{
+      display:flex; flex-direction:column;
+      gap:4px;
+      min-width: 260px;
+    }
+    .detailHead .left .h{
+      font-weight:900; font-size:16px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      max-width: 420px;
+    }
+    .detailHead .left .s{ color: var(--muted); font-size:12px }
+    .detailHead .actions{ display:flex; gap:8px; flex-wrap:wrap }
+    .twoCols{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      padding:12px;
+    }
+    .panel{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      border-radius: 18px;
+      padding:12px;
+    }
+    [data-theme="light"] .panel{ background: rgba(10,20,60,.03) }
+    .panel .ph{ font-weight:850; margin-bottom:8px }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      font-size:13px;
+      color: var(--muted);
+    }
+    .kv div{ padding:8px 10px; border:1px dashed rgba(255,255,255,.12); border-radius: 14px }
+    [data-theme="light"] .kv div{ border-color: rgba(10,20,60,.16) }
+    .kv b{ color: var(--text) }
+    .textarea{
+      width:100%;
+      min-height:100px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      border-radius: 16px;
+      padding:10px 12px;
+      outline:none;
+      resize:vertical;
+      font-family: var(--font);
+      font-size:13px;
+    }
+    [data-theme="light"] .textarea{ background: rgba(10,20,60,.02) }
+    .timeline{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .event{
+      display:flex; gap:10px;
+      align-items:flex-start;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      margin-top:6px;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px rgba(110,231,255,.12);
+    }
+    .event .box{
+      flex:1;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding:10px 12px;
+    }
+    [data-theme="light"] .event .box{ background: rgba(10,20,60,.02) }
+    .event .box .t{ font-weight:850; font-size:13px }
+    .event .box .d{ color: var(--muted); font-size:12px; margin-top:4px; line-height:1.5 }
+    .event .box .m{ color: var(--muted2); font-size:11px; margin-top:8px }
+
+    .chart{
+      height: 210px;
+      width:100%;
+      border-radius: 18px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    [data-theme="light"] .chart{ background: rgba(10,20,60,.02) }
+    .bars{
+      display:flex; gap:10px; align-items:flex-end;
+      height:100%;
+      padding:10px;
+    }
+    .bar{
+      flex:1;
+      border-radius: 12px 12px 6px 6px;
+      background: linear-gradient(180deg, rgba(110,231,255,.70), rgba(167,139,250,.55));
+      border:1px solid rgba(110,231,255,.20);
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
+      min-width: 14px;
+    }
+    .barLabel{
+      position:absolute; bottom:10px; left:10px; right:10px;
+      display:flex; justify-content:space-between;
+      color: var(--muted2);
+      font-size:11px;
+    }
+
+    .footerNote{
+      margin-top:14px;
+      color: var(--muted2);
+      font-size:12px;
+      text-align:center;
+    }
+
+    /* RTL */
+    [dir="rtl"] .app{ grid-template-columns: 1fr 290px; }
+    [dir="rtl"] .sidebar{ border-right:none; border-left:1px solid var(--stroke); }
+    [dir="rtl"] .brandRow{ padding-right:10px; padding-left:10px }
+    [dir="rtl"] .row .rightMeta{ align-items:flex-start; }
+    [dir="rtl"] .detailHead .actions{ justify-content:flex-start; }
+    @media (max-width: 1100px){
+      .app{ grid-template-columns: 1fr; }
+      .sidebar{ position:relative; height:auto; }
+      [dir="rtl"] .app{ grid-template-columns:1fr; }
+      .grid{ grid-template-columns:1fr; }
+      .ticketsLayout{ grid-template-columns:1fr; }
+      .search{ min-width: 220px; width:100%; max-width:none }
+      .topbar{ flex-direction:column; align-items:stretch }
+      .topActions{ justify-content:space-between }
+      .kpis{ grid-template-columns: repeat(2,1fr) }
+    }
+  </style>
+</head>
+<body data-theme="dark" dir="ltr">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brandRow">
+        <div class="logo">CX</div>
+        <div class="brandText">
+          <div class="t" id="brandTitle">CX Portal</div>
+          <div class="s" id="brandSub">Tickets • Branch Replies • Reports</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="active" data-view="dashboard">
+          <div class="left"><div class="icon">📊</div><div id="navDash">Dashboard</div></div>
+          <span class="pill" id="navDashPill">Live</span>
+        </button>
+        <button data-view="tickets">
+          <div class="left"><div class="icon">🎫</div><div id="navTickets">Tickets</div></div>
+          <span class="pill" id="navTicketsPill">Inbox</span>
+        </button>
+        <button data-view="reports">
+          <div class="left"><div class="icon">📈</div><div id="navReports">Reports</div></div>
+          <span class="pill" id="navReportsPill">Weekly</span>
+        </button>
+        <button data-view="settings">
+          <div class="left"><div class="icon">⚙️</div><div id="navSettings">Settings</div></div>
+          <span class="pill" id="navSettingsPill">UI</span>
+        </button>
+      </div>
+
+      <div class="sidebarFooter">
+        <div class="tinyRow">
+          <div style="display:flex;gap:10px;align-items:center">
+            <span class="badge" id="roleBadge">CX Team</span>
+            <span class="badge" id="branchCountBadge">60+ Branches</span>
+          </div>
+          <span class="badge" id="versionBadge">v1 Demo</span>
+        </div>
+
+        <div class="toggleRow">
+          <button class="btn" id="btnTheme">🌙 <span id="btnThemeTxt">Dark</span></button>
+          <button class="btn" id="btnLang">🇸🇦 <span id="btnLangTxt">AR</span></button>
+          <button class="btn primary" id="btnNewTicket">＋ <span id="btnNewTicketTxt">New Ticket</span></button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <div class="h" id="pageTitle">Dashboard</div>
+          <div class="p" id="pageSub">Monitor CX performance, ticket flow, and branch replies.</div>
+        </div>
+        <div class="topActions">
+          <div class="search">
+            🔎
+            <input id="globalSearch" placeholder="Search tickets, branches, customers..." />
+            <span class="pill" id="searchHint">Ctrl/⌘ K</span>
+          </div>
+          <button class="btn" id="btnExport">⬇️ <span id="btnExportTxt">Export</span></button>
+          <button class="btn" id="btnMockReply">✉️ <span id="btnMockReplyTxt">Simulate Branch Reply</span></button>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <section id="view-dashboard">
+        <div class="grid">
+          <div class="card">
+            <div class="cardHeader">
+              <div>
+                <div class="h" id="kpiHeader">Today Overview</div>
+                <div class="s" id="kpiSub">Live snapshot (demo data)</div>
+              </div>
+              <span class="badge" id="kpiNote">Ready for Microsoft integration</span>
+            </div>
+            <div class="cardBody">
+              <div class="kpis">
+                <div class="kpi">
+                  <div class="v" id="kpiOpen">0</div>
+                  <div class="l" id="kpiOpenL">Open Tickets</div>
+                  <div class="trend" id="kpiOpenT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiReplied">0</div>
+                  <div class="l" id="kpiRepliedL">Branch Replied</div>
+                  <div class="trend" id="kpiRepliedT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiSla">0%</div>
+                  <div class="l" id="kpiSlaL">SLA Compliance</div>
+                  <div class="trend" id="kpiSlaT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiAvg">0h</div>
+                  <div class="l" id="kpiAvgL">Avg Response</div>
+                  <div class="trend" id="kpiAvgT">—</div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px" class="chart">
+                <div class="bars" id="bars"></div>
+                <div class="barLabel">
+                  <span id="chartLeft">Ticket Volume (last 7 days)</span>
+                  <span id="chartRight">Demo</span>
+                </div>
+              </div>
+
+              <div class="footerNote" id="dashNote">
+                This is a UI demo. Replace the local data with Microsoft Dataverse / SharePoint / Graph APIs later.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="cardHeader">
+              <div>
+                <div class="h" id="quickHeader">Quick Actions</div>
+                <div class="s" id="quickSub">What do you want to do now?</div>
+              </div>
+            </div>
+            <div class="cardBody">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button class="btn primary" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
+                <button class="btn" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
+                <button class="btn" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
+                <div class="panel" style="margin-top:6px">
+                  <div class="ph" id="tipHeader">Integration Tip</div>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.6" id="tipBody">
+                    When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TICKETS -->
+      <section id="view-tickets" style="display:none">
+        <div class="ticketsLayout">
+          <div class="list">
+            <div class="listTop">
+              <select id="filterStatus">
+                <option value="all">All Status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Replied">Replied</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <select id="filterPriority">
+                <option value="all">All Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <input class="chipInput" id="filterBranch" placeholder="Branch contains..." />
+              <span class="badge" id="resultCount">0 tickets</span>
+            </div>
+            <div class="rows" id="ticketRows"></div>
+          </div>
+
+          <div class="detail">
+            <div class="detailHead">
+              <div class="left">
+                <div class="h" id="detailTitle">Select a ticket</div>
+                <div class="s" id="detailSub">Open a ticket to view details, timeline, and reply info.</div>
+              </div>
+              <div class="actions">
+                <button class="btn" id="btnAssign">👤 <span id="btnAssignTxt">Assign</span></button>
+                <button class="btn" id="btnClose">✅ <span id="btnCloseTxt">Close</span></button>
+                <button class="btn primary" id="btnAddNote">📝 <span id="btnAddNoteTxt">Add Note</span></button>
+              </div>
+            </div>
+            <div class="twoCols">
+              <div class="panel">
+                <div class="ph" id="panelInfoH">Ticket Info</div>
+                <div class="kv" id="ticketInfo"></div>
+              </div>
+              <div class="panel">
+                <div class="ph" id="panelDescH">Description</div>
+                <div style="color:var(--muted);font-size:13px;line-height:1.6" id="ticketDesc">—</div>
+              </div>
+              <div class="panel">
+                <div class="ph" id="panelReplyH">Branch Reply</div>
+                <div style="display:flex;gap:10px;flex-direction:column">
+                  <textarea class="textarea" id="branchReply" placeholder="Branch reply will appear here..."></textarea>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn primary" id="btnSaveReply">💾 <span id="btnSaveReplyTxt">Save Reply</span></button>
+                    <button class="btn" id="btnMarkReplied">✳️ <span id="btnMarkRepliedTxt">Mark as Replied</span></button>
+                  </div>
+                  <div style="color:var(--muted2);font-size:12px" id="replyMeta">—</div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="ph" id="panelTimelineH">Timeline</div>
+                <div class="timeline" id="timeline"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footerNote" id="ticketsNote">
+          Demo only. For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="view-reports" style="display:none">
+        <div class="card" style="margin-top:16px">
+          <div class="cardHeader">
+            <div>
+              <div class="h" id="reportsH">Reports</div>
+              <div class="s" id="reportsS">Placeholder section (ready for Power BI / analytics)</div>
+            </div>
+            <span class="badge">Coming soon</span>
+          </div>
+          <div class="cardBody">
+            <div class="panel">
+              <div class="ph" id="reportsTipH">What you can add here</div>
+              <div style="color:var(--muted);font-size:13px;line-height:1.7" id="reportsTip">
+                • Branch ranking (Google reviews, survey scores)<br/>
+                • SLA compliance by region/brand<br/>
+                • Top complaint categories and trends<br/>
+                • Export to Excel / PDF<br/>
+                • Embed Power BI (later)
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="view-settings" style="display:none">
+        <div class="card" style="margin-top:16px">
+          <div class="cardHeader">
+            <div>
+              <div class="h" id="settingsH">Settings</div>
+              <div class="s" id="settingsS">Customize this portal UI</div>
+            </div>
+          </div>
+          <div class="cardBody">
+            <div class="panel">
+              <div class="ph" id="brandingH">Branding</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <input class="chipInput" id="brandInput" placeholder="Portal title (e.g., PFC CX Portal)" style="min-width:280px"/>
+                <button class="btn primary" id="saveBrand">💾 <span id="saveBrandTxt">Save</span></button>
+                <span class="badge" id="brandingNote">Saved in localStorage</span>
+              </div>
+              <div style="margin-top:10px;color:var(--muted);font-size:13px" id="brandingS">
+                This is a demo. Later, branding can be stored in Dataverse settings or SharePoint list.
+              </div>
+            </div>
+
+            <div class="panel" style="margin-top:12px">
+              <div class="ph" id="integrationH">Microsoft Integration (Later)</div>
+              <div style="color:var(--muted);font-size:13px;line-height:1.7" id="integrationS">
+                Recommended architecture (free to start):
+                <br/>• Azure Static Web Apps / Cloudflare Pages hosting
+                <br/>• Azure AD login (SSO)
+                <br/>• Dataverse (preferred) or SharePoint list as ticket store
+                <br/>• Power Automate / Graph API to capture branch email replies + attachments
+                <br/>• Store attachments in SharePoint/Dataverse and show them in ticket details
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+
+  const I18N = {
+    en: {
+      brandTitle:"CX Portal",
+      brandSub:"Tickets • Branch Replies • Reports",
+      Dashboard:"Dashboard",
+      Tickets:"Tickets",
+      Reports:"Reports",
+      Settings:"Settings",
+      pageDash:"Dashboard",
+      pageDashSub:"Monitor CX performance, ticket flow, and branch replies.",
+      pageTickets:"Tickets Inbox",
+      pageTicketsSub:"Search, filter, assign, and update branch replies in one place.",
+      pageReports:"Reports",
+      pageReportsSub:"Analytics area (ready for Power BI).",
+      pageSettings:"Settings",
+      pageSettingsSub:"Customize portal language, theme, and branding.",
+      newTicket:"New Ticket",
+      export:"Export",
+      simReply:"Simulate Branch Reply",
+      quick:"Quick Actions",
+      goInbox:"Go to Tickets Inbox",
+      openReports:"Open Reports",
+      customize:"Customize UI",
+      tipH:"Integration Tip",
+      tipBody:"When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.",
+      today:"Today Overview",
+      live:"Live snapshot (demo data)",
+      open:"Open Tickets",
+      replied:"Branch Replied",
+      sla:"SLA Compliance",
+      avg:"Avg Response",
+      chartLeft:"Ticket Volume (last 7 days)",
+      ticketsNote:"Demo only. For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.",
+      selectTicket:"Select a ticket",
+      selectTicketSub:"Open a ticket to view details, timeline, and reply info.",
+      assign:"Assign",
+      close:"Close",
+      addNote:"Add Note",
+      info:"Ticket Info",
+      desc:"Description",
+      reply:"Branch Reply",
+      saveReply:"Save Reply",
+      markReplied:"Mark as Replied",
+      settingsH:"Settings",
+      settingsS:"Customize this portal UI",
+      brandingH:"Branding",
+      save:"Save",
+      integrationH:"Microsoft Integration (Later)"
+    },
+    ar: {
+      brandTitle:"بوابة تجارب العملاء",
+      brandSub:"التذاكر • ردود الفروع • التقارير",
+      Dashboard:"لوحة التحكم",
+      Tickets:"التذاكر",
+      Reports:"التقارير",
+      Settings:"الإعدادات",
+      pageDash:"لوحة التحكم",
+      pageDashSub:"تابع أداء تجارب العملاء، حركة التذاكر، وردود الفروع.",
+      pageTickets:"صندوق التذاكر",
+      pageTicketsSub:"بحث وفلاتر وتعيين مسؤول وتحديث ردود الفروع من مكان واحد.",
+      pageReports:"التقارير",
+      pageReportsSub:"قسم التحليلات (جاهز لـ Power BI).",
+      pageSettings:"الإعدادات",
+      pageSettingsSub:"تحكم باللغة والثيم والهوية.",
+      newTicket:"تذكرة جديدة",
+      export:"تصدير",
+      simReply:"محاكاة رد فرع",
+      quick:"إجراءات سريعة",
+      goInbox:"الذهاب لصندوق التذاكر",
+      openReports:"فتح التقارير",
+      customize:"تخصيص الواجهة",
+      tipH:"نصيحة ربط",
+      tipBody:"عند الجاهزية: استخدم Azure AD + Microsoft Graph لقراءة ردود الفروع من الإيميل، ثم خزّن الردود والمرفقات في SharePoint/Dataverse واعرضها هنا.",
+      today:"ملخص اليوم",
+      live:"بيانات تجريبية (ديمو)",
+      open:"تذاكر مفتوحة",
+      replied:"تم الرد من الفرع",
+      sla:"الالتزام بـ SLA",
+      avg:"متوسط الرد",
+      chartLeft:"حجم التذاكر (آخر 7 أيام)",
+      ticketsNote:"ديمو فقط. للربط الحقيقي مع ردود الإيميل والمرفقات: Graph + SharePoint/Dataverse.",
+      selectTicket:"اختر تذكرة",
+      selectTicketSub:"افتح تذكرة لعرض التفاصيل والتايم لاين ومعلومات الرد.",
+      assign:"تعيين",
+      close:"إغلاق",
+      addNote:"إضافة ملاحظة",
+      info:"معلومات التذكرة",
+      desc:"الوصف",
+      reply:"رد الفرع",
+      saveReply:"حفظ الرد",
+      markReplied:"تحديد كـ تم الرد",
+      settingsH:"الإعدادات",
+      settingsS:"خصص هذه البوابة",
+      brandingH:"الهوية",
+      save:"حفظ",
+      integrationH:"الربط مع Microsoft (لاحقًا)"
+    }
+  };
+
+  const BRANCHES = [
+    "Khamis Mushayt","Al Marwa","Mohammadiah","Red Sea","Clock Tower","Jizan","Shawqia","Naseem",
+    "Salamah","Terra Mall","Qurtoba","Obhour","Baghdadiah","Al Awali","Al Samer","Al Ghadeer",
+    "Anas Bin Malik","Al Yaqout","Dammam","Mercado","Buraydah","Uthman Ibn Affan","Riyadh Park",
+    "Al Tahliah","Al Aziziah","Mall of Arabia","Al Khalidiyyah","Al Sharaya","Hamdaniah","Rawabi",
+    "Al Mabouth","Al Marwa 2","Jeddah Center","Taif","Madinah","Khobar","Hail","Yanbu",
+    "Qassim","Jubail","Makkah","Tabuk","Abha","Najran","Sakaka","Al Bahah",
+    "Al Qunfudhah","Al Lith","Arar","Rafha","Dawadmi","Afif","Al Kharj","Al Majmaah",
+    "Al Zulfi","Riyadh North","Riyadh East","Riyadh West","Jeddah North","Jeddah South","Jeddah East",
+    "Jeddah West"
+  ];
+
+  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+  function pad(n){ return String(n).padStart(2,'0') }
+  function fmtDate(d){
+    const dt = new Date(d);
+    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  }
+  function uid(){
+    return "TKT-" + Math.floor(100000 + Math.random()*900000);
+  }
+
+  const demoTickets = ()=>{
+    const statuses = ["Open","In Progress","Replied","Closed"];
+    const prios = ["High","Medium","Low"];
+    const cats = ["Food Quality","Service Quality","Order Delay","Wrong Order","Foreign Object","Atmosphere"];
+    const sources = ["Google review","Dine In Survey","App Survey","Call Center","WhatsApp","Email","Meta Business"];
+    const names = ["Ahmed","Khalid","Sara","Maha","Fahad","Huda","Noura","Abdullah","Yousef","Reem"];
+    const notes = [
+      "Customer reported cold food and delay.",
+      "Customer complained about portion quantity issue.",
+      "Customer mentioned hair found in soup.",
+      "Wrong order delivered; missing items.",
+      "Service quality issue with cashier attitude.",
+      "Food tasted old/dry; not like usual."
+    ];
+    const now = Date.now();
+    const arr = [];
+    for(let i=0;i<48;i++){
+      const created = now - Math.floor(Math.random()*1000*60*60*72);
+      const st = rand(statuses);
+      const pr = rand(prios);
+      const br = rand(BRANCHES);
+      const id = uid();
+      const subj = `${id} • ${rand(cats)} • ${br}`;
+      arr.push({
+        id,
+        subject: subj,
+        status: st,
+        priority: pr,
+        branch: br,
+        category: rand(cats),
+        source: rand(sources),
+        customerName: rand(names),
+        customerPhone: "05" + Math.floor(10000000 + Math.random()*89999999),
+        createdAt: created,
+        assignedTo: Math.random()>.6 ? rand(["CX - Thamer","CX - Ahmed","Ops - Salem","QA - Areej"]) : "",
+        description: rand(notes),
+        branchReply: st==="Replied"||st==="Closed" ? "تم التواصل مع العميل واتخذنا الإجراء اللازم." : "",
+        replyBy: st==="Replied"||st==="Closed" ? rand(["branch@company.com","supervisor@company.com"]) : "",
+        replyAt: st==="Replied"||st==="Closed" ? (created + Math.floor(Math.random()*1000*60*60*10)) : null,
+        timeline: [
+          {t:"Ticket created", d:`Created from ${rand(sources)}.`, m: fmtDate(created)},
+        ]
+      });
+    }
+    // add some timeline events
+    arr.forEach(t=>{
+      if(Math.random()>.55){
+        const ts = t.createdAt + Math.floor(Math.random()*1000*60*60*4);
+        t.timeline.push({t:"Assigned", d: t.assignedTo?`Assigned to ${t.assignedTo}.`:"Auto triage pending.", m: fmtDate(ts)});
+      }
+      if(t.replyAt){
+        t.timeline.push({t:"Branch replied", d: t.branchReply || "Branch reply received.", m: fmtDate(t.replyAt)});
+      }
+    })
+    // newest first
+    arr.sort((a,b)=>b.createdAt-a.createdAt);
+    return arr;
+  };
+
+  const STORE_KEY = "cx_portal_demo_state_v1";
+  const defaultState = {
+    lang:"en",
+    theme:"dark",
+    brandTitle:I18N.en.brandTitle,
+    tickets: demoTickets(),
+    selectedId: null
+  };
+  const state = (()=> {
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return defaultState;
+      const parsed = JSON.parse(raw);
+      return {...defaultState, ...parsed};
+    }catch{ return defaultState; }
+  })();
+  const saveState = ()=> localStorage.setItem(STORE_KEY, JSON.stringify(state));
+
+  function applyLang(){
+    const dict = I18N[state.lang];
+    $("brandTitle").textContent = state.brandTitle || dict.brandTitle;
+    $("brandSub").textContent = dict.brandSub;
+
+    document.querySelector('[data-view="dashboard"] .left div:last-child').textContent = dict.Dashboard;
+    document.querySelector('[data-view="tickets"] .left div:last-child').textContent = dict.Tickets;
+    document.querySelector('[data-view="reports"] .left div:last-child').textContent = dict.Reports;
+    document.querySelector('[data-view="settings"] .left div:last-child').textContent = dict.Settings;
+
+    $("btnNewTicketTxt").textContent = dict.newTicket;
+    $("btnExportTxt").textContent = dict.export;
+    $("btnMockReplyTxt").textContent = dict.simReply;
+
+    $("kpiHeader").textContent = dict.today;
+    $("kpiSub").textContent = dict.live;
+    $("kpiOpenL").textContent = dict.open;
+    $("kpiRepliedL").textContent = dict.replied;
+    $("kpiSlaL").textContent = dict.sla;
+    $("kpiAvgL").textContent = dict.avg;
+    $("chartLeft").textContent = dict.chartLeft;
+
+    $("quickHeader").textContent = dict.quick;
+    $("goTicketsTxt").textContent = dict.goInbox;
+    $("goReportsTxt").textContent = dict.openReports;
+    $("goSettingsTxt").textContent = dict.customize;
+    $("tipHeader").textContent = dict.tipH;
+    $("tipBody").textContent = dict.tipBody;
+
+    $("ticketsNote").textContent = dict.ticketsNote;
+    $("detailTitle").textContent = dict.selectTicket;
+    $("detailSub").textContent = dict.selectTicketSub;
+    $("btnAssignTxt").textContent = dict.assign;
+    $("btnCloseTxt").textContent = dict.close;
+    $("btnAddNoteTxt").textContent = dict.addNote;
+    $("panelInfoH").textContent = dict.info;
+    $("panelDescH").textContent = dict.desc;
+    $("panelReplyH").textContent = dict.reply;
+    $("btnSaveReplyTxt").textContent = dict.saveReply;
+    $("btnMarkRepliedTxt").textContent = dict.markReplied;
+    $("panelTimelineH").textContent = dict.selectTicket.includes("Select") ? "Timeline" : "التايم لاين";
+
+    $("reportsH").textContent = dict.pageReports;
+    $("reportsS").textContent = dict.pageReportsSub;
+
+    $("settingsH").textContent = dict.settingsH;
+    $("settingsS").textContent = dict.settingsS;
+    $("brandingH").textContent = dict.brandingH;
+    $("saveBrandTxt").textContent = dict.save;
+    $("integrationH").textContent = dict.integrationH;
+
+    $("btnLangTxt").textContent = state.lang.toUpperCase();
+    $("btnLang").innerHTML = (state.lang==="ar" ? "🇸🇦" : "🇺🇸") + " <span id='btnLangTxt'>" + state.lang.toUpperCase() + "</span>";
+
+    // direction
+    document.body.setAttribute("dir", state.lang==="ar" ? "rtl" : "ltr");
+  }
+
+  function applyTheme(){
+    document.body.setAttribute("data-theme", state.theme);
+    const isDark = state.theme === "dark";
+    $("btnThemeTxt").textContent = isDark ? "Dark" : "Light";
+    $("btnTheme").innerHTML = (isDark ? "🌙" : "☀️") + " <span id='btnThemeTxt'>" + (isDark ? "Dark" : "Light") + "</span>";
+  }
+
+  function setView(view){
+    const dict = I18N[state.lang];
+    const views = ["dashboard","tickets","reports","settings"];
+    views.forEach(v=>{
+      $("view-"+v).style.display = (v===view) ? "" : "none";
+      document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v===view);
+    });
+    if(view==="dashboard"){
+      $("pageTitle").textContent = dict.pageDash;
+      $("pageSub").textContent = dict.pageDashSub;
+    }
+    if(view==="tickets"){
+      $("pageTitle").textContent = dict.pageTickets;
+      $("pageSub").textContent = dict.pageTicketsSub;
+      renderTickets();
+    }
+    if(view==="reports"){
+      $("pageTitle").textContent = dict.pageReports;
+      $("pageSub").textContent = dict.pageReportsSub;
+    }
+    if(view==="settings"){
+      $("pageTitle").textContent = dict.pageSettings;
+      $("pageSub").textContent = dict.pageSettingsSub;
+      $("brandInput").value = state.brandTitle || I18N[state.lang].brandTitle;
+    }
+  }
+
+  function statusBadgeClass(s){
+    if(s==="Replied") return "good";
+    if(s==="In Progress") return "warn";
+    if(s==="Open") return "warn";
+    if(s==="Closed") return "badge";
+    return "badge";
+  }
+  function prioBadgeClass(p){
+    if(p==="High") return "bad";
+    if(p==="Medium") return "warn";
+    return "good";
+  }
+
+  function computeKPIs(){
+    const t = state.tickets;
+    const open = t.filter(x=>x.status==="Open"||x.status==="In Progress").length;
+    const replied = t.filter(x=>x.status==="Replied"||x.status==="Closed").length;
+
+    // demo SLA
+    const sla = Math.max(78, Math.min(98, Math.round(80 + Math.random()*18)));
+    // demo avg response
+    const avg = Math.max(1, Math.min(18, Math.round(2 + Math.random()*10)));
+
+    $("kpiOpen").textContent = open;
+    $("kpiReplied").textContent = replied;
+    $("kpiSla").textContent = sla + "%";
+    $("kpiAvg").textContent = avg + "h";
+
+    $("kpiOpenT").textContent = "+ " + Math.round(Math.random()*8) + " today";
+    $("kpiRepliedT").textContent = "+ " + Math.round(Math.random()*8) + " today";
+    $("kpiSlaT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*3) + "% vs last week";
+    $("kpiAvgT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*2) + "h vs last week";
+
+    // chart bars
+    const bars = $("bars");
+    bars.innerHTML = "";
+    for(let i=0;i<7;i++){
+      const h = 20 + Math.round(Math.random()*80);
+      const el = document.createElement("div");
+      el.className="bar";
+      el.style.height = h + "%";
+      bars.appendChild(el);
+    }
+  }
+
+  function filterTickets(){
+    const q = ($("globalSearch").value || "").toLowerCase().trim();
+    const status = $("filterStatus").value;
+    const prio = $("filterPriority").value;
+    const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
+
+    return state.tickets.filter(t=>{
+      const hay = (t.id+" "+t.subject+" "+t.branch+" "+t.customerName+" "+t.customerPhone+" "+t.category+" "+t.source+" "+t.description).toLowerCase();
+      if(q && !hay.includes(q)) return false;
+      if(status!=="all" && t.status!==status) return false;
+      if(prio!=="all" && t.priority!==prio) return false;
+      if(branchQ && !t.branch.toLowerCase().includes(branchQ)) return false;
+      return true;
+    });
+  }
+
+  function renderTickets(){
+    const rows = $("ticketRows");
+    const list = filterTickets();
+    $("resultCount").textContent = list.length + " tickets";
+
+    // set default selected
+    if(!state.selectedId && list[0]) state.selectedId = list[0].id;
+
+    rows.innerHTML = "";
+    list.forEach(t=>{
+      const r = document.createElement("div");
+      r.className = "row" + (t.id===state.selectedId ? " active" : "");
+      r.onclick = ()=>{ state.selectedId = t.id; saveState(); renderTickets(); renderDetail(); };
+
+      const left = document.createElement("div");
+      left.className="meta";
+
+      const title = document.createElement("div");
+      title.className="t";
+      title.textContent = t.subject;
+
+      const b = document.createElement("div");
+      b.className="b";
+      b.innerHTML = `
+        <span class="badge ${prioBadgeClass(t.priority)}">${t.priority}</span>
+        <span class="badge ${statusBadgeClass(t.status)}">${t.status}</span>
+        <span class="badge">${t.branch}</span>
+      `;
+
+      left.appendChild(title);
+      left.appendChild(b);
+
+      const right = document.createElement("div");
+      right.className="rightMeta";
+      right.innerHTML = `<div>${t.id}</div><div>${fmtDate(t.createdAt)}</div>`;
+
+      r.appendChild(left);
+      r.appendChild(right);
+      rows.appendChild(r);
+    });
+
+    renderDetail();
+  }
+
+  function renderDetail(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t){
+      $("ticketInfo").innerHTML = "";
+      $("ticketDesc").textContent = "—";
+      $("branchReply").value = "";
+      $("replyMeta").textContent = "—";
+      $("timeline").innerHTML = "";
+      return;
+    }
+    $("detailTitle").textContent = t.subject;
+    $("detailSub").textContent = t.id + " • " + t.branch + " • " + t.status;
+
+    const info = [
+      ["Ticket", t.id],
+      ["Status", t.status],
+      ["Priority", t.priority],
+      ["Branch", t.branch],
+      ["Category", t.category],
+      ["Source", t.source],
+      ["Customer", t.customerName],
+      ["Phone", t.customerPhone],
+      ["Assigned", t.assignedTo || "—"],
+      ["Created", fmtDate(t.createdAt)]
+    ];
+    $("ticketInfo").innerHTML = info.map(([k,v])=>`<div><b>${k}:</b> ${v}</div>`).join("");
+
+    $("ticketDesc").textContent = t.description || "—";
+    $("branchReply").value = t.branchReply || "";
+    $("replyMeta").textContent = t.replyAt ? (`Reply by ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`) : "No branch reply yet.";
+
+    // timeline
+    const tl = $("timeline");
+    tl.innerHTML = "";
+    (t.timeline||[]).forEach(ev=>{
+      const wrap = document.createElement("div");
+      wrap.className="event";
+      wrap.innerHTML = `
+        <div class="dot"></div>
+        <div class="box">
+          <div class="t">${ev.t}</div>
+          <div class="d">${ev.d}</div>
+          <div class="m">${ev.m}</div>
+        </div>
+      `;
+      tl.appendChild(wrap);
+    });
+  }
+
+  function createTicket(){
+    const now = Date.now();
+    const id = uid();
+    const br = rand(BRANCHES);
+    const t = {
+      id,
+      subject: `${id} • Food Quality • ${br}`,
+      status:"Open",
+      priority: rand(["High","Medium","Low"]),
+      branch: br,
+      category: rand(["Food Quality","Service Quality","Order Delay","Wrong Order"]),
+      source: rand(["Google review","WhatsApp","App Survey","Call Center","Email"]),
+      customerName: rand(["Ahmed","Khalid","Sara","Maha","Fahad","Huda"]),
+      customerPhone: "05" + Math.floor(10000000 + Math.random()*89999999),
+      createdAt: now,
+      assignedTo:"",
+      description: "New ticket created from portal (demo). Replace with SharePoint/Dataverse create later.",
+      branchReply:"",
+      replyBy:"",
+      replyAt:null,
+      timeline:[{t:"Ticket created", d:"Created from Portal (demo).", m: fmtDate(now)}]
+    };
+    state.tickets.unshift(t);
+    state.selectedId = id;
+    saveState();
+    computeKPIs();
+    setView("tickets");
+  }
+
+  function simulateBranchReply(){
+    const t = state.tickets.find(x=>x.id===state.selectedId) || state.tickets[0];
+    if(!t) return;
+    const now = Date.now();
+    t.branchReply = state.lang==="ar"
+      ? "تم التواصل مع العميل، وتم التعويض حسب السياسة، وتم التأكيد على الفريق بالالتزام بالجودة."
+      : "Branch contacted the customer, provided compensation as per policy, and reinforced quality standards with the team.";
+    t.replyBy = "branch.supervisor@company.com";
+    t.replyAt = now;
+    t.status = "Replied";
+    t.timeline = t.timeline || [];
+    t.timeline.push({t:"Branch replied", d:"Reply captured (demo).", m: fmtDate(now)});
+    saveState();
+    computeKPIs();
+    renderTickets();
+  }
+
+  function saveReply(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t) return;
+    t.branchReply = $("branchReply").value || "";
+    if(t.branchReply && !t.replyAt){
+      t.replyAt = Date.now();
+      t.replyBy = "branch@company.com";
+      t.timeline.push({t:"Branch reply saved", d:"Reply text saved from portal (demo).", m: fmtDate(t.replyAt)});
+    }
+    saveState();
+    renderDetail();
+    computeKPIs();
+  }
+  function markReplied(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t) return;
+    t.status = "Replied";
+    t.timeline.push({t:"Status updated", d:"Marked as Replied.", m: fmtDate(Date.now())});
+    saveState();
+    renderTickets();
+    computeKPIs();
+  }
+  function closeTicket(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t) return;
+    t.status = "Closed";
+    t.timeline.push({t:"Ticket closed", d:"Closed by CX (demo).", m: fmtDate(Date.now())});
+    saveState();
+    renderTickets();
+    computeKPIs();
+  }
+  function assignTicket(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t) return;
+    const assignees = ["CX - Thamer","CX - Ahmed","Ops - Salem","QA - Areej"];
+    t.assignedTo = rand(assignees);
+    t.timeline.push({t:"Assigned", d:`Assigned to ${t.assignedTo}.`, m: fmtDate(Date.now())});
+    saveState();
+    renderDetail();
+  }
+  function addNote(){
+    const t = state.tickets.find(x=>x.id===state.selectedId);
+    if(!t) return;
+    const note = prompt(state.lang==="ar" ? "اكتب ملاحظة:" : "Write a note:");
+    if(!note) return;
+    t.timeline.push({t:"Internal note", d: note.replaceAll("<","&lt;"), m: fmtDate(Date.now())});
+    saveState();
+    renderDetail();
+  }
+
+  function exportJSON(){
+    const data = {
+      exportedAt: new Date().toISOString(),
+      tickets: state.tickets
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cx_portal_export.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // keyboard shortcuts
+  document.addEventListener("keydown", (e)=>{
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
+      e.preventDefault();
+      $("globalSearch").focus();
+    }
+  });
+
+  // nav
+  document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.addEventListener("click", ()=> setView(btn.dataset.view));
+  });
+  $("goTickets").onclick = ()=> setView("tickets");
+  $("goReports").onclick = ()=> setView("reports");
+  $("goSettings").onclick = ()=> setView("settings");
+
+  // filters
+  ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
+    $(id).addEventListener("input", ()=> renderTickets());
+    $(id).addEventListener("change", ()=> renderTickets());
+  });
+
+  $("globalSearch").addEventListener("input", ()=>{
+    // if not in tickets, still allow searching then jump to tickets
+    renderTickets();
+  });
+
+  // buttons
+  $("btnTheme").onclick = ()=>{
+    state.theme = (state.theme==="dark") ? "light" : "dark";
+    saveState(); applyTheme();
+  };
+  $("btnLang").onclick = ()=>{
+    state.lang = (state.lang==="en") ? "ar" : "en";
+    saveState(); applyLang(); computeKPIs(); renderTickets(); setView(currentView());
+  };
+  $("btnNewTicket").onclick = createTicket;
+  $("btnMockReply").onclick = simulateBranchReply;
+  $("btnExport").onclick = exportJSON;
+
+  $("btnSaveReply").onclick = saveReply;
+  $("btnMarkReplied").onclick = markReplied;
+  $("btnClose").onclick = closeTicket;
+  $("btnAssign").onclick = assignTicket;
+  $("btnAddNote").onclick = addNote;
+
+  $("saveBrand").onclick = ()=>{
+    const v = $("brandInput").value.trim();
+    if(v){
+      state.brandTitle = v;
+      saveState();
+      applyLang();
+      alert(state.lang==="ar" ? "تم حفظ الهوية ✅" : "Brand saved ✅");
+    }
+  };
+
+  function currentView(){
+    const dash = $("view-dashboard").style.display !== "none";
+    const tic = $("view-tickets").style.display !== "none";
+    const rep = $("view-reports").style.display !== "none";
+    const set = $("view-settings").style.display !== "none";
+    if(tic) return "tickets";
+    if(rep) return "reports";
+    if(set) return "settings";
+    return "dashboard";
+  }
+
+  // init
+  applyTheme();
+  applyLang();
+  computeKPIs();
+  setView("dashboard");
+
+})();
+</script>
+</body>
+</html>
