@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CX Portal — Tickets Dashboard</title>
   <meta name="description" content="Customer Experience Ticketing Portal (Demo UI) — Ready for Microsoft integration." />
+
+  <!-- Arabic-friendly font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{
       --bg: #0b1020;
@@ -24,7 +33,9 @@
       --shadow: 0 12px 30px rgba(0,0,0,.35);
       --radius: 18px;
       --radius2: 26px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+
+      /* 👇 FIX: Arabic-friendly font stack */
+      --font: "Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
     }
     [data-theme="light"]{
       --bg: #f7f8ff;
@@ -40,6 +51,7 @@
       --brand: #0ea5e9;
       --brand2:#7c3aed;
     }
+
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
@@ -54,6 +66,11 @@
       overflow-x:hidden;
     }
     a{ color:inherit; text-decoration:none }
+
+    /* FIX: better Arabic rendering */
+    body, input, textarea, select, button { font-family: var(--font); }
+    [dir="rtl"] body { letter-spacing: 0; }
+
     .app{
       display:grid;
       grid-template-columns: 290px 1fr;
@@ -140,9 +157,8 @@
       border-color: rgba(110,231,255,.28);
     }
 
-    .main{
-      padding:18px 18px 28px 18px;
-    }
+    .main{ padding:18px 18px 28px 18px; }
+
     .topbar{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:14px 14px;
@@ -152,9 +168,7 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
     }
-    .topbar .title{
-      display:flex; flex-direction:column;
-    }
+    .topbar .title{ display:flex; flex-direction:column; }
     .topbar .title .h{ font-weight:850; font-size:18px }
     .topbar .title .p{ color: var(--muted); font-size:13px; margin-top:2px }
     .topActions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
@@ -175,6 +189,7 @@
       color: var(--text);
       font-size:14px;
     }
+
     .grid{
       margin-top:16px;
       display:grid;
@@ -319,6 +334,7 @@
     }
     .detailHead .left .s{ color: var(--muted); font-size:12px }
     .detailHead .actions{ display:flex; gap:8px; flex-wrap:wrap }
+
     .twoCols{
       display:grid;
       grid-template-columns: 1fr;
@@ -357,13 +373,9 @@
       font-size:13px;
     }
     [data-theme="light"] .textarea{ background: rgba(10,20,60,.02) }
-    .timeline{
-      display:flex; flex-direction:column; gap:10px;
-    }
-    .event{
-      display:flex; gap:10px;
-      align-items:flex-start;
-    }
+
+    .timeline{ display:flex; flex-direction:column; gap:10px; }
+    .event{ display:flex; gap:10px; align-items:flex-start; }
     .dot{
       width:10px; height:10px; border-radius:999px;
       margin-top:6px;
@@ -393,11 +405,7 @@
       overflow:hidden;
     }
     [data-theme="light"] .chart{ background: rgba(10,20,60,.02) }
-    .bars{
-      display:flex; gap:10px; align-items:flex-end;
-      height:100%;
-      padding:10px;
-    }
+    .bars{ display:flex; gap:10px; align-items:flex-end; height:100%; padding:10px; }
     .bar{
       flex:1;
       border-radius: 12px 12px 6px 6px;
@@ -412,7 +420,6 @@
       color: var(--muted2);
       font-size:11px;
     }
-
     .footerNote{
       margin-top:14px;
       color: var(--muted2);
@@ -420,12 +427,20 @@
       text-align:center;
     }
 
-    /* RTL */
+    /* ✅ RTL FIXES */
     [dir="rtl"] .app{ grid-template-columns: 1fr 290px; }
     [dir="rtl"] .sidebar{ border-right:none; border-left:1px solid var(--stroke); }
     [dir="rtl"] .brandRow{ padding-right:10px; padding-left:10px }
+    [dir="rtl"] .topbar{ direction: rtl; }
+    [dir="rtl"] .topActions{ flex-direction: row-reverse; }
+    [dir="rtl"] .search{ direction: rtl; }
+    [dir="rtl"] .row{ direction: rtl; }
     [dir="rtl"] .row .rightMeta{ align-items:flex-start; }
+    [dir="rtl"] .detailHead{ direction: rtl; }
     [dir="rtl"] .detailHead .actions{ justify-content:flex-start; }
+    [dir="rtl"] .kv{ direction: rtl; }
+    [dir="rtl"] .barLabel{ direction: rtl; }
+
     @media (max-width: 1100px){
       .app{ grid-template-columns: 1fr; }
       .sidebar{ position:relative; height:auto; }
@@ -439,7 +454,8 @@
     }
   </style>
 </head>
-<body data-theme="dark" dir="ltr">
+
+<body data-theme="dark">
   <div class="app">
     <aside class="sidebar">
       <div class="brandRow">
@@ -581,19 +597,8 @@
         <div class="ticketsLayout">
           <div class="list">
             <div class="listTop">
-              <select id="filterStatus">
-                <option value="all">All Status</option>
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Replied">Replied</option>
-                <option value="Closed">Closed</option>
-              </select>
-              <select id="filterPriority">
-                <option value="all">All Priority</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
+              <select id="filterStatus"></select>
+              <select id="filterPriority"></select>
               <input class="chipInput" id="filterBranch" placeholder="Branch contains..." />
               <span class="badge" id="resultCount">0 tickets</span>
             </div>
@@ -612,6 +617,7 @@
                 <button class="btn primary" id="btnAddNote">📝 <span id="btnAddNoteTxt">Add Note</span></button>
               </div>
             </div>
+
             <div class="twoCols">
               <div class="panel">
                 <div class="ph" id="panelInfoH">Ticket Info</div>
@@ -709,9 +715,22 @@
   </div>
 
 <script>
-(function(){
+  // =========================
+  // 1) Supabase config
+  // =========================
+const SUPABASE_URL = "https://zwouwfhsorfnhmhvoqsm.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+  // Helper
   const $ = (id)=>document.getElementById(id);
 
+  // =========================
+  // 2) i18n
+  // =========================
   const I18N = {
     en: {
       brandTitle:"CX Portal",
@@ -720,6 +739,7 @@
       Tickets:"Tickets",
       Reports:"Reports",
       Settings:"Settings",
+
       pageDash:"Dashboard",
       pageDashSub:"Monitor CX performance, ticket flow, and branch replies.",
       pageTickets:"Tickets Inbox",
@@ -728,23 +748,30 @@
       pageReportsSub:"Analytics area (ready for Power BI).",
       pageSettings:"Settings",
       pageSettingsSub:"Customize portal language, theme, and branding.",
+
       newTicket:"New Ticket",
       export:"Export",
       simReply:"Simulate Branch Reply",
+
+      searchPH:"Search tickets, branches, customers...",
+      branchPH:"Branch contains...",
+
+      today:"Today Overview",
+      live:"Live snapshot",
+      open:"Open Tickets",
+      replied:"Branch Replied",
+      sla:"SLA Compliance",
+      avg:"Avg Response",
+      chartLeft:"Ticket Volume (last 7 days)",
+
       quick:"Quick Actions",
       goInbox:"Go to Tickets Inbox",
       openReports:"Open Reports",
       customize:"Customize UI",
       tipH:"Integration Tip",
       tipBody:"When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.",
-      today:"Today Overview",
-      live:"Live snapshot (demo data)",
-      open:"Open Tickets",
-      replied:"Branch Replied",
-      sla:"SLA Compliance",
-      avg:"Avg Response",
-      chartLeft:"Ticket Volume (last 7 days)",
-      ticketsNote:"Demo only. For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.",
+
+      ticketsNote:"For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.",
       selectTicket:"Select a ticket",
       selectTicketSub:"Open a ticket to view details, timeline, and reply info.",
       assign:"Assign",
@@ -755,12 +782,43 @@
       reply:"Branch Reply",
       saveReply:"Save Reply",
       markReplied:"Mark as Replied",
+      timeline:"Timeline",
+
+      replyMetaNone:"No branch reply yet.",
+      replyMetaBy:"Reply by",
+
+      reportsTipH:"What you can add here",
       settingsH:"Settings",
       settingsS:"Customize this portal UI",
       brandingH:"Branding",
       save:"Save",
-      integrationH:"Microsoft Integration (Later)"
+      integrationH:"Microsoft Integration (Later)",
+
+      // filters
+      statusAll:"All Status",
+      statusOpen:"Open",
+      statusProgress:"In Progress",
+      statusReplied:"Replied",
+      statusClosed:"Closed",
+
+      prioAll:"All Priority",
+      prioHigh:"High",
+      prioMed:"Medium",
+      prioLow:"Low",
+
+      // ticket fields
+      f_ticket:"Ticket",
+      f_status:"Status",
+      f_priority:"Priority",
+      f_branch:"Branch",
+      f_category:"Category",
+      f_source:"Source",
+      f_customer:"Customer",
+      f_phone:"Phone",
+      f_assigned:"Assigned",
+      f_created:"Created"
     },
+
     ar: {
       brandTitle:"بوابة تجارب العملاء",
       brandSub:"التذاكر • ردود الفروع • التقارير",
@@ -768,6 +826,7 @@
       Tickets:"التذاكر",
       Reports:"التقارير",
       Settings:"الإعدادات",
+
       pageDash:"لوحة التحكم",
       pageDashSub:"تابع أداء تجارب العملاء، حركة التذاكر، وردود الفروع.",
       pageTickets:"صندوق التذاكر",
@@ -776,23 +835,30 @@
       pageReportsSub:"قسم التحليلات (جاهز لـ Power BI).",
       pageSettings:"الإعدادات",
       pageSettingsSub:"تحكم باللغة والثيم والهوية.",
+
       newTicket:"تذكرة جديدة",
       export:"تصدير",
       simReply:"محاكاة رد فرع",
+
+      searchPH:"ابحث عن التذاكر / الفروع / العملاء...",
+      branchPH:"ابحث باسم الفرع...",
+
+      today:"ملخص اليوم",
+      live:"لقطة مباشرة",
+      open:"تذاكر مفتوحة",
+      replied:"تم الرد من الفرع",
+      sla:"الالتزام بـ SLA",
+      avg:"متوسط الرد",
+      chartLeft:"حجم التذاكر (آخر 7 أيام)",
+
       quick:"إجراءات سريعة",
       goInbox:"الذهاب لصندوق التذاكر",
       openReports:"فتح التقارير",
       customize:"تخصيص الواجهة",
       tipH:"نصيحة ربط",
       tipBody:"عند الجاهزية: استخدم Azure AD + Microsoft Graph لقراءة ردود الفروع من الإيميل، ثم خزّن الردود والمرفقات في SharePoint/Dataverse واعرضها هنا.",
-      today:"ملخص اليوم",
-      live:"بيانات تجريبية (ديمو)",
-      open:"تذاكر مفتوحة",
-      replied:"تم الرد من الفرع",
-      sla:"الالتزام بـ SLA",
-      avg:"متوسط الرد",
-      chartLeft:"حجم التذاكر (آخر 7 أيام)",
-      ticketsNote:"ديمو فقط. للربط الحقيقي مع ردود الإيميل والمرفقات: Graph + SharePoint/Dataverse.",
+
+      ticketsNote:"للربط الحقيقي مع ردود الإيميل والمرفقات: Graph + SharePoint/Dataverse.",
       selectTicket:"اختر تذكرة",
       selectTicketSub:"افتح تذكرة لعرض التفاصيل والتايم لاين ومعلومات الرد.",
       assign:"تعيين",
@@ -803,35 +869,59 @@
       reply:"رد الفرع",
       saveReply:"حفظ الرد",
       markReplied:"تحديد كـ تم الرد",
+      timeline:"التايم لاين",
+
+      replyMetaNone:"لا يوجد رد من الفرع حتى الآن.",
+      replyMetaBy:"تم الرد بواسطة",
+
+      reportsTipH:"أفكار تضيفها هنا",
       settingsH:"الإعدادات",
       settingsS:"خصص هذه البوابة",
       brandingH:"الهوية",
       save:"حفظ",
-      integrationH:"الربط مع Microsoft (لاحقًا)"
+      integrationH:"الربط مع Microsoft (لاحقًا)",
+
+      // filters
+      statusAll:"كل الحالات",
+      statusOpen:"مفتوحة",
+      statusProgress:"قيد المعالجة",
+      statusReplied:"تم الرد",
+      statusClosed:"مغلقة",
+
+      prioAll:"كل الأولويات",
+      prioHigh:"عالية",
+      prioMed:"متوسطة",
+      prioLow:"منخفضة",
+
+      // ticket fields
+      f_ticket:"رقم التذكرة",
+      f_status:"الحالة",
+      f_priority:"الأولوية",
+      f_branch:"الفرع",
+      f_category:"التصنيف",
+      f_source:"المصدر",
+      f_customer:"العميل",
+      f_phone:"الجوال",
+      f_assigned:"المسؤول",
+      f_created:"تاريخ الإنشاء"
     }
   };
 
+  // =========================
+  // 3) Demo data (fallback)
+  // =========================
   const BRANCHES = [
     "Khamis Mushayt","Al Marwa","Mohammadiah","Red Sea","Clock Tower","Jizan","Shawqia","Naseem",
     "Salamah","Terra Mall","Qurtoba","Obhour","Baghdadiah","Al Awali","Al Samer","Al Ghadeer",
-    "Anas Bin Malik","Al Yaqout","Dammam","Mercado","Buraydah","Uthman Ibn Affan","Riyadh Park",
-    "Al Tahliah","Al Aziziah","Mall of Arabia","Al Khalidiyyah","Al Sharaya","Hamdaniah","Rawabi",
-    "Al Mabouth","Al Marwa 2","Jeddah Center","Taif","Madinah","Khobar","Hail","Yanbu",
-    "Qassim","Jubail","Makkah","Tabuk","Abha","Najran","Sakaka","Al Bahah",
-    "Al Qunfudhah","Al Lith","Arar","Rafha","Dawadmi","Afif","Al Kharj","Al Majmaah",
-    "Al Zulfi","Riyadh North","Riyadh East","Riyadh West","Jeddah North","Jeddah South","Jeddah East",
-    "Jeddah West"
+    "Anas Bin Malik","Al Yaqout","Dammam","Mercado","Buraydah","Uthman Ibn Affan","Riyadh Park"
   ];
-
   function rand(arr){ return arr[Math.floor(Math.random()*arr.length)] }
   function pad(n){ return String(n).padStart(2,'0') }
   function fmtDate(d){
     const dt = new Date(d);
     return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
   }
-  function uid(){
-    return "TKT-" + Math.floor(100000 + Math.random()*900000);
-  }
+  function uid(){ return "TKT-" + Math.floor(100000 + Math.random()*900000); }
 
   const demoTickets = ()=>{
     const statuses = ["Open","In Progress","Replied","Closed"];
@@ -849,16 +939,15 @@
     ];
     const now = Date.now();
     const arr = [];
-    for(let i=0;i<48;i++){
+    for(let i=0;i<20;i++){
       const created = now - Math.floor(Math.random()*1000*60*60*72);
       const st = rand(statuses);
       const pr = rand(prios);
       const br = rand(BRANCHES);
       const id = uid();
-      const subj = `${id} • ${rand(cats)} • ${br}`;
       arr.push({
         id,
-        subject: subj,
+        subject: `${id} • ${rand(cats)} • ${br}`,
         status: st,
         priority: pr,
         branch: br,
@@ -867,38 +956,29 @@
         customerName: rand(names),
         customerPhone: "05" + Math.floor(10000000 + Math.random()*89999999),
         createdAt: created,
-        assignedTo: Math.random()>.6 ? rand(["CX - Thamer","CX - Ahmed","Ops - Salem","QA - Areej"]) : "",
+        assignedTo: "",
         description: rand(notes),
         branchReply: st==="Replied"||st==="Closed" ? "تم التواصل مع العميل واتخذنا الإجراء اللازم." : "",
-        replyBy: st==="Replied"||st==="Closed" ? rand(["branch@company.com","supervisor@company.com"]) : "",
+        replyBy: st==="Replied"||st==="Closed" ? "branch@company.com" : "",
         replyAt: st==="Replied"||st==="Closed" ? (created + Math.floor(Math.random()*1000*60*60*10)) : null,
-        timeline: [
-          {t:"Ticket created", d:`Created from ${rand(sources)}.`, m: fmtDate(created)},
-        ]
+        timeline: [{t:"Ticket created", d:"Created (demo).", m: fmtDate(created)}]
       });
     }
-    // add some timeline events
-    arr.forEach(t=>{
-      if(Math.random()>.55){
-        const ts = t.createdAt + Math.floor(Math.random()*1000*60*60*4);
-        t.timeline.push({t:"Assigned", d: t.assignedTo?`Assigned to ${t.assignedTo}.`:"Auto triage pending.", m: fmtDate(ts)});
-      }
-      if(t.replyAt){
-        t.timeline.push({t:"Branch replied", d: t.branchReply || "Branch reply received.", m: fmtDate(t.replyAt)});
-      }
-    })
-    // newest first
     arr.sort((a,b)=>b.createdAt-a.createdAt);
     return arr;
   };
 
-  const STORE_KEY = "cx_portal_demo_state_v1";
+  // =========================
+  // 4) State
+  // =========================
+  const STORE_KEY = "cx_portal_state_v2";
   const defaultState = {
     lang:"en",
     theme:"dark",
     brandTitle:I18N.en.brandTitle,
     tickets: demoTickets(),
-    selectedId: null
+    selectedId: null,
+    sourceMode: "demo" // "supabase" when loaded
   };
   const state = (()=> {
     try{
@@ -910,8 +990,81 @@
   })();
   const saveState = ()=> localStorage.setItem(STORE_KEY, JSON.stringify(state));
 
+  // =========================
+  // 5) Supabase loader (reads table tickets)
+  // =========================
+  async function loadTickets(){
+    try{
+      // إذا ما حطيت المفتاح الحقيقي، لا نسوي طلب
+      if(!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE_YOUR")) return;
+
+      const { data, error } = await supabaseClient
+        .from("tickets")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if(error){
+        console.log("Supabase error:", error);
+        return;
+      }
+
+      if(Array.isArray(data) && data.length){
+        // mapping from your table columns
+        // columns in your screenshot: id, created_at, ticket_no, customer_name, customer_phone, branch_name (+ others later)
+        const mapped = data.map(r=>{
+          const tktNo = r.ticket_no ?? "";
+          const ticketId = tktNo ? `#${tktNo}` : (r.id ? String(r.id).slice(0,8) : uid());
+
+          const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+          const branch = r.branch_name || r.branch || "—";
+          const customerName = r.customer_name || "—";
+          const customerPhone = r.customer_phone || r.customer_ph || "—";
+
+          return {
+            id: ticketId,
+            subject: `${ticketId} • ${branch}`,
+            status: r.status || "Open",
+            priority: r.priority || "Medium",
+            branch,
+            category: r.category || r.feedback_cat || "—",
+            source: r.source || r.feedback_type || "—",
+            customerName,
+            customerPhone,
+            createdAt,
+            assignedTo: r.assigned_to || "",
+            description: r.description || r.notes || "—",
+            branchReply: r.branch_reply || "",
+            replyBy: r.reply_by || "",
+            replyAt: r.reply_at ? new Date(r.reply_at).getTime() : null,
+            timeline: [
+              { t: "Ticket created", d: "Loaded from Supabase.", m: fmtDate(createdAt) }
+            ]
+          };
+        });
+
+        state.tickets = mapped;
+        state.sourceMode = "supabase";
+        if(!state.selectedId && mapped[0]) state.selectedId = mapped[0].id;
+        saveState();
+
+        computeKPIs();
+        if(currentView()==="tickets") renderTickets();
+      }
+    } catch (e) {
+      console.log("loadTickets exception:", e);
+    }
+  }
+
+  // =========================
+  // 6) UI functions
+  // =========================
   function applyLang(){
     const dict = I18N[state.lang];
+
+    // ✅ FIX: set lang + dir on <html> (not body)
+    document.documentElement.lang = (state.lang==="ar") ? "ar" : "en";
+    document.documentElement.dir  = (state.lang==="ar") ? "rtl" : "ltr";
+
     $("brandTitle").textContent = state.brandTitle || dict.brandTitle;
     $("brandSub").textContent = dict.brandSub;
 
@@ -924,8 +1077,26 @@
     $("btnExportTxt").textContent = dict.export;
     $("btnMockReplyTxt").textContent = dict.simReply;
 
+    $("globalSearch").placeholder = dict.searchPH;
+    $("filterBranch").placeholder = dict.branchPH;
+
+    // Filters (rebuild options so they translate)
+    $("filterStatus").innerHTML = `
+      <option value="all">${dict.statusAll}</option>
+      <option value="Open">${dict.statusOpen}</option>
+      <option value="In Progress">${dict.statusProgress}</option>
+      <option value="Replied">${dict.statusReplied}</option>
+      <option value="Closed">${dict.statusClosed}</option>
+    `;
+    $("filterPriority").innerHTML = `
+      <option value="all">${dict.prioAll}</option>
+      <option value="High">${dict.prioHigh}</option>
+      <option value="Medium">${dict.prioMed}</option>
+      <option value="Low">${dict.prioLow}</option>
+    `;
+
     $("kpiHeader").textContent = dict.today;
-    $("kpiSub").textContent = dict.live;
+    $("kpiSub").textContent = dict.live + (state.sourceMode==="supabase" ? " • Supabase" : " • Demo");
     $("kpiOpenL").textContent = dict.open;
     $("kpiRepliedL").textContent = dict.replied;
     $("kpiSlaL").textContent = dict.sla;
@@ -940,6 +1111,8 @@
     $("tipBody").textContent = dict.tipBody;
 
     $("ticketsNote").textContent = dict.ticketsNote;
+
+    // Details labels
     $("detailTitle").textContent = dict.selectTicket;
     $("detailSub").textContent = dict.selectTicketSub;
     $("btnAssignTxt").textContent = dict.assign;
@@ -950,7 +1123,7 @@
     $("panelReplyH").textContent = dict.reply;
     $("btnSaveReplyTxt").textContent = dict.saveReply;
     $("btnMarkRepliedTxt").textContent = dict.markReplied;
-    $("panelTimelineH").textContent = dict.selectTicket.includes("Select") ? "Timeline" : "التايم لاين";
+    $("panelTimelineH").textContent = dict.timeline;
 
     $("reportsH").textContent = dict.pageReports;
     $("reportsS").textContent = dict.pageReportsSub;
@@ -961,17 +1134,13 @@
     $("saveBrandTxt").textContent = dict.save;
     $("integrationH").textContent = dict.integrationH;
 
-    $("btnLangTxt").textContent = state.lang.toUpperCase();
+    // Lang button
     $("btnLang").innerHTML = (state.lang==="ar" ? "🇸🇦" : "🇺🇸") + " <span id='btnLangTxt'>" + state.lang.toUpperCase() + "</span>";
-
-    // direction
-    document.body.setAttribute("dir", state.lang==="ar" ? "rtl" : "ltr");
   }
 
   function applyTheme(){
     document.body.setAttribute("data-theme", state.theme);
     const isDark = state.theme === "dark";
-    $("btnThemeTxt").textContent = isDark ? "Dark" : "Light";
     $("btnTheme").innerHTML = (isDark ? "🌙" : "☀️") + " <span id='btnThemeTxt'>" + (isDark ? "Dark" : "Light") + "</span>";
   }
 
@@ -982,6 +1151,7 @@
       $("view-"+v).style.display = (v===view) ? "" : "none";
       document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v===view);
     });
+
     if(view==="dashboard"){
       $("pageTitle").textContent = dict.pageDash;
       $("pageSub").textContent = dict.pageDashSub;
@@ -1016,13 +1186,12 @@
   }
 
   function computeKPIs(){
-    const t = state.tickets;
+    const t = state.tickets || [];
     const open = t.filter(x=>x.status==="Open"||x.status==="In Progress").length;
     const replied = t.filter(x=>x.status==="Replied"||x.status==="Closed").length;
 
-    // demo SLA
+    // demo SLA + avg (later from real data)
     const sla = Math.max(78, Math.min(98, Math.round(80 + Math.random()*18)));
-    // demo avg response
     const avg = Math.max(1, Math.min(18, Math.round(2 + Math.random()*10)));
 
     $("kpiOpen").textContent = open;
@@ -1035,7 +1204,6 @@
     $("kpiSlaT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*3) + "% vs last week";
     $("kpiAvgT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*2) + "h vs last week";
 
-    // chart bars
     const bars = $("bars");
     bars.innerHTML = "";
     for(let i=0;i<7;i++){
@@ -1053,12 +1221,12 @@
     const prio = $("filterPriority").value;
     const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
 
-    return state.tickets.filter(t=>{
+    return (state.tickets||[]).filter(t=>{
       const hay = (t.id+" "+t.subject+" "+t.branch+" "+t.customerName+" "+t.customerPhone+" "+t.category+" "+t.source+" "+t.description).toLowerCase();
       if(q && !hay.includes(q)) return false;
       if(status!=="all" && t.status!==status) return false;
       if(prio!=="all" && t.priority!==prio) return false;
-      if(branchQ && !t.branch.toLowerCase().includes(branchQ)) return false;
+      if(branchQ && !String(t.branch||"").toLowerCase().includes(branchQ)) return false;
       return true;
     });
   }
@@ -1066,9 +1234,8 @@
   function renderTickets(){
     const rows = $("ticketRows");
     const list = filterTickets();
-    $("resultCount").textContent = list.length + " tickets";
+    $("resultCount").textContent = list.length + (state.lang==="ar" ? " تذكرة" : " tickets");
 
-    // set default selected
     if(!state.selectedId && list[0]) state.selectedId = list[0].id;
 
     rows.innerHTML = "";
@@ -1108,7 +1275,8 @@
   }
 
   function renderDetail(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const dict = I18N[state.lang];
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t){
       $("ticketInfo").innerHTML = "";
       $("ticketDesc").textContent = "—";
@@ -1117,28 +1285,31 @@
       $("timeline").innerHTML = "";
       return;
     }
+
     $("detailTitle").textContent = t.subject;
     $("detailSub").textContent = t.id + " • " + t.branch + " • " + t.status;
 
     const info = [
-      ["Ticket", t.id],
-      ["Status", t.status],
-      ["Priority", t.priority],
-      ["Branch", t.branch],
-      ["Category", t.category],
-      ["Source", t.source],
-      ["Customer", t.customerName],
-      ["Phone", t.customerPhone],
-      ["Assigned", t.assignedTo || "—"],
-      ["Created", fmtDate(t.createdAt)]
+      [dict.f_ticket, t.id],
+      [dict.f_status, t.status],
+      [dict.f_priority, t.priority],
+      [dict.f_branch, t.branch],
+      [dict.f_category, t.category],
+      [dict.f_source, t.source],
+      [dict.f_customer, t.customerName],
+      [dict.f_phone, t.customerPhone],
+      [dict.f_assigned, t.assignedTo || "—"],
+      [dict.f_created, fmtDate(t.createdAt)]
     ];
     $("ticketInfo").innerHTML = info.map(([k,v])=>`<div><b>${k}:</b> ${v}</div>`).join("");
 
     $("ticketDesc").textContent = t.description || "—";
     $("branchReply").value = t.branchReply || "";
-    $("replyMeta").textContent = t.replyAt ? (`Reply by ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`) : "No branch reply yet.";
 
-    // timeline
+    $("replyMeta").textContent = t.replyAt
+      ? `${dict.replyMetaBy} ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`
+      : dict.replyMetaNone;
+
     const tl = $("timeline");
     tl.innerHTML = "";
     (t.timeline||[]).forEach(ev=>{
@@ -1166,13 +1337,15 @@
       status:"Open",
       priority: rand(["High","Medium","Low"]),
       branch: br,
-      category: rand(["Food Quality","Service Quality","Order Delay","Wrong Order"]),
-      source: rand(["Google review","WhatsApp","App Survey","Call Center","Email"]),
-      customerName: rand(["Ahmed","Khalid","Sara","Maha","Fahad","Huda"]),
-      customerPhone: "05" + Math.floor(10000000 + Math.random()*89999999),
+      category: "Food Quality",
+      source: "Portal",
+      customerName: "—",
+      customerPhone: "—",
       createdAt: now,
       assignedTo:"",
-      description: "New ticket created from portal (demo). Replace with SharePoint/Dataverse create later.",
+      description: state.lang==="ar"
+        ? "تم إنشاء تذكرة جديدة (ديمو). لاحقًا نربط إنشاء التذاكر في Supabase/Dataverse."
+        : "New ticket created (demo). Later we will insert into Supabase/Dataverse.",
       branchReply:"",
       replyBy:"",
       replyAt:null,
@@ -1186,7 +1359,7 @@
   }
 
   function simulateBranchReply(){
-    const t = state.tickets.find(x=>x.id===state.selectedId) || state.tickets[0];
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId) || (state.tickets||[])[0];
     if(!t) return;
     const now = Date.now();
     t.branchReply = state.lang==="ar"
@@ -1203,20 +1376,20 @@
   }
 
   function saveReply(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
     t.branchReply = $("branchReply").value || "";
     if(t.branchReply && !t.replyAt){
       t.replyAt = Date.now();
       t.replyBy = "branch@company.com";
-      t.timeline.push({t:"Branch reply saved", d:"Reply text saved from portal (demo).", m: fmtDate(t.replyAt)});
+      t.timeline.push({t:"Branch reply saved", d:"Reply saved from portal (demo).", m: fmtDate(t.replyAt)});
     }
     saveState();
     renderDetail();
     computeKPIs();
   }
   function markReplied(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
     t.status = "Replied";
     t.timeline.push({t:"Status updated", d:"Marked as Replied.", m: fmtDate(Date.now())});
@@ -1225,7 +1398,7 @@
     computeKPIs();
   }
   function closeTicket(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
     t.status = "Closed";
     t.timeline.push({t:"Ticket closed", d:"Closed by CX (demo).", m: fmtDate(Date.now())});
@@ -1234,7 +1407,7 @@
     computeKPIs();
   }
   function assignTicket(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
     const assignees = ["CX - Thamer","CX - Ahmed","Ops - Salem","QA - Areej"];
     t.assignedTo = rand(assignees);
@@ -1243,7 +1416,7 @@
     renderDetail();
   }
   function addNote(){
-    const t = state.tickets.find(x=>x.id===state.selectedId);
+    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
     const note = prompt(state.lang==="ar" ? "اكتب ملاحظة:" : "Write a note:");
     if(!note) return;
@@ -1255,6 +1428,7 @@
   function exportJSON(){
     const data = {
       exportedAt: new Date().toISOString(),
+      sourceMode: state.sourceMode,
       tickets: state.tickets
     };
     const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
@@ -1263,6 +1437,17 @@
     a.download = "cx_portal_export.json";
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  function currentView(){
+    const dash = $("view-dashboard").style.display !== "none";
+    const tic = $("view-tickets").style.display !== "none";
+    const rep = $("view-reports").style.display !== "none";
+    const set = $("view-settings").style.display !== "none";
+    if(tic) return "tickets";
+    if(rep) return "reports";
+    if(set) return "settings";
+    return "dashboard";
   }
 
   // keyboard shortcuts
@@ -1287,10 +1472,7 @@
     $(id).addEventListener("change", ()=> renderTickets());
   });
 
-  $("globalSearch").addEventListener("input", ()=>{
-    // if not in tickets, still allow searching then jump to tickets
-    renderTickets();
-  });
+  $("globalSearch").addEventListener("input", ()=> renderTickets());
 
   // buttons
   $("btnTheme").onclick = ()=>{
@@ -1299,7 +1481,11 @@
   };
   $("btnLang").onclick = ()=>{
     state.lang = (state.lang==="en") ? "ar" : "en";
-    saveState(); applyLang(); computeKPIs(); renderTickets(); setView(currentView());
+    saveState();
+    applyLang();
+    computeKPIs();
+    renderTickets();
+    setView(currentView());
   };
   $("btnNewTicket").onclick = createTicket;
   $("btnMockReply").onclick = simulateBranchReply;
@@ -1321,24 +1507,17 @@
     }
   };
 
-  function currentView(){
-    const dash = $("view-dashboard").style.display !== "none";
-    const tic = $("view-tickets").style.display !== "none";
-    const rep = $("view-reports").style.display !== "none";
-    const set = $("view-settings").style.display !== "none";
-    if(tic) return "tickets";
-    if(rep) return "reports";
-    if(set) return "settings";
-    return "dashboard";
-  }
-
   // init
-  applyTheme();
-  applyLang();
-  computeKPIs();
-  setView("dashboard");
+  (function init(){
+    applyTheme();
+    applyLang();
+    computeKPIs();
+    setView("dashboard");
+    renderTickets();
 
-})();
+    // Load from Supabase (if key added)
+    loadTickets();
+  })();
 </script>
 </body>
 </html>
