@@ -6,12 +6,10 @@
   <title>CX Portal — Tickets Dashboard</title>
   <meta name="description" content="Customer Experience Ticketing Portal (Demo UI) — Ready for Microsoft integration." />
 
-  <!-- Arabic-friendly font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -33,10 +31,9 @@
       --shadow: 0 12px 30px rgba(0,0,0,.35);
       --radius: 18px;
       --radius2: 26px;
-
-      /* 👇 FIX: Arabic-friendly font stack */
       --font: "Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
     }
+
     [data-theme="light"]{
       --bg: #f7f8ff;
       --bg2:#eef2ff;
@@ -65,9 +62,8 @@
       color: var(--text);
       overflow-x:hidden;
     }
-    a{ color:inherit; text-decoration:none }
 
-    /* FIX: better Arabic rendering */
+    a{ color:inherit; text-decoration:none }
     body, input, textarea, select, button { font-family: var(--font); }
     [dir="rtl"] body { letter-spacing: 0; }
 
@@ -427,7 +423,6 @@
       text-align:center;
     }
 
-    /* ✅ RTL FIXES */
     [dir="rtl"] .app{ grid-template-columns: 1fr 290px; }
     [dir="rtl"] .sidebar{ border-right:none; border-left:1px solid var(--stroke); }
     [dir="rtl"] .brandRow{ padding-right:10px; padding-left:10px }
@@ -519,7 +514,6 @@
         </div>
       </div>
 
-      <!-- DASHBOARD -->
       <section id="view-dashboard">
         <div class="grid">
           <div class="card">
@@ -592,7 +586,6 @@
         </div>
       </section>
 
-      <!-- TICKETS -->
       <section id="view-tickets" style="display:none">
         <div class="ticketsLayout">
           <div class="list">
@@ -650,7 +643,6 @@
         </div>
       </section>
 
-      <!-- REPORTS -->
       <section id="view-reports" style="display:none">
         <div class="card" style="margin-top:16px">
           <div class="cardHeader">
@@ -675,7 +667,6 @@
         </div>
       </section>
 
-      <!-- SETTINGS -->
       <section id="view-settings" style="display:none">
         <div class="card" style="margin-top:16px">
           <div class="cardHeader">
@@ -715,22 +706,16 @@
   </div>
 
 <script>
-  // =========================
-  // 1) Supabase config
-  // =========================
-const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
+  const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
 
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-  // Helper
+  const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
   const $ = (id)=>document.getElementById(id);
 
-  // =========================
-  // 2) i18n
-  // =========================
   const I18N = {
     en: {
       brandTitle:"CX Portal",
@@ -739,7 +724,6 @@ const supabaseClient = supabase.createClient(
       Tickets:"Tickets",
       Reports:"Reports",
       Settings:"Settings",
-
       pageDash:"Dashboard",
       pageDashSub:"Monitor CX performance, ticket flow, and branch replies.",
       pageTickets:"Tickets Inbox",
@@ -748,14 +732,11 @@ const supabaseClient = supabase.createClient(
       pageReportsSub:"Analytics area (ready for Power BI).",
       pageSettings:"Settings",
       pageSettingsSub:"Customize portal language, theme, and branding.",
-
       newTicket:"New Ticket",
       export:"Export",
       simReply:"Simulate Branch Reply",
-
       searchPH:"Search tickets, branches, customers...",
       branchPH:"Branch contains...",
-
       today:"Today Overview",
       live:"Live snapshot",
       open:"Open Tickets",
@@ -763,14 +744,12 @@ const supabaseClient = supabase.createClient(
       sla:"SLA Compliance",
       avg:"Avg Response",
       chartLeft:"Ticket Volume (last 7 days)",
-
       quick:"Quick Actions",
       goInbox:"Go to Tickets Inbox",
       openReports:"Open Reports",
       customize:"Customize UI",
       tipH:"Integration Tip",
       tipBody:"When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.",
-
       ticketsNote:"For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.",
       selectTicket:"Select a ticket",
       selectTicketSub:"Open a ticket to view details, timeline, and reply info.",
@@ -783,30 +762,23 @@ const supabaseClient = supabase.createClient(
       saveReply:"Save Reply",
       markReplied:"Mark as Replied",
       timeline:"Timeline",
-
       replyMetaNone:"No branch reply yet.",
       replyMetaBy:"Reply by",
-
       reportsTipH:"What you can add here",
       settingsH:"Settings",
       settingsS:"Customize this portal UI",
       brandingH:"Branding",
       save:"Save",
       integrationH:"Microsoft Integration (Later)",
-
-      // filters
       statusAll:"All Status",
       statusOpen:"Open",
       statusProgress:"In Progress",
       statusReplied:"Replied",
       statusClosed:"Closed",
-
       prioAll:"All Priority",
       prioHigh:"High",
       prioMed:"Medium",
       prioLow:"Low",
-
-      // ticket fields
       f_ticket:"Ticket",
       f_status:"Status",
       f_priority:"Priority",
@@ -818,7 +790,6 @@ const supabaseClient = supabase.createClient(
       f_assigned:"Assigned",
       f_created:"Created"
     },
-
     ar: {
       brandTitle:"بوابة تجارب العملاء",
       brandSub:"التذاكر • ردود الفروع • التقارير",
@@ -826,7 +797,6 @@ const supabaseClient = supabase.createClient(
       Tickets:"التذاكر",
       Reports:"التقارير",
       Settings:"الإعدادات",
-
       pageDash:"لوحة التحكم",
       pageDashSub:"تابع أداء تجارب العملاء، حركة التذاكر، وردود الفروع.",
       pageTickets:"صندوق التذاكر",
@@ -835,14 +805,11 @@ const supabaseClient = supabase.createClient(
       pageReportsSub:"قسم التحليلات (جاهز لـ Power BI).",
       pageSettings:"الإعدادات",
       pageSettingsSub:"تحكم باللغة والثيم والهوية.",
-
       newTicket:"تذكرة جديدة",
       export:"تصدير",
       simReply:"محاكاة رد فرع",
-
       searchPH:"ابحث عن التذاكر / الفروع / العملاء...",
       branchPH:"ابحث باسم الفرع...",
-
       today:"ملخص اليوم",
       live:"لقطة مباشرة",
       open:"تذاكر مفتوحة",
@@ -850,14 +817,12 @@ const supabaseClient = supabase.createClient(
       sla:"الالتزام بـ SLA",
       avg:"متوسط الرد",
       chartLeft:"حجم التذاكر (آخر 7 أيام)",
-
       quick:"إجراءات سريعة",
       goInbox:"الذهاب لصندوق التذاكر",
       openReports:"فتح التقارير",
       customize:"تخصيص الواجهة",
       tipH:"نصيحة ربط",
       tipBody:"عند الجاهزية: استخدم Azure AD + Microsoft Graph لقراءة ردود الفروع من الإيميل، ثم خزّن الردود والمرفقات في SharePoint/Dataverse واعرضها هنا.",
-
       ticketsNote:"للربط الحقيقي مع ردود الإيميل والمرفقات: Graph + SharePoint/Dataverse.",
       selectTicket:"اختر تذكرة",
       selectTicketSub:"افتح تذكرة لعرض التفاصيل والتايم لاين ومعلومات الرد.",
@@ -870,30 +835,23 @@ const supabaseClient = supabase.createClient(
       saveReply:"حفظ الرد",
       markReplied:"تحديد كـ تم الرد",
       timeline:"التايم لاين",
-
       replyMetaNone:"لا يوجد رد من الفرع حتى الآن.",
       replyMetaBy:"تم الرد بواسطة",
-
       reportsTipH:"أفكار تضيفها هنا",
       settingsH:"الإعدادات",
       settingsS:"خصص هذه البوابة",
       brandingH:"الهوية",
       save:"حفظ",
       integrationH:"الربط مع Microsoft (لاحقًا)",
-
-      // filters
       statusAll:"كل الحالات",
       statusOpen:"مفتوحة",
       statusProgress:"قيد المعالجة",
       statusReplied:"تم الرد",
       statusClosed:"مغلقة",
-
       prioAll:"كل الأولويات",
       prioHigh:"عالية",
       prioMed:"متوسطة",
       prioLow:"منخفضة",
-
-      // ticket fields
       f_ticket:"رقم التذكرة",
       f_status:"الحالة",
       f_priority:"الأولوية",
@@ -907,14 +865,12 @@ const supabaseClient = supabase.createClient(
     }
   };
 
-  // =========================
-  // 3) Demo data (fallback)
-  // =========================
   const BRANCHES = [
     "Khamis Mushayt","Al Marwa","Mohammadiah","Red Sea","Clock Tower","Jizan","Shawqia","Naseem",
     "Salamah","Terra Mall","Qurtoba","Obhour","Baghdadiah","Al Awali","Al Samer","Al Ghadeer",
     "Anas Bin Malik","Al Yaqout","Dammam","Mercado","Buraydah","Uthman Ibn Affan","Riyadh Park"
   ];
+
   function rand(arr){ return arr[Math.floor(Math.random()*arr.length)] }
   function pad(n){ return String(n).padStart(2,'0') }
   function fmtDate(d){
@@ -923,7 +879,7 @@ const supabaseClient = supabase.createClient(
   }
   function uid(){ return "TKT-" + Math.floor(100000 + Math.random()*900000); }
 
-  const demoTickets = ()=>{
+  function demoTickets(){
     const statuses = ["Open","In Progress","Replied","Closed"];
     const prios = ["High","Medium","Low"];
     const cats = ["Food Quality","Service Quality","Order Delay","Wrong Order","Foreign Object","Atmosphere"];
@@ -966,11 +922,8 @@ const supabaseClient = supabase.createClient(
     }
     arr.sort((a,b)=>b.createdAt-a.createdAt);
     return arr;
-  };
+  }
 
-  // =========================
-  // 4) State
-  // =========================
   const STORE_KEY = "cx_portal_state_v2";
   const defaultState = {
     lang:"en",
@@ -978,26 +931,24 @@ const supabaseClient = supabase.createClient(
     brandTitle:I18N.en.brandTitle,
     tickets: demoTickets(),
     selectedId: null,
-    sourceMode: "demo" // "supabase" when loaded
+    sourceMode: "demo"
   };
+
   const state = (()=> {
     try{
       const raw = localStorage.getItem(STORE_KEY);
       if(!raw) return defaultState;
       const parsed = JSON.parse(raw);
       return {...defaultState, ...parsed};
-    }catch{ return defaultState; }
+    }catch{
+      return defaultState;
+    }
   })();
+
   const saveState = ()=> localStorage.setItem(STORE_KEY, JSON.stringify(state));
 
-  // =========================
-  // 5) Supabase loader (reads table tickets)
-  // =========================
   async function loadTickets(){
     try{
-      // إذا ما حطيت المفتاح الحقيقي، لا نسوي طلب
-      if(!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("PASTE_YOUR")) return;
-
       const { data, error } = await supabaseClient
         .from("tickets")
         .select("*")
@@ -1009,12 +960,9 @@ const supabaseClient = supabase.createClient(
       }
 
       if(Array.isArray(data) && data.length){
-        // mapping from your table columns
-        // columns in your screenshot: id, created_at, ticket_no, customer_name, customer_phone, branch_name (+ others later)
         const mapped = data.map(r=>{
           const tktNo = r.ticket_no ?? "";
           const ticketId = tktNo ? `#${tktNo}` : (r.id ? String(r.id).slice(0,8) : uid());
-
           const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
           const branch = r.branch_name || r.branch || "—";
           const customerName = r.customer_name || "—";
@@ -1046,7 +994,6 @@ const supabaseClient = supabase.createClient(
         state.sourceMode = "supabase";
         if(!state.selectedId && mapped[0]) state.selectedId = mapped[0].id;
         saveState();
-
         computeKPIs();
         if(currentView()==="tickets") renderTickets();
       }
@@ -1055,13 +1002,9 @@ const supabaseClient = supabase.createClient(
     }
   }
 
-  // =========================
-  // 6) UI functions
-  // =========================
   function applyLang(){
     const dict = I18N[state.lang];
 
-    // ✅ FIX: set lang + dir on <html> (not body)
     document.documentElement.lang = (state.lang==="ar") ? "ar" : "en";
     document.documentElement.dir  = (state.lang==="ar") ? "rtl" : "ltr";
 
@@ -1080,7 +1023,6 @@ const supabaseClient = supabase.createClient(
     $("globalSearch").placeholder = dict.searchPH;
     $("filterBranch").placeholder = dict.branchPH;
 
-    // Filters (rebuild options so they translate)
     $("filterStatus").innerHTML = `
       <option value="all">${dict.statusAll}</option>
       <option value="Open">${dict.statusOpen}</option>
@@ -1112,7 +1054,6 @@ const supabaseClient = supabase.createClient(
 
     $("ticketsNote").textContent = dict.ticketsNote;
 
-    // Details labels
     $("detailTitle").textContent = dict.selectTicket;
     $("detailSub").textContent = dict.selectTicketSub;
     $("btnAssignTxt").textContent = dict.assign;
@@ -1134,7 +1075,6 @@ const supabaseClient = supabase.createClient(
     $("saveBrandTxt").textContent = dict.save;
     $("integrationH").textContent = dict.integrationH;
 
-    // Lang button
     $("btnLang").innerHTML = (state.lang==="ar" ? "🇸🇦" : "🇺🇸") + " <span id='btnLangTxt'>" + state.lang.toUpperCase() + "</span>";
   }
 
@@ -1179,6 +1119,7 @@ const supabaseClient = supabase.createClient(
     if(s==="Closed") return "badge";
     return "badge";
   }
+
   function prioBadgeClass(p){
     if(p==="High") return "bad";
     if(p==="Medium") return "warn";
@@ -1190,7 +1131,6 @@ const supabaseClient = supabase.createClient(
     const open = t.filter(x=>x.status==="Open"||x.status==="In Progress").length;
     const replied = t.filter(x=>x.status==="Replied"||x.status==="Closed").length;
 
-    // demo SLA + avg (later from real data)
     const sla = Math.max(78, Math.min(98, Math.round(80 + Math.random()*18)));
     const avg = Math.max(1, Math.min(18, Math.round(2 + Math.random()*10)));
 
@@ -1327,48 +1267,72 @@ const supabaseClient = supabase.createClient(
     });
   }
 
-  async function createTicket(){
-  const payload = {
-    customer_name: "New Customer",
-    customer_phone: "0500000000",
-    branch_name: "Salamah",
-  };
+  async function createTicket() {
+    try {
+      const payload = {
+        customer_name: "New Customer",
+        customer_phone: "0500000000",
+        branch_name: "Salamah"
+      };
 
-  const { data, error } = await supabaseClient
-    .from("tickets")
-    .insert([payload])
-    .select("*");
+      const { data, error } = await supabaseClient
+        .from("tickets")
+        .insert([payload])
+        .select("*");
 
-  if (error) {
-    console.log("Insert error:", error);
-    alert("Ticket creation failed");
-    return;
+      if (error) {
+        console.log("Insert error:", error);
+        createDemoTicket();
+        alert("Supabase insert failed, demo ticket created instead.");
+        return;
+      }
+
+      console.log("Ticket inserted:", data);
+
+      await loadTickets();
+      computeKPIs();
+      setView("tickets");
+    } catch (e) {
+      console.log("createTicket exception:", e);
+      createDemoTicket();
+      alert("Supabase error, demo ticket created instead.");
+    }
   }
 
-  console.log("Ticket inserted:", data);
+  function createDemoTicket() {
+    const now = Date.now();
+    const id = uid();
+    const branch = rand(BRANCHES);
 
-  await loadTickets();
-  setView("tickets");
-}
-  console.log("Ticket inserted:", data);
-
-console.log("Ticket inserted:", data);
-
-await loadTickets();
-setView("tickets");
-}
-        ? "تم إنشاء تذكرة جديدة (ديمو). لاحقًا نربط إنشاء التذاكر في Supabase/Dataverse."
-        : "New ticket created (demo). Later we will insert into Supabase/Dataverse.",
-      branchReply:"",
-      replyBy:"",
-      replyAt:null,
-      timeline:[{t:"Ticket created", d:"Created from Portal (demo).", m: fmtDate(now)}]
+    const t = {
+      id,
+      subject: `${id} • Food Quality • ${branch}`,
+      status: "Open",
+      priority: "Medium",
+      branch,
+      category: "Food Quality",
+      source: "WhatsApp",
+      customerName: "New Customer",
+      customerPhone: "0500000000",
+      createdAt: now,
+      assignedTo: "",
+      description:
+        state.lang === "ar"
+          ? "تم إنشاء تذكرة جديدة (ديمو). لاحقًا نربط إنشاء التذاكر في Supabase/Dataverse."
+          : "New ticket created (demo). Later we will insert into Supabase/Dataverse.",
+      branchReply: "",
+      replyBy: "",
+      replyAt: null,
+      timeline: [{t:"Ticket created", d:"Created from Portal (demo).", m: fmtDate(now)}]
     };
+
     state.tickets.unshift(t);
     state.selectedId = id;
+    state.sourceMode = "demo";
     saveState();
     computeKPIs();
     setView("tickets");
+    renderTickets();
   }
 
   function simulateBranchReply(){
@@ -1401,6 +1365,7 @@ setView("tickets");
     renderDetail();
     computeKPIs();
   }
+
   function markReplied(){
     const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
@@ -1410,6 +1375,7 @@ setView("tickets");
     renderTickets();
     computeKPIs();
   }
+
   function closeTicket(){
     const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
@@ -1419,6 +1385,7 @@ setView("tickets");
     renderTickets();
     computeKPIs();
   }
+
   function assignTicket(){
     const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
@@ -1428,6 +1395,7 @@ setView("tickets");
     saveState();
     renderDetail();
   }
+
   function addNote(){
     const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
     if(!t) return;
@@ -1453,7 +1421,6 @@ setView("tickets");
   }
 
   function currentView(){
-    const dash = $("view-dashboard").style.display !== "none";
     const tic = $("view-tickets").style.display !== "none";
     const rep = $("view-reports").style.display !== "none";
     const set = $("view-settings").style.display !== "none";
@@ -1463,7 +1430,6 @@ setView("tickets");
     return "dashboard";
   }
 
-  // keyboard shortcuts
   document.addEventListener("keydown", (e)=>{
     if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
       e.preventDefault();
@@ -1471,15 +1437,14 @@ setView("tickets");
     }
   });
 
-  // nav
   document.querySelectorAll(".nav button").forEach(btn=>{
     btn.addEventListener("click", ()=> setView(btn.dataset.view));
   });
+
   $("goTickets").onclick = ()=> setView("tickets");
   $("goReports").onclick = ()=> setView("reports");
   $("goSettings").onclick = ()=> setView("settings");
 
-  // filters
   ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
     $(id).addEventListener("input", ()=> renderTickets());
     $(id).addEventListener("change", ()=> renderTickets());
@@ -1487,11 +1452,12 @@ setView("tickets");
 
   $("globalSearch").addEventListener("input", ()=> renderTickets());
 
-  // buttons
   $("btnTheme").onclick = ()=>{
     state.theme = (state.theme==="dark") ? "light" : "dark";
-    saveState(); applyTheme();
+    saveState();
+    applyTheme();
   };
+
   $("btnLang").onclick = ()=>{
     state.lang = (state.lang==="en") ? "ar" : "en";
     saveState();
@@ -1500,10 +1466,10 @@ setView("tickets");
     renderTickets();
     setView(currentView());
   };
+
   $("btnNewTicket").onclick = createTicket;
   $("btnMockReply").onclick = simulateBranchReply;
   $("btnExport").onclick = exportJSON;
-
   $("btnSaveReply").onclick = saveReply;
   $("btnMarkReplied").onclick = markReplied;
   $("btnClose").onclick = closeTicket;
@@ -1520,16 +1486,13 @@ setView("tickets");
     }
   };
 
-  // init
-  (function init(){
+  (async function init(){
     applyTheme();
     applyLang();
     computeKPIs();
     setView("dashboard");
     renderTickets();
-
-    // Load from Supabase (if key added)
-    loadTickets();
+    await loadTickets();
   })();
 </script>
 </body>
