@@ -1267,26 +1267,103 @@
     });
   }
 
-  async function createTicket() {
-    try {
-      const payload = {
-        customer_name: "New Customer",
-        customer_phone: "0500000000",
-        branch_name: "Salamah"
+ async function createTicket() {
+  try {
+    const payload = {
+      customer_name: "New Customer",
+      customer_phone: "0500000000",
+      branch_name: "Salamah"
+    };
+
+    const { data, error } = await supabaseClient
+      .from("tickets")
+      .insert([payload])
+      .select("*");
+
+    if (error) {
+      console.log("Insert error details:", error);
+
+      // fallback to demo/local ticket so button always works
+      const now = Date.now();
+      const id = uid();
+
+      const t = {
+        id,
+        subject: `${id} • Food Quality • Salamah`,
+        status: "Open",
+        priority: "Medium",
+        branch: "Salamah",
+        category: "Food Quality",
+        source: "Portal",
+        customerName: "New Customer",
+        customerPhone: "0500000000",
+        createdAt: now,
+        assignedTo: "",
+        description: "Supabase insert failed, so ticket was created locally as fallback.",
+        branchReply: "",
+        replyBy: "",
+        replyAt: null,
+        timeline: [
+          { t: "Ticket created", d: "Created locally because Supabase insert failed.", m: fmtDate(now) }
+        ]
       };
 
-      const { data, error } = await supabaseClient
-        .from("tickets")
-        .insert([payload])
-        .select("*");
+      state.tickets.unshift(t);
+      state.selectedId = id;
+      state.sourceMode = "demo";
+      saveState();
+      computeKPIs();
+      setView("tickets");
 
-      if (error) {
-        console.log("Insert error:", error);
-        createDemoTicket();
-        alert("Supabase insert failed, demo ticket created instead.");
-        return;
-      }
+      alert("Supabase insert failed:\\n" + (error.message || "Unknown error") + "\\n\\nA local demo ticket was created instead.");
+      return;
+    }
 
+    console.log("Ticket inserted successfully:", data);
+
+    await loadTickets();
+    computeKPIs();
+    setView("tickets");
+    alert("Ticket created successfully ✅");
+
+  } catch (e) {
+    console.log("createTicket exception:", e);
+
+    // fallback
+    const now = Date.now();
+    const id = uid();
+
+    const t = {
+      id,
+      subject: `${id} • Food Quality • Salamah`,
+      status: "Open",
+      priority: "Medium",
+      branch: "Salamah",
+      category: "Food Quality",
+      source: "Portal",
+      customerName: "New Customer",
+      customerPhone: "0500000000",
+      createdAt: now,
+      assignedTo: "",
+      description: "Exception happened during Supabase insert, so ticket was created locally.",
+      branchReply: "",
+      replyBy: "",
+      replyAt: null,
+      timeline: [
+        { t: "Ticket created", d: "Created locally because an exception happened.", m: fmtDate(now) }
+      ]
+    };
+
+    state.tickets.unshift(t);
+    state.selectedId = id;
+    state.sourceMode = "demo";
+    saveState();
+    computeKPIs();
+    setView("tickets");
+
+    alert("Exception: " + (e.message || e));
+  }
+}
       console.log("Ticket inserted:", data);
 
       await loadTickets();
