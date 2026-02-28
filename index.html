@@ -1350,18 +1350,11 @@ const supabaseClient = supabase.createClient(
   await loadTickets();
   setView("tickets");
 }
-      id,
-      subject: `${id} • Food Quality • ${br}`,
-      status:"Open",
-      priority: rand(["High","Medium","Low"]),
-      branch: br,
-      category: "Food Quality",
-      source: "Portal",
-      customerName: "—",
-      customerPhone: "—",
-      createdAt: now,
-      assignedTo:"",
-      description: state.lang==="ar"
+  console.log("Ticket inserted:", data);
+
+await loadTickets();
+setView("tickets");
+}
         ? "تم إنشاء تذكرة جديدة (ديمو). لاحقًا نربط إنشاء التذاكر في Supabase/Dataverse."
         : "New ticket created (demo). Later we will insert into Supabase/Dataverse.",
       branchReply:"",
