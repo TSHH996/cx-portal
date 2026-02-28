@@ -10,34 +10,32 @@
     theme: "dark",
     brandTitle: "CX Portal",
     tickets: [],
-    selectedId: null,      // uuid الحقيقي من tickets.id
-    repliesByTicket: {}    // { [ticket_id]: [...] }
+    selectedId: null,
+    repliesByTicket: {}
   };
 
-  function pad(n) {
-    return String(n).padStart(2, "0");
-  }
+  function pad(n){ return String(n).padStart(2, "0"); }
 
-  function fmtDate(d) {
+  function fmtDate(d){
     if (!d) return "—";
     const dt = new Date(d);
     if (Number.isNaN(dt.getTime())) return "—";
-    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
   }
 
-  function uid() {
+  function uid(){
     return "TKT-" + Math.floor(100000 + Math.random() * 900000);
   }
 
-  function currentView() {
+  function currentView(){
     if ($("view-tickets").style.display !== "none") return "tickets";
     if ($("view-reports").style.display !== "none") return "reports";
     if ($("view-settings").style.display !== "none") return "settings";
     return "dashboard";
   }
 
-  function setView(view) {
-    ["dashboard", "tickets", "reports", "settings"].forEach(v => {
+  function setView(view){
+    ["dashboard","tickets","reports","settings"].forEach(v=>{
       $("view-" + v).style.display = (v === view) ? "" : "none";
       document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v === view);
     });
@@ -62,12 +60,12 @@
     }
   }
 
-  function applyTheme() {
+  function applyTheme(){
     document.body.setAttribute("data-theme", state.theme);
     $("btnThemeTxt").textContent = state.theme === "dark" ? "Dark" : "Light";
   }
 
-  function applyLang() {
+  function applyLang(){
     const isAr = state.lang === "ar";
     document.documentElement.lang = isAr ? "ar" : "en";
     document.documentElement.dir = isAr ? "rtl" : "ltr";
@@ -75,7 +73,7 @@
     $("brandTitle").textContent = state.brandTitle;
   }
 
-  function statusBadgeClass(s) {
+  function statusBadgeClass(s){
     if (s === "Replied") return "good";
     if (s === "In Progress") return "warn";
     if (s === "Open") return "warn";
@@ -83,26 +81,26 @@
     return "";
   }
 
-  function prioBadgeClass(p) {
+  function prioBadgeClass(p){
     if (p === "High") return "bad";
     if (p === "Medium") return "warn";
     return "good";
   }
 
-  function getRepliesForTicket(ticketUuid) {
+  function getRepliesForTicket(ticketUuid){
     return state.repliesByTicket[ticketUuid] || [];
   }
 
-  function getLatestReply(ticketUuid) {
+  function getLatestReply(ticketUuid){
     const replies = getRepliesForTicket(ticketUuid);
     return replies.length ? replies[replies.length - 1] : null;
   }
 
-  function buildTimeline(ticket) {
+  function buildTimeline(ticket){
     const timeline = [
       {
-        t: "Ticket created",
-        d: "Loaded from Supabase.",
+        t:"Ticket created",
+        d:"Loaded from Supabase.",
         m: fmtDate(ticket.createdAt)
       }
     ];
@@ -117,33 +115,33 @@
 
       if (r.action_taken) {
         timeline.push({
-          t: "Action taken",
-          d: r.action_taken,
-          m: fmtDate(r.created_at)
+          t:"Action taken",
+          d:r.action_taken,
+          m:fmtDate(r.created_at)
         });
       }
     });
 
     if (ticket.status === "Replied") {
       timeline.push({
-        t: "Ticket marked as Replied",
-        d: "Status updated to Replied.",
-        m: "Status update"
+        t:"Ticket marked as Replied",
+        d:"Status updated to Replied.",
+        m:"Status update"
       });
     }
 
     if (ticket.status === "Closed") {
       timeline.push({
-        t: "Ticket closed",
-        d: "Status updated to Closed.",
-        m: "Status update"
+        t:"Ticket closed",
+        d:"Status updated to Closed.",
+        m:"Status update"
       });
     }
 
     return timeline;
   }
 
-  function computeKPIs() {
+  function computeKPIs(){
     const t = state.tickets || [];
     const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
     const replied = t.filter(x =>
@@ -174,7 +172,7 @@
     const displayValues = values.length ? values : [35, 50, 45, 70, 55, 80, 60];
     const max = Math.max(...displayValues, 1);
 
-    displayValues.forEach(v => {
+    displayValues.forEach(v=>{
       const el = document.createElement("div");
       el.className = "bar";
       el.style.height = `${Math.max(12, (v / max) * 100)}%`;
@@ -182,14 +180,14 @@
     });
   }
 
-  async function loadRepliesMap() {
-    try {
+  async function loadRepliesMap(){
+    try{
       const { data, error } = await supabaseClient
         .from("ticket_replies")
         .select("*")
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending:true });
 
-      if (error) {
+      if(error){
         console.error("Replies load error:", error);
         return;
       }
@@ -202,19 +200,19 @@
       });
 
       state.repliesByTicket = grouped;
-    } catch (e) {
+    }catch(e){
       console.error("loadRepliesMap exception:", e);
     }
   }
 
-  async function loadTickets() {
-    try {
+  async function loadTickets(){
+    try{
       const { data, error } = await supabaseClient
         .from("tickets")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending:false });
 
-      if (error) {
+      if(error){
         console.error("Supabase load error:", error);
         $("systemMsg").textContent = "Load error: " + (error.message || "Unknown error");
         return;
@@ -223,13 +221,13 @@
       state.tickets = (data || []).map(r => {
         const ticketLabel = (r.ticket_no !== null && r.ticket_no !== undefined)
           ? `#${r.ticket_no}`
-          : (r.id ? `#${String(r.id).slice(0, 8)}` : uid());
+          : (r.id ? `#${String(r.id).slice(0,8)}` : uid());
 
         const createdAt = r.created_at || new Date().toISOString();
 
         return {
           rowId: r.id || null,
-          id: ticketLabel, // للعرض فقط
+          id: ticketLabel,
           ticketLabel,
           subject: `${ticketLabel} • ${r.branch_name || "—"}`,
           status: r.status || "Open",
@@ -256,13 +254,13 @@
       renderDetail();
 
       $("systemMsg").textContent = `Connected. Loaded ${state.tickets.length} ticket(s).`;
-    } catch (e) {
+    }catch(e){
       console.error("loadTickets exception:", e);
       $("systemMsg").textContent = "Exception: " + (e.message || e);
     }
   }
 
-  function filterTickets() {
+  function filterTickets(){
     const q = ($("globalSearch").value || "").toLowerCase().trim();
     const status = $("filterStatus").value;
     const prio = $("filterPriority").value;
@@ -278,7 +276,7 @@
     });
   }
 
-  function renderTickets() {
+  function renderTickets(){
     const rows = $("ticketRows");
     const list = filterTickets();
 
@@ -326,9 +324,8 @@
     renderDetail();
   }
 
-  function renderDetail() {
+  function renderDetail(){
     const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
-
     if (!t) {
       $("detailTitle").textContent = "Select a ticket";
       $("detailSub").textContent = "Open a ticket to view details.";
@@ -358,7 +355,7 @@
       ["Created", fmtDate(t.createdAt)]
     ];
 
-    $("ticketInfo").innerHTML = info.map(([k, v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
+    $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
     $("ticketDesc").textContent = t.description || "—";
     $("branchReply").value = latestReply?.reply_text || "";
 
@@ -368,7 +365,6 @@
 
     const tl = $("timeline");
     tl.innerHTML = "";
-
     buildTimeline(t).forEach(ev => {
       const wrap = document.createElement("div");
       wrap.className = "event";
@@ -384,8 +380,8 @@
     });
   }
 
-  async function createTicket() {
-    try {
+  async function createTicket(){
+    try{
       const payload = {
         customer_name: "New Customer",
         customer_phone: "0500000000",
@@ -403,7 +399,7 @@
         .insert([payload])
         .select("*");
 
-      if (error) {
+      if(error){
         console.error("Insert error:", error);
         alert("Ticket creation failed: " + (error.message || "Unknown error"));
         return;
@@ -417,13 +413,13 @@
       setView("tickets");
       renderTickets();
       alert("Ticket created successfully ✅");
-    } catch (e) {
+    }catch(e){
       console.error("createTicket exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function saveReply() {
+  async function saveReply(){
     const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
     if (!t || !t.rowId) {
       alert("Please select a ticket first.");
@@ -436,7 +432,7 @@
       return;
     }
 
-    try {
+    try{
       const { error } = await supabaseClient
         .from("ticket_replies")
         .insert([{
@@ -446,7 +442,7 @@
           action_taken: "Reply saved"
         }]);
 
-      if (error) {
+      if(error){
         console.error("Save reply error:", error);
         alert("Save reply failed: " + (error.message || "Unknown error"));
         return;
@@ -456,23 +452,23 @@
       renderDetail();
       computeKPIs();
       alert("Reply saved ✅");
-    } catch (e) {
+    }catch(e){
       console.error("saveReply exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function markReplied() {
+  async function markReplied(){
     const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
     if (!t || !t.rowId) return;
 
-    try {
+    try{
       const { error } = await supabaseClient
         .from("tickets")
-        .update({ status: "Replied" })
+        .update({ status:"Replied" })
         .eq("id", t.rowId);
 
-      if (error) {
+      if(error){
         console.error("Mark replied error:", error);
         alert("Mark replied failed: " + (error.message || "Unknown error"));
         return;
@@ -482,23 +478,23 @@
       renderTickets();
       renderDetail();
       alert("Ticket marked as Replied ✅");
-    } catch (e) {
+    }catch(e){
       console.error("markReplied exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function closeTicket() {
+  async function closeTicket(){
     const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
     if (!t || !t.rowId) return;
 
-    try {
+    try{
       const { error } = await supabaseClient
         .from("tickets")
-        .update({ status: "Closed" })
+        .update({ status:"Closed" })
         .eq("id", t.rowId);
 
-      if (error) {
+      if(error){
         console.error("Close ticket error:", error);
         alert("Close failed: " + (error.message || "Unknown error"));
         return;
@@ -508,21 +504,21 @@
       renderTickets();
       renderDetail();
       alert("Ticket closed ✅");
-    } catch (e) {
+    }catch(e){
       console.error("closeTicket exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  function assignTicket() {
+  function assignTicket(){
     alert("Assign button ready. Next step we can connect it later to Supabase assign_to.");
   }
 
-  function addNote() {
+  function addNote(){
     alert("Add Note button ready. Next step we can connect it later to a notes table.");
   }
 
-  function exportJSON() {
+  function exportJSON(){
     const data = {
       exportedAt: new Date().toISOString(),
       tickets: state.tickets,
@@ -536,34 +532,34 @@
     URL.revokeObjectURL(a.href);
   }
 
-  document.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+  document.addEventListener("keydown", (e)=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
       e.preventDefault();
       $("globalSearch").focus();
     }
   });
 
-  document.querySelectorAll(".nav button").forEach(btn => {
-    btn.addEventListener("click", () => setView(btn.dataset.view));
+  document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.addEventListener("click", ()=> setView(btn.dataset.view));
   });
 
-  $("goTickets").onclick = () => setView("tickets");
-  $("goReports").onclick = () => setView("reports");
-  $("goSettings").onclick = () => setView("settings");
+  $("goTickets").onclick = ()=> setView("tickets");
+  $("goReports").onclick = ()=> setView("reports");
+  $("goSettings").onclick = ()=> setView("settings");
 
-  ["filterStatus","filterPriority","filterBranch"].forEach(id => {
+  ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
     $(id).addEventListener("input", renderTickets);
     $(id).addEventListener("change", renderTickets);
   });
 
   $("globalSearch").addEventListener("input", renderTickets);
 
-  $("btnTheme").onclick = () => {
+  $("btnTheme").onclick = ()=>{
     state.theme = state.theme === "dark" ? "light" : "dark";
     applyTheme();
   };
 
-  $("btnLang").onclick = () => {
+  $("btnLang").onclick = ()=>{
     state.lang = state.lang === "en" ? "ar" : "en";
     applyLang();
     renderTickets();
@@ -578,16 +574,16 @@
   $("btnAssign").onclick = assignTicket;
   $("btnAddNote").onclick = addNote;
 
-  $("saveBrand").onclick = () => {
+  $("saveBrand").onclick = ()=>{
     const v = $("brandInput").value.trim();
-    if (v) {
+    if(v){
       state.brandTitle = v;
       $("brandTitle").textContent = v;
       alert("Brand saved ✅");
     }
   };
 
-  (async function init() {
+  (async function init(){
     applyTheme();
     applyLang();
     computeKPIs();
