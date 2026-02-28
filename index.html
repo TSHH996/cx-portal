@@ -1,690 +1,3 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CX Portal — Tickets Dashboard</title>
-  <meta name="description" content="Customer Experience Ticketing Portal" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    :root{
-      --bg:#0b1020;
-      --bg2:#0e1630;
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.08);
-      --stroke:rgba(255,255,255,.12);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.65);
-      --muted2:rgba(255,255,255,.48);
-      --brand:#6ee7ff;
-      --brand2:#a78bfa;
-      --good:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
-      --shadow:0 12px 30px rgba(0,0,0,.35);
-      --radius:18px;
-      --radius2:26px;
-      --font:"Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-    [data-theme="light"]{
-      --bg:#f7f8ff;
-      --bg2:#eef2ff;
-      --card:rgba(10,20,60,.04);
-      --card2:rgba(10,20,60,.06);
-      --stroke:rgba(10,20,60,.10);
-      --text:rgba(10,20,60,.92);
-      --muted:rgba(10,20,60,.65);
-      --muted2:rgba(10,20,60,.50);
-      --shadow:0 10px 25px rgba(10,20,60,.12);
-      --brand:#0ea5e9;
-      --brand2:#7c3aed;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:var(--font);
-      background:
-        radial-gradient(900px 600px at 10% 10%, rgba(110,231,255,.20), transparent 60%),
-        radial-gradient(900px 600px at 90% 20%, rgba(167,139,250,.20), transparent 55%),
-        radial-gradient(900px 600px at 50% 95%, rgba(52,211,153,.12), transparent 55%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
-      color:var(--text);
-      overflow-x:hidden;
-    }
-    body, input, textarea, select, button{font-family:var(--font)}
-    a{color:inherit;text-decoration:none}
-
-    .app{
-      display:grid;
-      grid-template-columns:290px 1fr;
-      min-height:100vh;
-    }
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      padding:18px 14px;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-right:1px solid var(--stroke);
-      backdrop-filter:blur(14px);
-    }
-    .brandRow{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 10px 16px 10px;
-    }
-    .logo{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      background:linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow:0 10px 25px rgba(0,0,0,.25);
-      display:grid;
-      place-items:center;
-      color:#061026;
-      font-weight:900;
-    }
-    .brandText .t{font-weight:800}
-    .brandText .s{font-size:12px;color:var(--muted);margin-top:2px}
-
-    .nav{
-      margin-top:8px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .nav button{
-      width:100%;
-      border:1px solid var(--stroke);
-      background:transparent;
-      color:var(--text);
-      padding:11px 12px;
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      cursor:pointer;
-    }
-    .nav button.active{
-      background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
-      border-color:rgba(110,231,255,.30);
-    }
-    .nav .left{display:flex;align-items:center;gap:10px}
-    .icon{
-      width:28px;height:28px;border-radius:10px;
-      background:var(--card);
-      display:grid;place-items:center;
-      border:1px solid var(--stroke);
-      font-size:14px;
-    }
-    .pill,.badge{
-      font-size:12px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      color:var(--muted);
-    }
-    .badge.good{border-color:rgba(52,211,153,.35);color:rgba(52,211,153,.95)}
-    .badge.warn{border-color:rgba(251,191,36,.35);color:rgba(251,191,36,.95)}
-    .badge.bad{border-color:rgba(251,113,133,.35);color:rgba(251,113,133,.95)}
-
-    .sidebarFooter{
-      position:absolute;
-      left:14px;right:14px;bottom:14px;
-      padding:12px;
-      border-radius:16px;
-      background:var(--card);
-      border:1px solid var(--stroke);
-    }
-    .tinyRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .toggleRow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-
-    .btn{
-      border:1px solid var(--stroke);
-      background:var(--card);
-      color:var(--text);
-      padding:9px 10px;
-      border-radius:14px;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    .btn.primary{
-      background:linear-gradient(135deg, rgba(110,231,255,.20), rgba(167,139,250,.18));
-      border-color:rgba(110,231,255,.28);
-    }
-
-    .main{padding:18px 18px 28px 18px}
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px;
-      border-radius:var(--radius2);
-      background:var(--card);
-      border:1px solid var(--stroke);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-    }
-    .topbar .title .h{font-weight:850;font-size:18px}
-    .topbar .title .p{color:var(--muted);font-size:13px;margin-top:2px}
-    .topActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .search{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      padding:9px 12px;
-      border-radius:14px;
-      min-width:320px;
-      max-width:420px;
-    }
-    .search input{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      color:var(--text);
-      font-size:14px;
-    }
-
-    .grid{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:14px;
-    }
-    .card{
-      border:1px solid var(--stroke);
-      background:var(--card);
-      border-radius:var(--radius2);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-    }
-    .cardHeader{
-      padding:14px 14px 10px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .cardHeader .h{font-weight:850}
-    .cardHeader .s{color:var(--muted);font-size:13px}
-    .cardBody{padding:14px}
-
-    .kpis{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-    .kpi{
-      padding:14px;
-      border-radius:18px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-    .kpi .v{font-size:22px;font-weight:900}
-    .kpi .l{color:var(--muted);font-size:12px}
-    .kpi .trend{color:var(--muted2);font-size:12px}
-
-    .ticketsLayout{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:14px;
-    }
-    .list,.detail{
-      border-radius:var(--radius2);
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      overflow:hidden;
-      min-height:520px;
-    }
-    .listTop,.detailHead{
-      padding:12px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-
-    select,.chipInput,.textarea{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      padding:9px 10px;
-      border-radius:14px;
-      outline:none;
-      font-size:13px;
-    }
-    .rows{max-height:620px;overflow:auto}
-    .row{
-      padding:12px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-      cursor:pointer;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .row.active{
-      background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
-      border-bottom-color:rgba(110,231,255,.22);
-    }
-    .row .meta{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      min-width:0;
-    }
-    .row .meta .t{
-      font-weight:800;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:360px;
-    }
-    .row .meta .b{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-      color:var(--muted);
-      font-size:12px;
-    }
-    .rightMeta{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      gap:6px;
-      color:var(--muted);
-      font-size:12px;
-      white-space:nowrap;
-    }
-
-    .detailHead .left{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      min-width:260px;
-    }
-    .detailHead .left .h{
-      font-weight:900;
-      font-size:16px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:420px;
-    }
-    .detailHead .left .s{color:var(--muted);font-size:12px}
-    .detailHead .actions{display:flex;gap:8px;flex-wrap:wrap}
-
-    .twoCols{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      padding:12px;
-    }
-    .panel{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      border-radius:18px;
-      padding:12px;
-    }
-    .panel .ph{font-weight:850;margin-bottom:8px}
-    .kv{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      font-size:13px;
-      color:var(--muted);
-    }
-    .kv div{
-      padding:8px 10px;
-      border:1px dashed rgba(255,255,255,.12);
-      border-radius:14px;
-    }
-    .kv b{color:var(--text)}
-    .textarea{
-      width:100%;
-      min-height:100px;
-      resize:vertical;
-    }
-
-    .timeline{display:flex;flex-direction:column;gap:10px}
-    .event{display:flex;gap:10px;align-items:flex-start}
-    .dot{
-      width:10px;height:10px;border-radius:999px;margin-top:6px;
-      background:var(--brand);
-      box-shadow:0 0 0 4px rgba(110,231,255,.12);
-    }
-    .event .box{
-      flex:1;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      border-radius:16px;
-      padding:10px 12px;
-    }
-    .event .box .t{font-weight:850;font-size:13px}
-    .event .box .d{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
-    .event .box .m{color:var(--muted2);font-size:11px;margin-top:8px}
-
-    .chart{
-      height:210px;
-      width:100%;
-      border-radius:18px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      padding:10px;
-      position:relative;
-      overflow:hidden;
-    }
-    .bars{display:flex;gap:10px;align-items:flex-end;height:100%;padding:10px}
-    .bar{
-      flex:1;
-      border-radius:12px 12px 6px 6px;
-      background:linear-gradient(180deg, rgba(110,231,255,.70), rgba(167,139,250,.55));
-      border:1px solid rgba(110,231,255,.20);
-      min-width:14px;
-    }
-    .barLabel{
-      position:absolute;
-      bottom:10px;left:10px;right:10px;
-      display:flex;
-      justify-content:space-between;
-      color:var(--muted2);
-      font-size:11px;
-    }
-    .footerNote{
-      margin-top:14px;
-      color:var(--muted2);
-      font-size:12px;
-      text-align:center;
-    }
-
-    [dir="rtl"] .app{grid-template-columns:1fr 290px}
-    [dir="rtl"] .sidebar{border-right:none;border-left:1px solid var(--stroke)}
-    [dir="rtl"] .topbar,
-    [dir="rtl"] .search,
-    [dir="rtl"] .row,
-    [dir="rtl"] .detailHead,
-    [dir="rtl"] .kv,
-    [dir="rtl"] .barLabel{direction:rtl}
-    [dir="rtl"] .row .rightMeta{align-items:flex-start}
-
-    @media (max-width:1100px){
-      .app{grid-template-columns:1fr}
-      .sidebar{position:relative;height:auto}
-      [dir="rtl"] .app{grid-template-columns:1fr}
-      .grid,.ticketsLayout{grid-template-columns:1fr}
-      .search{min-width:220px;width:100%;max-width:none}
-      .topbar{flex-direction:column;align-items:stretch}
-      .topActions{justify-content:space-between}
-      .kpis{grid-template-columns:repeat(2,1fr)}
-    }
-  </style>
-</head>
-
-<body data-theme="dark">
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brandRow">
-        <div class="logo">CX</div>
-        <div class="brandText">
-          <div class="t" id="brandTitle">CX Portal</div>
-          <div class="s" id="brandSub">Tickets • Branch Replies • Reports</div>
-        </div>
-      </div>
-
-      <div class="nav">
-        <button class="active" data-view="dashboard">
-          <div class="left"><div class="icon">📊</div><div>Dashboard</div></div>
-          <span class="pill">Live</span>
-        </button>
-        <button data-view="tickets">
-          <div class="left"><div class="icon">🎫</div><div>Tickets</div></div>
-          <span class="pill">Inbox</span>
-        </button>
-        <button data-view="reports">
-          <div class="left"><div class="icon">📈</div><div>Reports</div></div>
-          <span class="pill">Weekly</span>
-        </button>
-        <button data-view="settings">
-          <div class="left"><div class="icon">⚙️</div><div>Settings</div></div>
-          <span class="pill">UI</span>
-        </button>
-      </div>
-
-      <div class="sidebarFooter">
-        <div class="tinyRow">
-          <div style="display:flex;gap:10px;align-items:center">
-            <span class="badge">CX Team</span>
-            <span class="badge">60+ Branches</span>
-          </div>
-          <span class="badge">v1</span>
-        </div>
-
-        <div class="toggleRow">
-          <button class="btn" id="btnTheme">🌙 <span id="btnThemeTxt">Dark</span></button>
-          <button class="btn" id="btnLang">🇸🇦 <span id="btnLangTxt">AR</span></button>
-          <button class="btn primary" id="btnNewTicket">＋ <span id="btnNewTicketTxt">New Ticket</span></button>
-        </div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="topbar">
-        <div class="title">
-          <div class="h" id="pageTitle">Dashboard</div>
-          <div class="p" id="pageSub">Monitor CX performance, ticket flow, and branch replies.</div>
-        </div>
-        <div class="topActions">
-          <div class="search">
-            🔎
-            <input id="globalSearch" placeholder="Search tickets, branches, customers..." />
-            <span class="pill">Ctrl/⌘ K</span>
-          </div>
-          <button class="btn" id="btnExport">⬇️ Export</button>
-        </div>
-      </div>
-
-      <section id="view-dashboard">
-        <div class="grid">
-          <div class="card">
-            <div class="cardHeader">
-              <div>
-                <div class="h">Today Overview</div>
-                <div class="s" id="kpiSub">Live snapshot</div>
-              </div>
-              <span class="badge">Supabase Connected</span>
-            </div>
-            <div class="cardBody">
-              <div class="kpis">
-                <div class="kpi">
-                  <div class="v" id="kpiOpen">0</div>
-                  <div class="l">Open Tickets</div>
-                  <div class="trend" id="kpiOpenT">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="v" id="kpiReplied">0</div>
-                  <div class="l">Branch Replied</div>
-                  <div class="trend" id="kpiRepliedT">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="v" id="kpiSla">0%</div>
-                  <div class="l">SLA Compliance</div>
-                  <div class="trend" id="kpiSlaT">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="v" id="kpiAvg">0h</div>
-                  <div class="l">Avg Response</div>
-                  <div class="trend" id="kpiAvgT">—</div>
-                </div>
-              </div>
-
-              <div style="margin-top:14px" class="chart">
-                <div class="bars" id="bars"></div>
-                <div class="barLabel">
-                  <span>Ticket Volume</span>
-                  <span>Live</span>
-                </div>
-              </div>
-
-              <div class="footerNote" id="systemMsg">
-                Connected to Supabase tickets table.
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="cardHeader">
-              <div>
-                <div class="h">Quick Actions</div>
-                <div class="s">What do you want to do now?</div>
-              </div>
-            </div>
-            <div class="cardBody">
-              <div style="display:flex;flex-direction:column;gap:10px">
-                <button class="btn primary" id="goTickets">🎫 Go to Tickets Inbox</button>
-                <button class="btn" id="goReports">📈 Open Reports</button>
-                <button class="btn" id="goSettings">⚙️ Customize UI</button>
-                <div class="panel" style="margin-top:6px">
-                  <div class="ph">Database Note</div>
-                  <div style="color:var(--muted);font-size:13px;line-height:1.6">
-                    New Ticket inserts directly into Supabase table: <b>tickets</b>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-tickets" style="display:none">
-        <div class="ticketsLayout">
-          <div class="list">
-            <div class="listTop">
-              <select id="filterStatus">
-                <option value="all">All Status</option>
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Replied">Replied</option>
-                <option value="Closed">Closed</option>
-              </select>
-              <select id="filterPriority">
-                <option value="all">All Priority</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-              <input class="chipInput" id="filterBranch" placeholder="Branch contains..." />
-              <span class="badge" id="resultCount">0 tickets</span>
-            </div>
-            <div class="rows" id="ticketRows"></div>
-          </div>
-
-          <div class="detail">
-            <div class="detailHead">
-              <div class="left">
-                <div class="h" id="detailTitle">Select a ticket</div>
-                <div class="s" id="detailSub">Open a ticket to view details.</div>
-              </div>
-              <div class="actions">
-                <button class="btn" id="btnAssign">👤 Assign</button>
-                <button class="btn" id="btnClose">✅ Close</button>
-                <button class="btn primary" id="btnAddNote">📝 Add Note</button>
-              </div>
-            </div>
-
-            <div class="twoCols">
-              <div class="panel">
-                <div class="ph">Ticket Info</div>
-                <div class="kv" id="ticketInfo"></div>
-              </div>
-              <div class="panel">
-                <div class="ph">Description</div>
-                <div style="color:var(--muted);font-size:13px;line-height:1.6" id="ticketDesc">—</div>
-              </div>
-              <div class="panel">
-                <div class="ph">Branch Reply</div>
-                <div style="display:flex;gap:10px;flex-direction:column">
-                  <textarea class="textarea" id="branchReply" placeholder="Branch reply will appear here..."></textarea>
-                  <div style="display:flex;gap:10px;flex-wrap:wrap">
-                    <button class="btn primary" id="btnSaveReply">💾 Save Reply</button>
-                    <button class="btn" id="btnMarkReplied">✳️ Mark as Replied</button>
-                  </div>
-                  <div style="color:var(--muted2);font-size:12px" id="replyMeta">—</div>
-                </div>
-              </div>
-              <div class="panel">
-                <div class="ph">Timeline</div>
-                <div class="timeline" id="timeline"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-reports" style="display:none">
-        <div class="card" style="margin-top:16px">
-          <div class="cardHeader">
-            <div>
-              <div class="h">Reports</div>
-              <div class="s">Placeholder section</div>
-            </div>
-          </div>
-          <div class="cardBody">
-            <div class="panel">
-              <div class="ph">Ready for analytics</div>
-              <div style="color:var(--muted);font-size:13px;line-height:1.7">
-                Add Power BI, Excel export, SLA reports, complaint categories, and branch performance.
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-settings" style="display:none">
-        <div class="card" style="margin-top:16px">
-          <div class="cardHeader">
-            <div>
-              <div class="h">Settings</div>
-              <div class="s">Customize this portal UI</div>
-            </div>
-          </div>
-          <div class="cardBody">
-            <div class="panel">
-              <div class="ph">Branding</div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                <input class="chipInput" id="brandInput" placeholder="Portal title" style="min-width:280px"/>
-                <button class="btn primary" id="saveBrand">💾 Save</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
-
 <script>
   const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
@@ -697,26 +10,30 @@
     theme: "dark",
     brandTitle: "CX Portal",
     tickets: [],
-    selectedId: null
+    selectedId: null,      // this is tickets.id (uuid)
+    repliesByTicket: {}    // { [ticket_id]: reply[] }
   };
 
-  function pad(n){ return String(n).padStart(2, "0"); }
-  function fmtDate(d){
-    const dt = new Date(d);
-    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  function pad(n) {
+    return String(n).padStart(2, "0");
   }
 
-  function uid(){ return "TKT-" + Math.floor(100000 + Math.random() * 900000); }
+  function fmtDate(d) {
+    if (!d) return "—";
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return "—";
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  }
 
-  function currentView(){
+  function currentView() {
     if ($("view-tickets").style.display !== "none") return "tickets";
     if ($("view-reports").style.display !== "none") return "reports";
     if ($("view-settings").style.display !== "none") return "settings";
     return "dashboard";
   }
 
-  function setView(view){
-    ["dashboard","tickets","reports","settings"].forEach(v=>{
+  function setView(view) {
+    ["dashboard", "tickets", "reports", "settings"].forEach(v => {
       $("view-" + v).style.display = (v === view) ? "" : "none";
       document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v === view);
     });
@@ -741,12 +58,12 @@
     }
   }
 
-  function applyTheme(){
+  function applyTheme() {
     document.body.setAttribute("data-theme", state.theme);
     $("btnThemeTxt").textContent = state.theme === "dark" ? "Dark" : "Light";
   }
 
-  function applyLang(){
+  function applyLang() {
     const isAr = state.lang === "ar";
     document.documentElement.lang = isAr ? "ar" : "en";
     document.documentElement.dir = isAr ? "rtl" : "ltr";
@@ -754,29 +71,85 @@
     $("brandTitle").textContent = state.brandTitle;
   }
 
-  function statusBadgeClass(s){
-    if(s === "Replied") return "good";
-    if(s === "In Progress") return "warn";
-    if(s === "Open") return "warn";
-    if(s === "Closed") return "";
+  function statusBadgeClass(s) {
+    if (s === "Replied") return "good";
+    if (s === "In Progress") return "warn";
+    if (s === "Open") return "warn";
+    if (s === "Closed") return "";
     return "";
   }
 
-  function prioBadgeClass(p){
-    if(p === "High") return "bad";
-    if(p === "Medium") return "warn";
+  function prioBadgeClass(p) {
+    if (p === "High") return "bad";
+    if (p === "Medium") return "warn";
     return "good";
   }
 
-  function computeKPIs(){
+  function getRepliesForTicket(ticketUuid) {
+    return state.repliesByTicket[ticketUuid] || [];
+  }
+
+  function getLatestReply(ticketUuid) {
+    const list = getRepliesForTicket(ticketUuid);
+    if (!list.length) return null;
+    return list[list.length - 1];
+  }
+
+  function buildTimeline(ticket) {
+    const timeline = [
+      {
+        t: "Ticket created",
+        d: `Ticket ${ticket.ticketLabel} created for ${ticket.branch}.`,
+        m: fmtDate(ticket.createdAt)
+      }
+    ];
+
+    const replies = getRepliesForTicket(ticket.rowId);
+    replies.forEach((r) => {
+      timeline.push({
+        t: r.reply_by ? `Reply by ${r.reply_by}` : "Reply added",
+        d: r.reply_text || (r.action_taken ? `Action taken: ${r.action_taken}` : "—"),
+        m: fmtDate(r.created_at)
+      });
+
+      if (r.action_taken) {
+        timeline.push({
+          t: "Action taken",
+          d: r.action_taken,
+          m: fmtDate(r.created_at)
+        });
+      }
+    });
+
+    if (ticket.status === "Replied") {
+      timeline.push({
+        t: "Ticket marked as Replied",
+        d: "Status was updated to Replied.",
+        m: "Status update"
+      });
+    }
+
+    if (ticket.status === "Closed") {
+      timeline.push({
+        t: "Ticket closed",
+        d: "Status was updated to Closed.",
+        m: "Status update"
+      });
+    }
+
+    return timeline;
+  }
+
+  function computeKPIs() {
     const t = state.tickets || [];
     const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
-    const replied = t.filter(x => x.status === "Replied" || x.status === "Closed").length;
+    const replied = t.filter(x => getRepliesForTicket(x.rowId).length > 0 || x.status === "Replied" || x.status === "Closed").length;
 
     $("kpiOpen").textContent = open;
     $("kpiReplied").textContent = replied;
-    $("kpiSla").textContent = "100%";
+    $("kpiSla").textContent = t.length ? "100%" : "0%";
     $("kpiAvg").textContent = t.length ? "2h" : "0h";
+
     $("kpiOpenT").textContent = `${open} active`;
     $("kpiRepliedT").textContent = `${replied} handled`;
     $("kpiSlaT").textContent = "Live";
@@ -784,101 +157,145 @@
 
     const bars = $("bars");
     bars.innerHTML = "";
-    const values = [35, 50, 45, 70, 55, 80, 60];
-    values.forEach(v=>{
+
+    const sourceCounts = {};
+    t.forEach(ticket => {
+      const label = ticket.branch && ticket.branch !== "—" ? ticket.branch : "Other";
+      sourceCounts[label] = (sourceCounts[label] || 0) + 1;
+    });
+
+    const values = Object.values(sourceCounts).slice(0, 7);
+    const displayValues = values.length ? values : [10, 20, 15, 30, 25, 18, 22];
+    const max = Math.max(...displayValues, 1);
+
+    displayValues.forEach(v => {
       const el = document.createElement("div");
       el.className = "bar";
-      el.style.height = v + "%";
+      el.style.height = `${Math.max(12, (v / max) * 100)}%`;
       bars.appendChild(el);
     });
   }
 
-  async function loadTickets(){
-    try{
+  async function loadRepliesMap() {
+    try {
+      const { data, error } = await supabaseClient
+        .from("ticket_replies")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Replies load error:", error);
+        return;
+      }
+
+      const grouped = {};
+      (data || []).forEach(reply => {
+        if (!reply.ticket_id) return;
+        if (!grouped[reply.ticket_id]) grouped[reply.ticket_id] = [];
+        grouped[reply.ticket_id].push(reply);
+      });
+
+      state.repliesByTicket = grouped;
+    } catch (e) {
+      console.error("loadRepliesMap exception:", e);
+    }
+  }
+
+  async function loadTickets() {
+    try {
       const { data, error } = await supabaseClient
         .from("tickets")
         .select("*")
-        .order("created_at", { ascending:false });
+        .order("created_at", { ascending: false });
 
-      if(error){
+      if (error) {
         console.error("Supabase load error:", error);
         $("systemMsg").textContent = "Load error: " + (error.message || "Unknown error");
         return;
       }
 
       state.tickets = (data || []).map(r => {
-        const ticketId = (r.ticket_no !== null && r.ticket_no !== undefined)
+        const ticketLabel = (r.ticket_no !== null && r.ticket_no !== undefined)
           ? `#${r.ticket_no}`
-          : (r.id ? String(r.id).slice(0, 8) : uid());
+          : (r.id ? `#${String(r.id).slice(0, 8)}` : "#—");
 
-        const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+        const createdAt = r.created_at || new Date().toISOString();
 
         return {
-          rowId: r.id || null,
-          id: ticketId,
-          subject: `${ticketId} • ${r.branch_name || "—"}`,
+          rowId: r.id || null,                     // uuid الحقيقي
+          ticketNo: r.ticket_no || null,
+          ticketLabel,                            // #10006
+          id: ticketLabel,                        // للعرض فقط
+          subject: `${ticketLabel} • ${r.branch_name || "—"}`,
           status: r.status || "Open",
           priority: r.priority || "Medium",
           branch: r.branch_name || "—",
-          category: r.category || "—",
-          source: r.source || "—",
+          category: r.feedback_category || "—",
+          subCategory: r.sub_category || "—",
+          source: r.feedback_type || "—",
           customerName: r.customer_name || "—",
           customerPhone: r.customer_phone || "—",
           createdAt,
-          assignedTo: r.assigned_to || "",
-          description: r.description || "—",
-          branchReply: r.branch_reply || "",
-          replyBy: r.reply_by || "",
-          replyAt: r.reply_at ? new Date(r.reply_at).getTime() : null,
-          timeline: [
-            { t:"Ticket created", d:"Loaded from Supabase.", m: fmtDate(createdAt) }
-          ]
+          assignedTo: r.assign_to || "—",
+          description: r.description || "—"
         };
       });
 
       if (!state.selectedId && state.tickets.length) {
-        state.selectedId = state.tickets[0].id;
+        state.selectedId = state.tickets[0].rowId;
       }
 
+      await loadRepliesMap();
       computeKPIs();
-      if (currentView() === "tickets") renderTickets();
+
+      if (currentView() === "tickets") {
+        renderTickets();
+      } else {
+        renderDetail();
+      }
+
       $("systemMsg").textContent = `Connected. Loaded ${state.tickets.length} ticket(s).`;
-    }catch(e){
+    } catch (e) {
       console.error("loadTickets exception:", e);
       $("systemMsg").textContent = "Exception: " + (e.message || e);
     }
   }
 
-  function filterTickets(){
+  function filterTickets() {
     const q = ($("globalSearch").value || "").toLowerCase().trim();
     const status = $("filterStatus").value;
     const prio = $("filterPriority").value;
     const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
 
     return (state.tickets || []).filter(t => {
-      const hay = `${t.id} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.source} ${t.description}`.toLowerCase();
+      const hay = `${t.ticketLabel} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.subCategory} ${t.source} ${t.description}`.toLowerCase();
+
       if (q && !hay.includes(q)) return false;
       if (status !== "all" && t.status !== status) return false;
       if (prio !== "all" && t.priority !== prio) return false;
       if (branchQ && !String(t.branch || "").toLowerCase().includes(branchQ)) return false;
+
       return true;
     });
   }
 
-  function renderTickets(){
+  function renderTickets() {
     const rows = $("ticketRows");
     const list = filterTickets();
 
     $("resultCount").textContent = `${list.length} tickets`;
 
-    if (!state.selectedId && list[0]) state.selectedId = list[0].id;
+    if (!state.selectedId && list[0]) {
+      state.selectedId = list[0].rowId;
+    }
 
     rows.innerHTML = "";
+
     list.forEach(t => {
       const r = document.createElement("div");
-      r.className = "row" + (t.id === state.selectedId ? " active" : "");
+      r.className = "row" + (t.rowId === state.selectedId ? " active" : "");
       r.onclick = () => {
-        state.selectedId = t.id;
+        state.selectedId = t.rowId;
         renderTickets();
         renderDetail();
       };
@@ -903,7 +320,7 @@
 
       const right = document.createElement("div");
       right.className = "rightMeta";
-      right.innerHTML = `<div>${t.id}</div><div>${fmtDate(t.createdAt)}</div>`;
+      right.innerHTML = `<div>${t.ticketLabel}</div><div>${fmtDate(t.createdAt)}</div>`;
 
       r.appendChild(left);
       r.appendChild(right);
@@ -913,9 +330,12 @@
     renderDetail();
   }
 
-  function renderDetail(){
-    const t = (state.tickets || []).find(x => x.id === state.selectedId);
+  function renderDetail() {
+    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+
     if (!t) {
+      $("detailTitle").textContent = "Select a ticket";
+      $("detailSub").textContent = "Open a ticket to view details.";
       $("ticketInfo").innerHTML = "";
       $("ticketDesc").textContent = "—";
       $("branchReply").value = "";
@@ -924,11 +344,14 @@
       return;
     }
 
+    const replies = getRepliesForTicket(t.rowId);
+    const latestReply = getLatestReply(t.rowId);
+
     $("detailTitle").textContent = t.subject;
-    $("detailSub").textContent = `${t.id} • ${t.branch} • ${t.status}`;
+    $("detailSub").textContent = `${t.ticketLabel} • ${t.branch} • ${t.status}`;
 
     const info = [
-      ["Ticket", t.id],
+      ["Ticket", t.ticketLabel],
       ["Status", t.status],
       ["Priority", t.priority],
       ["Branch", t.branch],
@@ -940,17 +363,24 @@
       ["Created", fmtDate(t.createdAt)]
     ];
 
-    $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
+    $("ticketInfo").innerHTML = info.map(([k, v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
     $("ticketDesc").textContent = t.description || "—";
-    $("branchReply").value = t.branchReply || "";
+    $("branchReply").value = latestReply?.reply_text || "";
 
-    $("replyMeta").textContent = t.replyAt
-      ? `Reply by ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`
-      : "No branch reply yet.";
+    if (latestReply) {
+      const metaParts = [];
+      metaParts.push(`Latest reply by ${latestReply.reply_by || "—"}`);
+      metaParts.push(fmtDate(latestReply.created_at));
+      if (latestReply.action_taken) metaParts.push(`Action: ${latestReply.action_taken}`);
+      $("replyMeta").textContent = metaParts.join(" • ");
+    } else {
+      $("replyMeta").textContent = "No branch reply yet.";
+    }
 
     const tl = $("timeline");
     tl.innerHTML = "";
-    (t.timeline || []).forEach(ev => {
+
+    buildTimeline(t).forEach(ev => {
       const wrap = document.createElement("div");
       wrap.className = "event";
       wrap.innerHTML = `
@@ -965,12 +395,18 @@
     });
   }
 
-  async function createTicket(){
-    try{
+  async function createTicket() {
+    try {
       const payload = {
         customer_name: "New Customer",
         customer_phone: "0500000000",
-        branch_name: "Salamah"
+        branch_name: "Salamah",
+        feedback_type: "Manual",
+        feedback_category: "General",
+        sub_category: "General",
+        description: "New ticket created from CX Portal",
+        priority: "Medium",
+        status: "Open"
       };
 
       const { data, error } = await supabaseClient
@@ -978,7 +414,7 @@
         .insert([payload])
         .select("*");
 
-      if(error){
+      if (error) {
         console.error("Insert error:", error);
         alert("Ticket creation failed: " + (error.message || "Unknown error"));
         return;
@@ -986,57 +422,73 @@
 
       console.log("Ticket inserted:", data);
       await loadTickets();
+
+      if (data && data[0] && data[0].id) {
+        state.selectedId = data[0].id;
+      }
+
       setView("tickets");
+      renderTickets();
       alert("Ticket created successfully ✅");
-    }catch(e){
+    } catch (e) {
       console.error("createTicket exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function saveReply(){
-    const t = (state.tickets || []).find(x => x.id === state.selectedId);
-    if (!t || !t.rowId) return;
+  async function saveReply() {
+    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+    if (!t || !t.rowId) {
+      alert("Please select a ticket first.");
+      return;
+    }
 
-    const replyText = $("branchReply").value || "";
-    const nowIso = new Date().toISOString();
+    const replyText = ($("branchReply").value || "").trim();
+    if (!replyText) {
+      alert("Please write a reply first.");
+      return;
+    }
 
-    try{
+    try {
       const { error } = await supabaseClient
-        .from("tickets")
-        .update({
-          branch_reply: replyText,
-          reply_by: "branch@company.com",
-          reply_at: nowIso
-        })
-        .eq("id", t.rowId);
+        .from("ticket_replies")
+        .insert([{
+          ticket_id: t.rowId,
+          reply_text: replyText,
+          reply_by: "Branch",
+          action_taken: "Reply saved"
+        }]);
 
-      if(error){
+      if (error) {
         console.error("Save reply error:", error);
         alert("Save reply failed: " + (error.message || "Unknown error"));
         return;
       }
 
-      await loadTickets();
-      renderTickets();
+      await loadRepliesMap();
+      renderDetail();
+      computeKPIs();
       alert("Reply saved ✅");
-    }catch(e){
+    } catch (e) {
       console.error("saveReply exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function markReplied(){
-    const t = (state.tickets || []).find(x => x.id === state.selectedId);
-    if (!t || !t.rowId) return;
+  async function markReplied() {
+    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+    if (!t || !t.rowId) {
+      alert("Please select a ticket first.");
+      return;
+    }
 
-    try{
+    try {
       const { error } = await supabaseClient
         .from("tickets")
-        .update({ status:"Replied" })
+        .update({ status: "Replied" })
         .eq("id", t.rowId);
 
-      if(error){
+      if (error) {
         console.error("Mark replied error:", error);
         alert("Mark replied failed: " + (error.message || "Unknown error"));
         return;
@@ -1044,23 +496,28 @@
 
       await loadTickets();
       renderTickets();
-    }catch(e){
+      renderDetail();
+      alert("Ticket marked as Replied ✅");
+    } catch (e) {
       console.error("markReplied exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  async function closeTicket(){
-    const t = (state.tickets || []).find(x => x.id === state.selectedId);
-    if (!t || !t.rowId) return;
+  async function closeTicket() {
+    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+    if (!t || !t.rowId) {
+      alert("Please select a ticket first.");
+      return;
+    }
 
-    try{
+    try {
       const { error } = await supabaseClient
         .from("tickets")
-        .update({ status:"Closed" })
+        .update({ status: "Closed" })
         .eq("id", t.rowId);
 
-      if(error){
+      if (error) {
         console.error("Close ticket error:", error);
         alert("Close failed: " + (error.message || "Unknown error"));
         return;
@@ -1068,26 +525,30 @@
 
       await loadTickets();
       renderTickets();
-    }catch(e){
+      renderDetail();
+      alert("Ticket closed ✅");
+    } catch (e) {
       console.error("closeTicket exception:", e);
       alert("Exception: " + (e.message || e));
     }
   }
 
-  function assignTicket(){
-    alert("Assign button ready. We can connect it later to Supabase assigned_to.");
+  function assignTicket() {
+    alert("Assign is ready. Next step we can connect it to assign_to in Supabase.");
   }
 
-  function addNote(){
-    alert("Add Note button ready. We can connect it later to Supabase note table.");
+  function addNote() {
+    alert("Add Note is ready. Next step we can connect it to a notes table.");
   }
 
-  function exportJSON(){
+  function exportJSON() {
     const data = {
       exportedAt: new Date().toISOString(),
-      tickets: state.tickets
+      tickets: state.tickets,
+      repliesByTicket: state.repliesByTicket
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "cx_portal_export.json";
@@ -1095,34 +556,34 @@
     URL.revokeObjectURL(a.href);
   }
 
-  document.addEventListener("keydown", (e)=>{
-    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
       e.preventDefault();
       $("globalSearch").focus();
     }
   });
 
-  document.querySelectorAll(".nav button").forEach(btn=>{
-    btn.addEventListener("click", ()=> setView(btn.dataset.view));
+  document.querySelectorAll(".nav button").forEach(btn => {
+    btn.addEventListener("click", () => setView(btn.dataset.view));
   });
 
-  $("goTickets").onclick = ()=> setView("tickets");
-  $("goReports").onclick = ()=> setView("reports");
-  $("goSettings").onclick = ()=> setView("settings");
+  $("goTickets").onclick = () => setView("tickets");
+  $("goReports").onclick = () => setView("reports");
+  $("goSettings").onclick = () => setView("settings");
 
-  ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
+  ["filterStatus", "filterPriority", "filterBranch"].forEach(id => {
     $(id).addEventListener("input", renderTickets);
     $(id).addEventListener("change", renderTickets);
   });
 
   $("globalSearch").addEventListener("input", renderTickets);
 
-  $("btnTheme").onclick = ()=>{
+  $("btnTheme").onclick = () => {
     state.theme = state.theme === "dark" ? "light" : "dark";
     applyTheme();
   };
 
-  $("btnLang").onclick = ()=>{
+  $("btnLang").onclick = () => {
     state.lang = state.lang === "en" ? "ar" : "en";
     applyLang();
     renderTickets();
@@ -1137,16 +598,16 @@
   $("btnAssign").onclick = assignTicket;
   $("btnAddNote").onclick = addNote;
 
-  $("saveBrand").onclick = ()=>{
+  $("saveBrand").onclick = () => {
     const v = $("brandInput").value.trim();
-    if(v){
+    if (v) {
       state.brandTitle = v;
       $("brandTitle").textContent = v;
       alert("Brand saved ✅");
     }
   };
 
-  (async function init(){
+  (async function init() {
     applyTheme();
     applyLang();
     computeKPIs();
@@ -1154,5 +615,3 @@
     await loadTickets();
   })();
 </script>
-</body>
-</html>
