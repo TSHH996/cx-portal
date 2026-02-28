@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CX Portal — Tickets Dashboard</title>
-  <meta name="description" content="Customer Experience Ticketing Portal (Demo UI) — Ready for Microsoft integration." />
+  <meta name="description" content="Customer Experience Ticketing Portal" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,438 +14,432 @@
 
   <style>
     :root{
-      --bg: #0b1020;
+      --bg:#0b1020;
       --bg2:#0e1630;
-      --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.12);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.65);
-      --muted2: rgba(255,255,255,.48);
-      --brand: #6ee7ff;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.65);
+      --muted2:rgba(255,255,255,.48);
+      --brand:#6ee7ff;
       --brand2:#a78bfa;
       --good:#34d399;
       --warn:#fbbf24;
       --bad:#fb7185;
-      --chip:#111a35;
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
-      --radius: 18px;
-      --radius2: 26px;
-      --font: "Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      --shadow:0 12px 30px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:26px;
+      --font:"Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-
     [data-theme="light"]{
-      --bg: #f7f8ff;
+      --bg:#f7f8ff;
       --bg2:#eef2ff;
-      --card: rgba(10,20,60,.04);
-      --card2: rgba(10,20,60,.06);
-      --stroke: rgba(10,20,60,.10);
-      --text: rgba(10,20,60,.92);
-      --muted: rgba(10,20,60,.65);
-      --muted2: rgba(10,20,60,.50);
-      --chip:#f1f5ff;
-      --shadow: 0 10px 25px rgba(10,20,60,.12);
-      --brand: #0ea5e9;
+      --card:rgba(10,20,60,.04);
+      --card2:rgba(10,20,60,.06);
+      --stroke:rgba(10,20,60,.10);
+      --text:rgba(10,20,60,.92);
+      --muted:rgba(10,20,60,.65);
+      --muted2:rgba(10,20,60,.50);
+      --shadow:0 10px 25px rgba(10,20,60,.12);
+      --brand:#0ea5e9;
       --brand2:#7c3aed;
     }
 
-    *{ box-sizing:border-box }
-    html,body{ height:100% }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: var(--font);
+      font-family:var(--font);
       background:
         radial-gradient(900px 600px at 10% 10%, rgba(110,231,255,.20), transparent 60%),
         radial-gradient(900px 600px at 90% 20%, rgba(167,139,250,.20), transparent 55%),
         radial-gradient(900px 600px at 50% 95%, rgba(52,211,153,.12), transparent 55%),
         linear-gradient(180deg, var(--bg), var(--bg2));
-      color: var(--text);
+      color:var(--text);
       overflow-x:hidden;
     }
-
-    a{ color:inherit; text-decoration:none }
-    body, input, textarea, select, button { font-family: var(--font); }
-    [dir="rtl"] body { letter-spacing: 0; }
+    body, input, textarea, select, button{font-family:var(--font)}
+    a{color:inherit;text-decoration:none}
 
     .app{
       display:grid;
-      grid-template-columns: 290px 1fr;
+      grid-template-columns:290px 1fr;
       min-height:100vh;
     }
     .sidebar{
-      position:sticky; top:0; height:100vh;
+      position:sticky;
+      top:0;
+      height:100vh;
       padding:18px 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-right: 1px solid var(--stroke);
-      backdrop-filter: blur(14px);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-right:1px solid var(--stroke);
+      backdrop-filter:blur(14px);
     }
     .brandRow{
-      display:flex; align-items:center; gap:12px;
+      display:flex;
+      align-items:center;
+      gap:12px;
       padding:10px 10px 16px 10px;
     }
     .logo{
-      width:42px; height:42px; border-radius:14px;
-      background: linear-gradient(135deg, var(--brand), var(--brand2));
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-      display:grid; place-items:center;
-      color:#061026; font-weight:900;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow:0 10px 25px rgba(0,0,0,.25);
+      display:grid;
+      place-items:center;
+      color:#061026;
+      font-weight:900;
     }
-    .brandText .t{ font-weight:800; letter-spacing:.2px; }
-    .brandText .s{ font-size:12px; color: var(--muted); margin-top:2px }
+    .brandText .t{font-weight:800}
+    .brandText .s{font-size:12px;color:var(--muted);margin-top:2px}
+
     .nav{
       margin-top:8px;
-      display:flex; flex-direction:column; gap:8px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
     .nav button{
       width:100%;
       border:1px solid var(--stroke);
-      background: transparent;
-      color: var(--text);
+      background:transparent;
+      color:var(--text);
       padding:11px 12px;
-      border-radius: 14px;
-      display:flex; align-items:center; justify-content:space-between;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       cursor:pointer;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
     }
-    .nav button:hover{ transform: translateY(-1px); background: var(--card) }
     .nav button.active{
-      background: linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
-      border-color: rgba(110,231,255,.30);
+      background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
+      border-color:rgba(110,231,255,.30);
     }
-    .nav .left{ display:flex; align-items:center; gap:10px }
+    .nav .left{display:flex;align-items:center;gap:10px}
     .icon{
-      width:28px; height:28px; border-radius:10px;
-      background: var(--card);
-      display:grid; place-items:center;
+      width:28px;height:28px;border-radius:10px;
+      background:var(--card);
+      display:grid;place-items:center;
       border:1px solid var(--stroke);
       font-size:14px;
     }
-    .pill{
+    .pill,.badge{
       font-size:12px;
-      padding:3px 8px;
+      padding:4px 8px;
       border-radius:999px;
-      background: var(--card);
       border:1px solid var(--stroke);
-      color: var(--muted);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
     }
+    .badge.good{border-color:rgba(52,211,153,.35);color:rgba(52,211,153,.95)}
+    .badge.warn{border-color:rgba(251,191,36,.35);color:rgba(251,191,36,.95)}
+    .badge.bad{border-color:rgba(251,113,133,.35);color:rgba(251,113,133,.95)}
+
     .sidebarFooter{
-      position:absolute; left:14px; right:14px; bottom:14px;
+      position:absolute;
+      left:14px;right:14px;bottom:14px;
       padding:12px;
-      border-radius: 16px;
-      background: var(--card);
+      border-radius:16px;
+      background:var(--card);
       border:1px solid var(--stroke);
     }
-    .tinyRow{ display:flex; align-items:center; justify-content:space-between; gap:10px }
-    .toggleRow{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+    .tinyRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .toggleRow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
     .btn{
       border:1px solid var(--stroke);
-      background: var(--card);
-      color: var(--text);
+      background:var(--card);
+      color:var(--text);
       padding:9px 10px;
-      border-radius: 14px;
+      border-radius:14px;
       cursor:pointer;
-      transition: transform .12s ease, background .12s ease;
-      display:inline-flex; align-items:center; gap:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
-    .btn:hover{ transform: translateY(-1px); background: var(--card2) }
     .btn.primary{
-      background: linear-gradient(135deg, rgba(110,231,255,.20), rgba(167,139,250,.18));
-      border-color: rgba(110,231,255,.28);
+      background:linear-gradient(135deg, rgba(110,231,255,.20), rgba(167,139,250,.18));
+      border-color:rgba(110,231,255,.28);
     }
 
-    .main{ padding:18px 18px 28px 18px; }
+    .main{padding:18px 18px 28px 18px}
 
     .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:14px 14px;
-      border-radius: var(--radius2);
-      background: var(--card);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px;
+      border-radius:var(--radius2);
+      background:var(--card);
       border:1px solid var(--stroke);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
     }
-    .topbar .title{ display:flex; flex-direction:column; }
-    .topbar .title .h{ font-weight:850; font-size:18px }
-    .topbar .title .p{ color: var(--muted); font-size:13px; margin-top:2px }
-    .topActions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    .topbar .title .h{font-weight:850;font-size:18px}
+    .topbar .title .p{color:var(--muted);font-size:13px;margin-top:2px}
+    .topActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .search{
-      display:flex; align-items:center; gap:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
+      background:rgba(255,255,255,.04);
       padding:9px 12px;
-      border-radius: 14px;
-      min-width: 320px;
-      max-width: 420px;
+      border-radius:14px;
+      min-width:320px;
+      max-width:420px;
     }
-    [data-theme="light"] .search{ background: rgba(10,20,60,.03) }
     .search input{
       width:100%;
-      border:none; outline:none;
+      border:none;
+      outline:none;
       background:transparent;
-      color: var(--text);
+      color:var(--text);
       font-size:14px;
     }
 
     .grid{
       margin-top:16px;
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns:1.2fr .8fr;
       gap:14px;
     }
     .card{
       border:1px solid var(--stroke);
-      background: var(--card);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
+      background:var(--card);
+      border-radius:var(--radius2);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
     }
     .cardHeader{
       padding:14px 14px 10px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    [data-theme="light"] .cardHeader{ border-bottom:1px solid rgba(10,20,60,.08) }
-    .cardHeader .h{ font-weight:850; }
-    .cardHeader .s{ color: var(--muted); font-size:13px }
-    .cardBody{ padding:14px; }
+    .cardHeader .h{font-weight:850}
+    .cardHeader .s{color:var(--muted);font-size:13px}
+    .cardBody{padding:14px}
 
     .kpis{
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns:repeat(4,1fr);
       gap:12px;
     }
     .kpi{
       padding:14px;
-      border-radius: 18px;
+      border-radius:18px;
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      display:flex; flex-direction:column; gap:6px;
+      background:rgba(255,255,255,.04);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
-    [data-theme="light"] .kpi{ background: rgba(10,20,60,.03) }
-    .kpi .v{ font-size:22px; font-weight:900 }
-    .kpi .l{ color: var(--muted); font-size:12px }
-    .kpi .trend{ color: var(--muted2); font-size:12px }
+    .kpi .v{font-size:22px;font-weight:900}
+    .kpi .l{color:var(--muted);font-size:12px}
+    .kpi .trend{color:var(--muted2);font-size:12px}
 
     .ticketsLayout{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:14px;
       margin-top:14px;
     }
-    .list{
-      border-radius: var(--radius2);
+    .list,.detail{
+      border-radius:var(--radius2);
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.03);
+      background:rgba(255,255,255,.03);
       overflow:hidden;
-      min-height: 520px;
+      min-height:520px;
     }
-    [data-theme="light"] .list{ background: rgba(10,20,60,.02) }
-    .listTop{
+    .listTop,.detailHead{
       padding:12px;
-      display:flex; gap:10px; flex-wrap:wrap;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
       align-items:center;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    [data-theme="light"] .listTop{ border-bottom:1px solid rgba(10,20,60,.08) }
-    select, .chipInput{
+
+    select,.chipInput,.textarea{
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      color: var(--text);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
       padding:9px 10px;
-      border-radius: 14px;
+      border-radius:14px;
       outline:none;
       font-size:13px;
     }
-    [data-theme="light"] select,[data-theme="light"] .chipInput{ background: rgba(10,20,60,.03) }
-    .rows{ max-height: 620px; overflow:auto; }
+    .rows{max-height:620px;overflow:auto}
     .row{
       padding:12px;
       border-bottom:1px solid rgba(255,255,255,.06);
       cursor:pointer;
-      transition: background .12s ease, transform .12s ease;
-      display:flex; justify-content:space-between; gap:10px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
     }
-    [data-theme="light"] .row{ border-bottom:1px solid rgba(10,20,60,.08) }
-    .row:hover{ background: rgba(255,255,255,.04) }
-    [data-theme="light"] .row:hover{ background: rgba(10,20,60,.03) }
     .row.active{
-      background: linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
-      border-bottom-color: rgba(110,231,255,.22);
+      background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));
+      border-bottom-color:rgba(110,231,255,.22);
     }
     .row .meta{
-      display:flex; flex-direction:column; gap:6px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
       min-width:0;
     }
     .row .meta .t{
       font-weight:800;
       white-space:nowrap;
-      overflow:hidden; text-overflow:ellipsis;
-      max-width: 360px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:360px;
     }
     .row .meta .b{
-      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-      color: var(--muted); font-size:12px;
-    }
-    .badge{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
       font-size:12px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
     }
-    .badge.good{ border-color: rgba(52,211,153,.35); color: rgba(52,211,153,.95) }
-    .badge.warn{ border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95) }
-    .badge.bad{ border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95) }
     .rightMeta{
-      display:flex; flex-direction:column; align-items:flex-end; gap:6px;
-      color: var(--muted);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      color:var(--muted);
       font-size:12px;
       white-space:nowrap;
     }
 
-    .detail{
-      border-radius: var(--radius2);
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.03);
-      overflow:hidden;
-      min-height: 520px;
-    }
-    [data-theme="light"] .detail{ background: rgba(10,20,60,.02) }
-    .detailHead{
-      padding:12px;
-      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      align-items:center;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
     .detailHead .left{
-      display:flex; flex-direction:column;
+      display:flex;
+      flex-direction:column;
       gap:4px;
-      min-width: 260px;
+      min-width:260px;
     }
     .detailHead .left .h{
-      font-weight:900; font-size:16px;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      max-width: 420px;
+      font-weight:900;
+      font-size:16px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:420px;
     }
-    .detailHead .left .s{ color: var(--muted); font-size:12px }
-    .detailHead .actions{ display:flex; gap:8px; flex-wrap:wrap }
+    .detailHead .left .s{color:var(--muted);font-size:12px}
+    .detailHead .actions{display:flex;gap:8px;flex-wrap:wrap}
 
     .twoCols{
       display:grid;
-      grid-template-columns: 1fr;
+      grid-template-columns:1fr;
       gap:12px;
       padding:12px;
     }
     .panel{
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      border-radius: 18px;
+      background:rgba(255,255,255,.04);
+      border-radius:18px;
       padding:12px;
     }
-    [data-theme="light"] .panel{ background: rgba(10,20,60,.03) }
-    .panel .ph{ font-weight:850; margin-bottom:8px }
+    .panel .ph{font-weight:850;margin-bottom:8px}
     .kv{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:8px;
       font-size:13px;
-      color: var(--muted);
+      color:var(--muted);
     }
-    .kv div{ padding:8px 10px; border:1px dashed rgba(255,255,255,.12); border-radius: 14px }
-    [data-theme="light"] .kv div{ border-color: rgba(10,20,60,.16) }
-    .kv b{ color: var(--text) }
+    .kv div{
+      padding:8px 10px;
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:14px;
+    }
+    .kv b{color:var(--text)}
     .textarea{
       width:100%;
       min-height:100px;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.03);
-      color: var(--text);
-      border-radius: 16px;
-      padding:10px 12px;
-      outline:none;
       resize:vertical;
-      font-family: var(--font);
-      font-size:13px;
     }
-    [data-theme="light"] .textarea{ background: rgba(10,20,60,.02) }
 
-    .timeline{ display:flex; flex-direction:column; gap:10px; }
-    .event{ display:flex; gap:10px; align-items:flex-start; }
+    .timeline{display:flex;flex-direction:column;gap:10px}
+    .event{display:flex;gap:10px;align-items:flex-start}
     .dot{
-      width:10px; height:10px; border-radius:999px;
-      margin-top:6px;
-      background: var(--brand);
-      box-shadow: 0 0 0 4px rgba(110,231,255,.12);
+      width:10px;height:10px;border-radius:999px;margin-top:6px;
+      background:var(--brand);
+      box-shadow:0 0 0 4px rgba(110,231,255,.12);
     }
     .event .box{
       flex:1;
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
       padding:10px 12px;
     }
-    [data-theme="light"] .event .box{ background: rgba(10,20,60,.02) }
-    .event .box .t{ font-weight:850; font-size:13px }
-    .event .box .d{ color: var(--muted); font-size:12px; margin-top:4px; line-height:1.5 }
-    .event .box .m{ color: var(--muted2); font-size:11px; margin-top:8px }
+    .event .box .t{font-weight:850;font-size:13px}
+    .event .box .d{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+    .event .box .m{color:var(--muted2);font-size:11px;margin-top:8px}
 
     .chart{
-      height: 210px;
+      height:210px;
       width:100%;
-      border-radius: 18px;
+      border-radius:18px;
       border:1px solid var(--stroke);
-      background: rgba(255,255,255,.03);
+      background:rgba(255,255,255,.03);
       padding:10px;
       position:relative;
       overflow:hidden;
     }
-    [data-theme="light"] .chart{ background: rgba(10,20,60,.02) }
-    .bars{ display:flex; gap:10px; align-items:flex-end; height:100%; padding:10px; }
+    .bars{display:flex;gap:10px;align-items:flex-end;height:100%;padding:10px}
     .bar{
       flex:1;
-      border-radius: 12px 12px 6px 6px;
-      background: linear-gradient(180deg, rgba(110,231,255,.70), rgba(167,139,250,.55));
+      border-radius:12px 12px 6px 6px;
+      background:linear-gradient(180deg, rgba(110,231,255,.70), rgba(167,139,250,.55));
       border:1px solid rgba(110,231,255,.20);
-      filter: drop-shadow(0 8px 14px rgba(0,0,0,.25));
-      min-width: 14px;
+      min-width:14px;
     }
     .barLabel{
-      position:absolute; bottom:10px; left:10px; right:10px;
-      display:flex; justify-content:space-between;
-      color: var(--muted2);
+      position:absolute;
+      bottom:10px;left:10px;right:10px;
+      display:flex;
+      justify-content:space-between;
+      color:var(--muted2);
       font-size:11px;
     }
     .footerNote{
       margin-top:14px;
-      color: var(--muted2);
+      color:var(--muted2);
       font-size:12px;
       text-align:center;
     }
 
-    [dir="rtl"] .app{ grid-template-columns: 1fr 290px; }
-    [dir="rtl"] .sidebar{ border-right:none; border-left:1px solid var(--stroke); }
-    [dir="rtl"] .brandRow{ padding-right:10px; padding-left:10px }
-    [dir="rtl"] .topbar{ direction: rtl; }
-    [dir="rtl"] .topActions{ flex-direction: row-reverse; }
-    [dir="rtl"] .search{ direction: rtl; }
-    [dir="rtl"] .row{ direction: rtl; }
-    [dir="rtl"] .row .rightMeta{ align-items:flex-start; }
-    [dir="rtl"] .detailHead{ direction: rtl; }
-    [dir="rtl"] .detailHead .actions{ justify-content:flex-start; }
-    [dir="rtl"] .kv{ direction: rtl; }
-    [dir="rtl"] .barLabel{ direction: rtl; }
+    [dir="rtl"] .app{grid-template-columns:1fr 290px}
+    [dir="rtl"] .sidebar{border-right:none;border-left:1px solid var(--stroke)}
+    [dir="rtl"] .topbar,
+    [dir="rtl"] .search,
+    [dir="rtl"] .row,
+    [dir="rtl"] .detailHead,
+    [dir="rtl"] .kv,
+    [dir="rtl"] .barLabel{direction:rtl}
+    [dir="rtl"] .row .rightMeta{align-items:flex-start}
 
-    @media (max-width: 1100px){
-      .app{ grid-template-columns: 1fr; }
-      .sidebar{ position:relative; height:auto; }
-      [dir="rtl"] .app{ grid-template-columns:1fr; }
-      .grid{ grid-template-columns:1fr; }
-      .ticketsLayout{ grid-template-columns:1fr; }
-      .search{ min-width: 220px; width:100%; max-width:none }
-      .topbar{ flex-direction:column; align-items:stretch }
-      .topActions{ justify-content:space-between }
-      .kpis{ grid-template-columns: repeat(2,1fr) }
+    @media (max-width:1100px){
+      .app{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      [dir="rtl"] .app{grid-template-columns:1fr}
+      .grid,.ticketsLayout{grid-template-columns:1fr}
+      .search{min-width:220px;width:100%;max-width:none}
+      .topbar{flex-direction:column;align-items:stretch}
+      .topActions{justify-content:space-between}
+      .kpis{grid-template-columns:repeat(2,1fr)}
     }
   </style>
 </head>
@@ -463,30 +457,30 @@
 
       <div class="nav">
         <button class="active" data-view="dashboard">
-          <div class="left"><div class="icon">📊</div><div id="navDash">Dashboard</div></div>
-          <span class="pill" id="navDashPill">Live</span>
+          <div class="left"><div class="icon">📊</div><div>Dashboard</div></div>
+          <span class="pill">Live</span>
         </button>
         <button data-view="tickets">
-          <div class="left"><div class="icon">🎫</div><div id="navTickets">Tickets</div></div>
-          <span class="pill" id="navTicketsPill">Inbox</span>
+          <div class="left"><div class="icon">🎫</div><div>Tickets</div></div>
+          <span class="pill">Inbox</span>
         </button>
         <button data-view="reports">
-          <div class="left"><div class="icon">📈</div><div id="navReports">Reports</div></div>
-          <span class="pill" id="navReportsPill">Weekly</span>
+          <div class="left"><div class="icon">📈</div><div>Reports</div></div>
+          <span class="pill">Weekly</span>
         </button>
         <button data-view="settings">
-          <div class="left"><div class="icon">⚙️</div><div id="navSettings">Settings</div></div>
-          <span class="pill" id="navSettingsPill">UI</span>
+          <div class="left"><div class="icon">⚙️</div><div>Settings</div></div>
+          <span class="pill">UI</span>
         </button>
       </div>
 
       <div class="sidebarFooter">
         <div class="tinyRow">
           <div style="display:flex;gap:10px;align-items:center">
-            <span class="badge" id="roleBadge">CX Team</span>
-            <span class="badge" id="branchCountBadge">60+ Branches</span>
+            <span class="badge">CX Team</span>
+            <span class="badge">60+ Branches</span>
           </div>
-          <span class="badge" id="versionBadge">v1 Demo</span>
+          <span class="badge">v1</span>
         </div>
 
         <div class="toggleRow">
@@ -507,10 +501,9 @@
           <div class="search">
             🔎
             <input id="globalSearch" placeholder="Search tickets, branches, customers..." />
-            <span class="pill" id="searchHint">Ctrl/⌘ K</span>
+            <span class="pill">Ctrl/⌘ K</span>
           </div>
-          <button class="btn" id="btnExport">⬇️ <span id="btnExportTxt">Export</span></button>
-          <button class="btn" id="btnMockReply">✉️ <span id="btnMockReplyTxt">Simulate Branch Reply</span></button>
+          <button class="btn" id="btnExport">⬇️ Export</button>
         </div>
       </div>
 
@@ -519,31 +512,31 @@
           <div class="card">
             <div class="cardHeader">
               <div>
-                <div class="h" id="kpiHeader">Today Overview</div>
-                <div class="s" id="kpiSub">Live snapshot (demo data)</div>
+                <div class="h">Today Overview</div>
+                <div class="s" id="kpiSub">Live snapshot</div>
               </div>
-              <span class="badge" id="kpiNote">Ready for Microsoft integration</span>
+              <span class="badge">Supabase Connected</span>
             </div>
             <div class="cardBody">
               <div class="kpis">
                 <div class="kpi">
                   <div class="v" id="kpiOpen">0</div>
-                  <div class="l" id="kpiOpenL">Open Tickets</div>
+                  <div class="l">Open Tickets</div>
                   <div class="trend" id="kpiOpenT">—</div>
                 </div>
                 <div class="kpi">
                   <div class="v" id="kpiReplied">0</div>
-                  <div class="l" id="kpiRepliedL">Branch Replied</div>
+                  <div class="l">Branch Replied</div>
                   <div class="trend" id="kpiRepliedT">—</div>
                 </div>
                 <div class="kpi">
                   <div class="v" id="kpiSla">0%</div>
-                  <div class="l" id="kpiSlaL">SLA Compliance</div>
+                  <div class="l">SLA Compliance</div>
                   <div class="trend" id="kpiSlaT">—</div>
                 </div>
                 <div class="kpi">
                   <div class="v" id="kpiAvg">0h</div>
-                  <div class="l" id="kpiAvgL">Avg Response</div>
+                  <div class="l">Avg Response</div>
                   <div class="trend" id="kpiAvgT">—</div>
                 </div>
               </div>
@@ -551,13 +544,13 @@
               <div style="margin-top:14px" class="chart">
                 <div class="bars" id="bars"></div>
                 <div class="barLabel">
-                  <span id="chartLeft">Ticket Volume (last 7 days)</span>
-                  <span id="chartRight">Demo</span>
+                  <span>Ticket Volume</span>
+                  <span>Live</span>
                 </div>
               </div>
 
-              <div class="footerNote" id="dashNote">
-                This is a UI demo. Replace the local data with Microsoft Dataverse / SharePoint / Graph APIs later.
+              <div class="footerNote" id="systemMsg">
+                Connected to Supabase tickets table.
               </div>
             </div>
           </div>
@@ -565,19 +558,19 @@
           <div class="card">
             <div class="cardHeader">
               <div>
-                <div class="h" id="quickHeader">Quick Actions</div>
-                <div class="s" id="quickSub">What do you want to do now?</div>
+                <div class="h">Quick Actions</div>
+                <div class="s">What do you want to do now?</div>
               </div>
             </div>
             <div class="cardBody">
               <div style="display:flex;flex-direction:column;gap:10px">
-                <button class="btn primary" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
-                <button class="btn" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
-                <button class="btn" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
+                <button class="btn primary" id="goTickets">🎫 Go to Tickets Inbox</button>
+                <button class="btn" id="goReports">📈 Open Reports</button>
+                <button class="btn" id="goSettings">⚙️ Customize UI</button>
                 <div class="panel" style="margin-top:6px">
-                  <div class="ph" id="tipHeader">Integration Tip</div>
-                  <div style="color:var(--muted);font-size:13px;line-height:1.6" id="tipBody">
-                    When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.
+                  <div class="ph">Database Note</div>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.6">
+                    New Ticket inserts directly into Supabase table: <b>tickets</b>
                   </div>
                 </div>
               </div>
@@ -590,8 +583,19 @@
         <div class="ticketsLayout">
           <div class="list">
             <div class="listTop">
-              <select id="filterStatus"></select>
-              <select id="filterPriority"></select>
+              <select id="filterStatus">
+                <option value="all">All Status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Replied">Replied</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <select id="filterPriority">
+                <option value="all">All Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
               <input class="chipInput" id="filterBranch" placeholder="Branch contains..." />
               <span class="badge" id="resultCount">0 tickets</span>
             </div>
@@ -602,44 +606,41 @@
             <div class="detailHead">
               <div class="left">
                 <div class="h" id="detailTitle">Select a ticket</div>
-                <div class="s" id="detailSub">Open a ticket to view details, timeline, and reply info.</div>
+                <div class="s" id="detailSub">Open a ticket to view details.</div>
               </div>
               <div class="actions">
-                <button class="btn" id="btnAssign">👤 <span id="btnAssignTxt">Assign</span></button>
-                <button class="btn" id="btnClose">✅ <span id="btnCloseTxt">Close</span></button>
-                <button class="btn primary" id="btnAddNote">📝 <span id="btnAddNoteTxt">Add Note</span></button>
+                <button class="btn" id="btnAssign">👤 Assign</button>
+                <button class="btn" id="btnClose">✅ Close</button>
+                <button class="btn primary" id="btnAddNote">📝 Add Note</button>
               </div>
             </div>
 
             <div class="twoCols">
               <div class="panel">
-                <div class="ph" id="panelInfoH">Ticket Info</div>
+                <div class="ph">Ticket Info</div>
                 <div class="kv" id="ticketInfo"></div>
               </div>
               <div class="panel">
-                <div class="ph" id="panelDescH">Description</div>
+                <div class="ph">Description</div>
                 <div style="color:var(--muted);font-size:13px;line-height:1.6" id="ticketDesc">—</div>
               </div>
               <div class="panel">
-                <div class="ph" id="panelReplyH">Branch Reply</div>
+                <div class="ph">Branch Reply</div>
                 <div style="display:flex;gap:10px;flex-direction:column">
                   <textarea class="textarea" id="branchReply" placeholder="Branch reply will appear here..."></textarea>
                   <div style="display:flex;gap:10px;flex-wrap:wrap">
-                    <button class="btn primary" id="btnSaveReply">💾 <span id="btnSaveReplyTxt">Save Reply</span></button>
-                    <button class="btn" id="btnMarkReplied">✳️ <span id="btnMarkRepliedTxt">Mark as Replied</span></button>
+                    <button class="btn primary" id="btnSaveReply">💾 Save Reply</button>
+                    <button class="btn" id="btnMarkReplied">✳️ Mark as Replied</button>
                   </div>
                   <div style="color:var(--muted2);font-size:12px" id="replyMeta">—</div>
                 </div>
               </div>
               <div class="panel">
-                <div class="ph" id="panelTimelineH">Timeline</div>
+                <div class="ph">Timeline</div>
                 <div class="timeline" id="timeline"></div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="footerNote" id="ticketsNote">
-          Demo only. For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.
         </div>
       </section>
 
@@ -647,20 +648,15 @@
         <div class="card" style="margin-top:16px">
           <div class="cardHeader">
             <div>
-              <div class="h" id="reportsH">Reports</div>
-              <div class="s" id="reportsS">Placeholder section (ready for Power BI / analytics)</div>
+              <div class="h">Reports</div>
+              <div class="s">Placeholder section</div>
             </div>
-            <span class="badge">Coming soon</span>
           </div>
           <div class="cardBody">
             <div class="panel">
-              <div class="ph" id="reportsTipH">What you can add here</div>
-              <div style="color:var(--muted);font-size:13px;line-height:1.7" id="reportsTip">
-                • Branch ranking (Google reviews, survey scores)<br/>
-                • SLA compliance by region/brand<br/>
-                • Top complaint categories and trends<br/>
-                • Export to Excel / PDF<br/>
-                • Embed Power BI (later)
+              <div class="ph">Ready for analytics</div>
+              <div style="color:var(--muted);font-size:13px;line-height:1.7">
+                Add Power BI, Excel export, SLA reports, complaint categories, and branch performance.
               </div>
             </div>
           </div>
@@ -671,32 +667,16 @@
         <div class="card" style="margin-top:16px">
           <div class="cardHeader">
             <div>
-              <div class="h" id="settingsH">Settings</div>
-              <div class="s" id="settingsS">Customize this portal UI</div>
+              <div class="h">Settings</div>
+              <div class="s">Customize this portal UI</div>
             </div>
           </div>
           <div class="cardBody">
             <div class="panel">
-              <div class="ph" id="brandingH">Branding</div>
+              <div class="ph">Branding</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                <input class="chipInput" id="brandInput" placeholder="Portal title (e.g., PFC CX Portal)" style="min-width:280px"/>
-                <button class="btn primary" id="saveBrand">💾 <span id="saveBrandTxt">Save</span></button>
-                <span class="badge" id="brandingNote">Saved in localStorage</span>
-              </div>
-              <div style="margin-top:10px;color:var(--muted);font-size:13px" id="brandingS">
-                This is a demo. Later, branding can be stored in Dataverse settings or SharePoint list.
-              </div>
-            </div>
-
-            <div class="panel" style="margin-top:12px">
-              <div class="ph" id="integrationH">Microsoft Integration (Later)</div>
-              <div style="color:var(--muted);font-size:13px;line-height:1.7" id="integrationS">
-                Recommended architecture (free to start):
-                <br/>• Azure Static Web Apps / Cloudflare Pages hosting
-                <br/>• Azure AD login (SSO)
-                <br/>• Dataverse (preferred) or SharePoint list as ticket store
-                <br/>• Power Automate / Graph API to capture branch email replies + attachments
-                <br/>• Store attachments in SharePoint/Dataverse and show them in ticket details
+                <input class="chipInput" id="brandInput" placeholder="Portal title" style="min-width:280px"/>
+                <button class="btn primary" id="saveBrand">💾 Save</button>
               </div>
             </div>
           </div>
@@ -708,450 +688,164 @@
 <script>
   const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  const $ = (id) => document.getElementById(id);
 
-  const $ = (id)=>document.getElementById(id);
-
-  const I18N = {
-    en: {
-      brandTitle:"CX Portal",
-      brandSub:"Tickets • Branch Replies • Reports",
-      Dashboard:"Dashboard",
-      Tickets:"Tickets",
-      Reports:"Reports",
-      Settings:"Settings",
-      pageDash:"Dashboard",
-      pageDashSub:"Monitor CX performance, ticket flow, and branch replies.",
-      pageTickets:"Tickets Inbox",
-      pageTicketsSub:"Search, filter, assign, and update branch replies in one place.",
-      pageReports:"Reports",
-      pageReportsSub:"Analytics area (ready for Power BI).",
-      pageSettings:"Settings",
-      pageSettingsSub:"Customize portal language, theme, and branding.",
-      newTicket:"New Ticket",
-      export:"Export",
-      simReply:"Simulate Branch Reply",
-      searchPH:"Search tickets, branches, customers...",
-      branchPH:"Branch contains...",
-      today:"Today Overview",
-      live:"Live snapshot",
-      open:"Open Tickets",
-      replied:"Branch Replied",
-      sla:"SLA Compliance",
-      avg:"Avg Response",
-      chartLeft:"Ticket Volume (last 7 days)",
-      quick:"Quick Actions",
-      goInbox:"Go to Tickets Inbox",
-      openReports:"Open Reports",
-      customize:"Customize UI",
-      tipH:"Integration Tip",
-      tipBody:"When ready: use Azure AD SSO + Microsoft Graph to read branch replies from email, then store replies + attachments into SharePoint/Dataverse and display them here.",
-      ticketsNote:"For real email replies + attachments, connect Graph + store files in SharePoint/Dataverse.",
-      selectTicket:"Select a ticket",
-      selectTicketSub:"Open a ticket to view details, timeline, and reply info.",
-      assign:"Assign",
-      close:"Close",
-      addNote:"Add Note",
-      info:"Ticket Info",
-      desc:"Description",
-      reply:"Branch Reply",
-      saveReply:"Save Reply",
-      markReplied:"Mark as Replied",
-      timeline:"Timeline",
-      replyMetaNone:"No branch reply yet.",
-      replyMetaBy:"Reply by",
-      reportsTipH:"What you can add here",
-      settingsH:"Settings",
-      settingsS:"Customize this portal UI",
-      brandingH:"Branding",
-      save:"Save",
-      integrationH:"Microsoft Integration (Later)",
-      statusAll:"All Status",
-      statusOpen:"Open",
-      statusProgress:"In Progress",
-      statusReplied:"Replied",
-      statusClosed:"Closed",
-      prioAll:"All Priority",
-      prioHigh:"High",
-      prioMed:"Medium",
-      prioLow:"Low",
-      f_ticket:"Ticket",
-      f_status:"Status",
-      f_priority:"Priority",
-      f_branch:"Branch",
-      f_category:"Category",
-      f_source:"Source",
-      f_customer:"Customer",
-      f_phone:"Phone",
-      f_assigned:"Assigned",
-      f_created:"Created"
-    },
-    ar: {
-      brandTitle:"بوابة تجارب العملاء",
-      brandSub:"التذاكر • ردود الفروع • التقارير",
-      Dashboard:"لوحة التحكم",
-      Tickets:"التذاكر",
-      Reports:"التقارير",
-      Settings:"الإعدادات",
-      pageDash:"لوحة التحكم",
-      pageDashSub:"تابع أداء تجارب العملاء، حركة التذاكر، وردود الفروع.",
-      pageTickets:"صندوق التذاكر",
-      pageTicketsSub:"بحث وفلاتر وتعيين مسؤول وتحديث ردود الفروع من مكان واحد.",
-      pageReports:"التقارير",
-      pageReportsSub:"قسم التحليلات (جاهز لـ Power BI).",
-      pageSettings:"الإعدادات",
-      pageSettingsSub:"تحكم باللغة والثيم والهوية.",
-      newTicket:"تذكرة جديدة",
-      export:"تصدير",
-      simReply:"محاكاة رد فرع",
-      searchPH:"ابحث عن التذاكر / الفروع / العملاء...",
-      branchPH:"ابحث باسم الفرع...",
-      today:"ملخص اليوم",
-      live:"لقطة مباشرة",
-      open:"تذاكر مفتوحة",
-      replied:"تم الرد من الفرع",
-      sla:"الالتزام بـ SLA",
-      avg:"متوسط الرد",
-      chartLeft:"حجم التذاكر (آخر 7 أيام)",
-      quick:"إجراءات سريعة",
-      goInbox:"الذهاب لصندوق التذاكر",
-      openReports:"فتح التقارير",
-      customize:"تخصيص الواجهة",
-      tipH:"نصيحة ربط",
-      tipBody:"عند الجاهزية: استخدم Azure AD + Microsoft Graph لقراءة ردود الفروع من الإيميل، ثم خزّن الردود والمرفقات في SharePoint/Dataverse واعرضها هنا.",
-      ticketsNote:"للربط الحقيقي مع ردود الإيميل والمرفقات: Graph + SharePoint/Dataverse.",
-      selectTicket:"اختر تذكرة",
-      selectTicketSub:"افتح تذكرة لعرض التفاصيل والتايم لاين ومعلومات الرد.",
-      assign:"تعيين",
-      close:"إغلاق",
-      addNote:"إضافة ملاحظة",
-      info:"معلومات التذكرة",
-      desc:"الوصف",
-      reply:"رد الفرع",
-      saveReply:"حفظ الرد",
-      markReplied:"تحديد كـ تم الرد",
-      timeline:"التايم لاين",
-      replyMetaNone:"لا يوجد رد من الفرع حتى الآن.",
-      replyMetaBy:"تم الرد بواسطة",
-      reportsTipH:"أفكار تضيفها هنا",
-      settingsH:"الإعدادات",
-      settingsS:"خصص هذه البوابة",
-      brandingH:"الهوية",
-      save:"حفظ",
-      integrationH:"الربط مع Microsoft (لاحقًا)",
-      statusAll:"كل الحالات",
-      statusOpen:"مفتوحة",
-      statusProgress:"قيد المعالجة",
-      statusReplied:"تم الرد",
-      statusClosed:"مغلقة",
-      prioAll:"كل الأولويات",
-      prioHigh:"عالية",
-      prioMed:"متوسطة",
-      prioLow:"منخفضة",
-      f_ticket:"رقم التذكرة",
-      f_status:"الحالة",
-      f_priority:"الأولوية",
-      f_branch:"الفرع",
-      f_category:"التصنيف",
-      f_source:"المصدر",
-      f_customer:"العميل",
-      f_phone:"الجوال",
-      f_assigned:"المسؤول",
-      f_created:"تاريخ الإنشاء"
-    }
+  const state = {
+    lang: "en",
+    theme: "dark",
+    brandTitle: "CX Portal",
+    tickets: [],
+    selectedId: null
   };
 
-  const BRANCHES = [
-    "Khamis Mushayt","Al Marwa","Mohammadiah","Red Sea","Clock Tower","Jizan","Shawqia","Naseem",
-    "Salamah","Terra Mall","Qurtoba","Obhour","Baghdadiah","Al Awali","Al Samer","Al Ghadeer",
-    "Anas Bin Malik","Al Yaqout","Dammam","Mercado","Buraydah","Uthman Ibn Affan","Riyadh Park"
-  ];
-
-  function rand(arr){ return arr[Math.floor(Math.random()*arr.length)] }
-  function pad(n){ return String(n).padStart(2,'0') }
+  function pad(n){ return String(n).padStart(2, "0"); }
   function fmtDate(d){
     const dt = new Date(d);
     return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
   }
-  function uid(){ return "TKT-" + Math.floor(100000 + Math.random()*900000); }
 
-  function demoTickets(){
-    const statuses = ["Open","In Progress","Replied","Closed"];
-    const prios = ["High","Medium","Low"];
-    const cats = ["Food Quality","Service Quality","Order Delay","Wrong Order","Foreign Object","Atmosphere"];
-    const sources = ["Google review","Dine In Survey","App Survey","Call Center","WhatsApp","Email","Meta Business"];
-    const names = ["Ahmed","Khalid","Sara","Maha","Fahad","Huda","Noura","Abdullah","Yousef","Reem"];
-    const notes = [
-      "Customer reported cold food and delay.",
-      "Customer complained about portion quantity issue.",
-      "Customer mentioned hair found in soup.",
-      "Wrong order delivered; missing items.",
-      "Service quality issue with cashier attitude.",
-      "Food tasted old/dry; not like usual."
-    ];
-    const now = Date.now();
-    const arr = [];
-    for(let i=0;i<20;i++){
-      const created = now - Math.floor(Math.random()*1000*60*60*72);
-      const st = rand(statuses);
-      const pr = rand(prios);
-      const br = rand(BRANCHES);
-      const id = uid();
-      arr.push({
-        id,
-        subject: `${id} • ${rand(cats)} • ${br}`,
-        status: st,
-        priority: pr,
-        branch: br,
-        category: rand(cats),
-        source: rand(sources),
-        customerName: rand(names),
-        customerPhone: "05" + Math.floor(10000000 + Math.random()*89999999),
-        createdAt: created,
-        assignedTo: "",
-        description: rand(notes),
-        branchReply: st==="Replied"||st==="Closed" ? "تم التواصل مع العميل واتخذنا الإجراء اللازم." : "",
-        replyBy: st==="Replied"||st==="Closed" ? "branch@company.com" : "",
-        replyAt: st==="Replied"||st==="Closed" ? (created + Math.floor(Math.random()*1000*60*60*10)) : null,
-        timeline: [{t:"Ticket created", d:"Created (demo).", m: fmtDate(created)}]
-      });
-    }
-    arr.sort((a,b)=>b.createdAt-a.createdAt);
-    return arr;
+  function uid(){ return "TKT-" + Math.floor(100000 + Math.random() * 900000); }
+
+  function currentView(){
+    if ($("view-tickets").style.display !== "none") return "tickets";
+    if ($("view-reports").style.display !== "none") return "reports";
+    if ($("view-settings").style.display !== "none") return "settings";
+    return "dashboard";
   }
 
-  const STORE_KEY = "cx_portal_state_v2";
-  const defaultState = {
-    lang:"en",
-    theme:"dark",
-    brandTitle:I18N.en.brandTitle,
-    tickets: demoTickets(),
-    selectedId: null,
-    sourceMode: "demo"
-  };
+  function setView(view){
+    ["dashboard","tickets","reports","settings"].forEach(v=>{
+      $("view-" + v).style.display = (v === view) ? "" : "none";
+      document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v === view);
+    });
 
-  const state = (()=> {
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if(!raw) return defaultState;
-      const parsed = JSON.parse(raw);
-      return {...defaultState, ...parsed};
-    }catch{
-      return defaultState;
+    if (view === "dashboard") {
+      $("pageTitle").textContent = "Dashboard";
+      $("pageSub").textContent = "Monitor CX performance, ticket flow, and branch replies.";
     }
-  })();
+    if (view === "tickets") {
+      $("pageTitle").textContent = "Tickets Inbox";
+      $("pageSub").textContent = "Search, filter, assign, and update branch replies in one place.";
+      renderTickets();
+    }
+    if (view === "reports") {
+      $("pageTitle").textContent = "Reports";
+      $("pageSub").textContent = "Analytics area.";
+    }
+    if (view === "settings") {
+      $("pageTitle").textContent = "Settings";
+      $("pageSub").textContent = "Customize portal language, theme, and branding.";
+      $("brandInput").value = state.brandTitle;
+    }
+  }
 
-  const saveState = ()=> localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  function applyTheme(){
+    document.body.setAttribute("data-theme", state.theme);
+    $("btnThemeTxt").textContent = state.theme === "dark" ? "Dark" : "Light";
+  }
+
+  function applyLang(){
+    const isAr = state.lang === "ar";
+    document.documentElement.lang = isAr ? "ar" : "en";
+    document.documentElement.dir = isAr ? "rtl" : "ltr";
+    $("btnLang").innerHTML = (isAr ? "🇸🇦" : "🇺🇸") + ` <span id="btnLangTxt">${state.lang.toUpperCase()}</span>`;
+    $("brandTitle").textContent = state.brandTitle;
+  }
+
+  function statusBadgeClass(s){
+    if(s === "Replied") return "good";
+    if(s === "In Progress") return "warn";
+    if(s === "Open") return "warn";
+    if(s === "Closed") return "";
+    return "";
+  }
+
+  function prioBadgeClass(p){
+    if(p === "High") return "bad";
+    if(p === "Medium") return "warn";
+    return "good";
+  }
+
+  function computeKPIs(){
+    const t = state.tickets || [];
+    const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
+    const replied = t.filter(x => x.status === "Replied" || x.status === "Closed").length;
+
+    $("kpiOpen").textContent = open;
+    $("kpiReplied").textContent = replied;
+    $("kpiSla").textContent = "100%";
+    $("kpiAvg").textContent = t.length ? "2h" : "0h";
+    $("kpiOpenT").textContent = `${open} active`;
+    $("kpiRepliedT").textContent = `${replied} handled`;
+    $("kpiSlaT").textContent = "Live";
+    $("kpiAvgT").textContent = "Live";
+
+    const bars = $("bars");
+    bars.innerHTML = "";
+    const values = [35, 50, 45, 70, 55, 80, 60];
+    values.forEach(v=>{
+      const el = document.createElement("div");
+      el.className = "bar";
+      el.style.height = v + "%";
+      bars.appendChild(el);
+    });
+  }
 
   async function loadTickets(){
     try{
       const { data, error } = await supabaseClient
         .from("tickets")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending:false });
 
       if(error){
-        console.log("Supabase error:", error);
+        console.error("Supabase load error:", error);
+        $("systemMsg").textContent = "Load error: " + (error.message || "Unknown error");
         return;
       }
 
-      if(Array.isArray(data) && data.length){
-        const mapped = data.map(r=>{
-          const tktNo = r.ticket_no ?? "";
-          const ticketId = tktNo ? `#${tktNo}` : (r.id ? String(r.id).slice(0,8) : uid());
-          const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
-          const branch = r.branch_name || r.branch || "—";
-          const customerName = r.customer_name || "—";
-          const customerPhone = r.customer_phone || r.customer_ph || "—";
+      state.tickets = (data || []).map(r => {
+        const ticketId = (r.ticket_no !== null && r.ticket_no !== undefined)
+          ? `#${r.ticket_no}`
+          : (r.id ? String(r.id).slice(0, 8) : uid());
 
-          return {
-            id: ticketId,
-            subject: `${ticketId} • ${branch}`,
-            status: r.status || "Open",
-            priority: r.priority || "Medium",
-            branch,
-            category: r.category || r.feedback_cat || "—",
-            source: r.source || r.feedback_type || "—",
-            customerName,
-            customerPhone,
-            createdAt,
-            assignedTo: r.assigned_to || "",
-            description: r.description || r.notes || "—",
-            branchReply: r.branch_reply || "",
-            replyBy: r.reply_by || "",
-            replyAt: r.reply_at ? new Date(r.reply_at).getTime() : null,
-            timeline: [
-              { t: "Ticket created", d: "Loaded from Supabase.", m: fmtDate(createdAt) }
-            ]
-          };
-        });
+        const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
 
-        state.tickets = mapped;
-        state.sourceMode = "supabase";
-        if(!state.selectedId && mapped[0]) state.selectedId = mapped[0].id;
-        saveState();
-        computeKPIs();
-        if(currentView()==="tickets") renderTickets();
+        return {
+          rowId: r.id || null,
+          id: ticketId,
+          subject: `${ticketId} • ${r.branch_name || "—"}`,
+          status: r.status || "Open",
+          priority: r.priority || "Medium",
+          branch: r.branch_name || "—",
+          category: r.category || "—",
+          source: r.source || "—",
+          customerName: r.customer_name || "—",
+          customerPhone: r.customer_phone || "—",
+          createdAt,
+          assignedTo: r.assigned_to || "",
+          description: r.description || "—",
+          branchReply: r.branch_reply || "",
+          replyBy: r.reply_by || "",
+          replyAt: r.reply_at ? new Date(r.reply_at).getTime() : null,
+          timeline: [
+            { t:"Ticket created", d:"Loaded from Supabase.", m: fmtDate(createdAt) }
+          ]
+        };
+      });
+
+      if (!state.selectedId && state.tickets.length) {
+        state.selectedId = state.tickets[0].id;
       }
-    } catch (e) {
-      console.log("loadTickets exception:", e);
-    }
-  }
 
-  function applyLang(){
-    const dict = I18N[state.lang];
-
-    document.documentElement.lang = (state.lang==="ar") ? "ar" : "en";
-    document.documentElement.dir  = (state.lang==="ar") ? "rtl" : "ltr";
-
-    $("brandTitle").textContent = state.brandTitle || dict.brandTitle;
-    $("brandSub").textContent = dict.brandSub;
-
-    document.querySelector('[data-view="dashboard"] .left div:last-child').textContent = dict.Dashboard;
-    document.querySelector('[data-view="tickets"] .left div:last-child').textContent = dict.Tickets;
-    document.querySelector('[data-view="reports"] .left div:last-child').textContent = dict.Reports;
-    document.querySelector('[data-view="settings"] .left div:last-child').textContent = dict.Settings;
-
-    $("btnNewTicketTxt").textContent = dict.newTicket;
-    $("btnExportTxt").textContent = dict.export;
-    $("btnMockReplyTxt").textContent = dict.simReply;
-
-    $("globalSearch").placeholder = dict.searchPH;
-    $("filterBranch").placeholder = dict.branchPH;
-
-    $("filterStatus").innerHTML = `
-      <option value="all">${dict.statusAll}</option>
-      <option value="Open">${dict.statusOpen}</option>
-      <option value="In Progress">${dict.statusProgress}</option>
-      <option value="Replied">${dict.statusReplied}</option>
-      <option value="Closed">${dict.statusClosed}</option>
-    `;
-    $("filterPriority").innerHTML = `
-      <option value="all">${dict.prioAll}</option>
-      <option value="High">${dict.prioHigh}</option>
-      <option value="Medium">${dict.prioMed}</option>
-      <option value="Low">${dict.prioLow}</option>
-    `;
-
-    $("kpiHeader").textContent = dict.today;
-    $("kpiSub").textContent = dict.live + (state.sourceMode==="supabase" ? " • Supabase" : " • Demo");
-    $("kpiOpenL").textContent = dict.open;
-    $("kpiRepliedL").textContent = dict.replied;
-    $("kpiSlaL").textContent = dict.sla;
-    $("kpiAvgL").textContent = dict.avg;
-    $("chartLeft").textContent = dict.chartLeft;
-
-    $("quickHeader").textContent = dict.quick;
-    $("goTicketsTxt").textContent = dict.goInbox;
-    $("goReportsTxt").textContent = dict.openReports;
-    $("goSettingsTxt").textContent = dict.customize;
-    $("tipHeader").textContent = dict.tipH;
-    $("tipBody").textContent = dict.tipBody;
-
-    $("ticketsNote").textContent = dict.ticketsNote;
-
-    $("detailTitle").textContent = dict.selectTicket;
-    $("detailSub").textContent = dict.selectTicketSub;
-    $("btnAssignTxt").textContent = dict.assign;
-    $("btnCloseTxt").textContent = dict.close;
-    $("btnAddNoteTxt").textContent = dict.addNote;
-    $("panelInfoH").textContent = dict.info;
-    $("panelDescH").textContent = dict.desc;
-    $("panelReplyH").textContent = dict.reply;
-    $("btnSaveReplyTxt").textContent = dict.saveReply;
-    $("btnMarkRepliedTxt").textContent = dict.markReplied;
-    $("panelTimelineH").textContent = dict.timeline;
-
-    $("reportsH").textContent = dict.pageReports;
-    $("reportsS").textContent = dict.pageReportsSub;
-
-    $("settingsH").textContent = dict.settingsH;
-    $("settingsS").textContent = dict.settingsS;
-    $("brandingH").textContent = dict.brandingH;
-    $("saveBrandTxt").textContent = dict.save;
-    $("integrationH").textContent = dict.integrationH;
-
-    $("btnLang").innerHTML = (state.lang==="ar" ? "🇸🇦" : "🇺🇸") + " <span id='btnLangTxt'>" + state.lang.toUpperCase() + "</span>";
-  }
-
-  function applyTheme(){
-    document.body.setAttribute("data-theme", state.theme);
-    const isDark = state.theme === "dark";
-    $("btnTheme").innerHTML = (isDark ? "🌙" : "☀️") + " <span id='btnThemeTxt'>" + (isDark ? "Dark" : "Light") + "</span>";
-  }
-
-  function setView(view){
-    const dict = I18N[state.lang];
-    const views = ["dashboard","tickets","reports","settings"];
-    views.forEach(v=>{
-      $("view-"+v).style.display = (v===view) ? "" : "none";
-      document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v===view);
-    });
-
-    if(view==="dashboard"){
-      $("pageTitle").textContent = dict.pageDash;
-      $("pageSub").textContent = dict.pageDashSub;
-    }
-    if(view==="tickets"){
-      $("pageTitle").textContent = dict.pageTickets;
-      $("pageSub").textContent = dict.pageTicketsSub;
-      renderTickets();
-    }
-    if(view==="reports"){
-      $("pageTitle").textContent = dict.pageReports;
-      $("pageSub").textContent = dict.pageReportsSub;
-    }
-    if(view==="settings"){
-      $("pageTitle").textContent = dict.pageSettings;
-      $("pageSub").textContent = dict.pageSettingsSub;
-      $("brandInput").value = state.brandTitle || I18N[state.lang].brandTitle;
-    }
-  }
-
-  function statusBadgeClass(s){
-    if(s==="Replied") return "good";
-    if(s==="In Progress") return "warn";
-    if(s==="Open") return "warn";
-    if(s==="Closed") return "badge";
-    return "badge";
-  }
-
-  function prioBadgeClass(p){
-    if(p==="High") return "bad";
-    if(p==="Medium") return "warn";
-    return "good";
-  }
-
-  function computeKPIs(){
-    const t = state.tickets || [];
-    const open = t.filter(x=>x.status==="Open"||x.status==="In Progress").length;
-    const replied = t.filter(x=>x.status==="Replied"||x.status==="Closed").length;
-
-    const sla = Math.max(78, Math.min(98, Math.round(80 + Math.random()*18)));
-    const avg = Math.max(1, Math.min(18, Math.round(2 + Math.random()*10)));
-
-    $("kpiOpen").textContent = open;
-    $("kpiReplied").textContent = replied;
-    $("kpiSla").textContent = sla + "%";
-    $("kpiAvg").textContent = avg + "h";
-
-    $("kpiOpenT").textContent = "+ " + Math.round(Math.random()*8) + " today";
-    $("kpiRepliedT").textContent = "+ " + Math.round(Math.random()*8) + " today";
-    $("kpiSlaT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*3) + "% vs last week";
-    $("kpiAvgT").textContent = (Math.random()>.5?"+":"-") + Math.round(Math.random()*2) + "h vs last week";
-
-    const bars = $("bars");
-    bars.innerHTML = "";
-    for(let i=0;i<7;i++){
-      const h = 20 + Math.round(Math.random()*80);
-      const el = document.createElement("div");
-      el.className="bar";
-      el.style.height = h + "%";
-      bars.appendChild(el);
+      computeKPIs();
+      if (currentView() === "tickets") renderTickets();
+      $("systemMsg").textContent = `Connected. Loaded ${state.tickets.length} ticket(s).`;
+    }catch(e){
+      console.error("loadTickets exception:", e);
+      $("systemMsg").textContent = "Exception: " + (e.message || e);
     }
   }
 
@@ -1161,12 +855,12 @@
     const prio = $("filterPriority").value;
     const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
 
-    return (state.tickets||[]).filter(t=>{
-      const hay = (t.id+" "+t.subject+" "+t.branch+" "+t.customerName+" "+t.customerPhone+" "+t.category+" "+t.source+" "+t.description).toLowerCase();
-      if(q && !hay.includes(q)) return false;
-      if(status!=="all" && t.status!==status) return false;
-      if(prio!=="all" && t.priority!==prio) return false;
-      if(branchQ && !String(t.branch||"").toLowerCase().includes(branchQ)) return false;
+    return (state.tickets || []).filter(t => {
+      const hay = `${t.id} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.source} ${t.description}`.toLowerCase();
+      if (q && !hay.includes(q)) return false;
+      if (status !== "all" && t.status !== status) return false;
+      if (prio !== "all" && t.priority !== prio) return false;
+      if (branchQ && !String(t.branch || "").toLowerCase().includes(branchQ)) return false;
       return true;
     });
   }
@@ -1174,25 +868,30 @@
   function renderTickets(){
     const rows = $("ticketRows");
     const list = filterTickets();
-    $("resultCount").textContent = list.length + (state.lang==="ar" ? " تذكرة" : " tickets");
 
-    if(!state.selectedId && list[0]) state.selectedId = list[0].id;
+    $("resultCount").textContent = `${list.length} tickets`;
+
+    if (!state.selectedId && list[0]) state.selectedId = list[0].id;
 
     rows.innerHTML = "";
-    list.forEach(t=>{
+    list.forEach(t => {
       const r = document.createElement("div");
-      r.className = "row" + (t.id===state.selectedId ? " active" : "");
-      r.onclick = ()=>{ state.selectedId = t.id; saveState(); renderTickets(); renderDetail(); };
+      r.className = "row" + (t.id === state.selectedId ? " active" : "");
+      r.onclick = () => {
+        state.selectedId = t.id;
+        renderTickets();
+        renderDetail();
+      };
 
       const left = document.createElement("div");
-      left.className="meta";
+      left.className = "meta";
 
       const title = document.createElement("div");
-      title.className="t";
+      title.className = "t";
       title.textContent = t.subject;
 
       const b = document.createElement("div");
-      b.className="b";
+      b.className = "b";
       b.innerHTML = `
         <span class="badge ${prioBadgeClass(t.priority)}">${t.priority}</span>
         <span class="badge ${statusBadgeClass(t.status)}">${t.status}</span>
@@ -1203,7 +902,7 @@
       left.appendChild(b);
 
       const right = document.createElement("div");
-      right.className="rightMeta";
+      right.className = "rightMeta";
       right.innerHTML = `<div>${t.id}</div><div>${fmtDate(t.createdAt)}</div>`;
 
       r.appendChild(left);
@@ -1215,9 +914,8 @@
   }
 
   function renderDetail(){
-    const dict = I18N[state.lang];
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t){
+    const t = (state.tickets || []).find(x => x.id === state.selectedId);
+    if (!t) {
       $("ticketInfo").innerHTML = "";
       $("ticketDesc").textContent = "—";
       $("branchReply").value = "";
@@ -1227,34 +925,34 @@
     }
 
     $("detailTitle").textContent = t.subject;
-    $("detailSub").textContent = t.id + " • " + t.branch + " • " + t.status;
+    $("detailSub").textContent = `${t.id} • ${t.branch} • ${t.status}`;
 
     const info = [
-      [dict.f_ticket, t.id],
-      [dict.f_status, t.status],
-      [dict.f_priority, t.priority],
-      [dict.f_branch, t.branch],
-      [dict.f_category, t.category],
-      [dict.f_source, t.source],
-      [dict.f_customer, t.customerName],
-      [dict.f_phone, t.customerPhone],
-      [dict.f_assigned, t.assignedTo || "—"],
-      [dict.f_created, fmtDate(t.createdAt)]
+      ["Ticket", t.id],
+      ["Status", t.status],
+      ["Priority", t.priority],
+      ["Branch", t.branch],
+      ["Category", t.category],
+      ["Source", t.source],
+      ["Customer", t.customerName],
+      ["Phone", t.customerPhone],
+      ["Assigned", t.assignedTo || "—"],
+      ["Created", fmtDate(t.createdAt)]
     ];
-    $("ticketInfo").innerHTML = info.map(([k,v])=>`<div><b>${k}:</b> ${v}</div>`).join("");
 
+    $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
     $("ticketDesc").textContent = t.description || "—";
     $("branchReply").value = t.branchReply || "";
 
     $("replyMeta").textContent = t.replyAt
-      ? `${dict.replyMetaBy} ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`
-      : dict.replyMetaNone;
+      ? `Reply by ${t.replyBy || "—"} • ${fmtDate(t.replyAt)}`
+      : "No branch reply yet.";
 
     const tl = $("timeline");
     tl.innerHTML = "";
-    (t.timeline||[]).forEach(ev=>{
+    (t.timeline || []).forEach(ev => {
       const wrap = document.createElement("div");
-      wrap.className="event";
+      wrap.className = "event";
       wrap.innerHTML = `
         <div class="dot"></div>
         <div class="box">
@@ -1267,229 +965,129 @@
     });
   }
 
- async function createTicket() {
-  try {
-    const payload = {
-      customer_name: "New Customer",
-      customer_phone: "0500000000",
-      branch_name: "Salamah"
-    };
-
-    const { data, error } = await supabaseClient
-      .from("tickets")
-      .insert([payload])
-      .select("*");
-
-    if (error) {
-      console.log("Insert error details:", error);
-
-      // fallback to demo/local ticket so button always works
-      const now = Date.now();
-      const id = uid();
-
-      const t = {
-        id,
-        subject: `${id} • Food Quality • Salamah`,
-        status: "Open",
-        priority: "Medium",
-        branch: "Salamah",
-        category: "Food Quality",
-        source: "Portal",
-        customerName: "New Customer",
-        customerPhone: "0500000000",
-        createdAt: now,
-        assignedTo: "",
-        description: "Supabase insert failed, so ticket was created locally as fallback.",
-        branchReply: "",
-        replyBy: "",
-        replyAt: null,
-        timeline: [
-          { t: "Ticket created", d: "Created locally because Supabase insert failed.", m: fmtDate(now) }
-        ]
+  async function createTicket(){
+    try{
+      const payload = {
+        customer_name: "New Customer",
+        customer_phone: "0500000000",
+        branch_name: "Salamah"
       };
 
-      state.tickets.unshift(t);
-      state.selectedId = id;
-      state.sourceMode = "demo";
-      saveState();
-      computeKPIs();
-      setView("tickets");
+      const { data, error } = await supabaseClient
+        .from("tickets")
+        .insert([payload])
+        .select("*");
 
-      alert("Supabase insert failed:\\n" + (error.message || "Unknown error") + "\\n\\nA local demo ticket was created instead.");
-      return;
-    }
+      if(error){
+        console.error("Insert error:", error);
+        alert("Ticket creation failed: " + (error.message || "Unknown error"));
+        return;
+      }
 
-    console.log("Ticket inserted successfully:", data);
-
-    await loadTickets();
-    computeKPIs();
-    setView("tickets");
-    alert("Ticket created successfully ✅");
-
-  } catch (e) {
-    console.log("createTicket exception:", e);
-
-    // fallback
-    const now = Date.now();
-    const id = uid();
-
-    const t = {
-      id,
-      subject: `${id} • Food Quality • Salamah`,
-      status: "Open",
-      priority: "Medium",
-      branch: "Salamah",
-      category: "Food Quality",
-      source: "Portal",
-      customerName: "New Customer",
-      customerPhone: "0500000000",
-      createdAt: now,
-      assignedTo: "",
-      description: "Exception happened during Supabase insert, so ticket was created locally.",
-      branchReply: "",
-      replyBy: "",
-      replyAt: null,
-      timeline: [
-        { t: "Ticket created", d: "Created locally because an exception happened.", m: fmtDate(now) }
-      ]
-    };
-
-    state.tickets.unshift(t);
-    state.selectedId = id;
-    state.sourceMode = "demo";
-    saveState();
-    computeKPIs();
-    setView("tickets");
-
-    alert("Exception: " + (e.message || e));
-  }
-}
       console.log("Ticket inserted:", data);
+      await loadTickets();
+      setView("tickets");
+      alert("Ticket created successfully ✅");
+    }catch(e){
+      console.error("createTicket exception:", e);
+      alert("Exception: " + (e.message || e));
+    }
+  }
+
+  async function saveReply(){
+    const t = (state.tickets || []).find(x => x.id === state.selectedId);
+    if (!t || !t.rowId) return;
+
+    const replyText = $("branchReply").value || "";
+    const nowIso = new Date().toISOString();
+
+    try{
+      const { error } = await supabaseClient
+        .from("tickets")
+        .update({
+          branch_reply: replyText,
+          reply_by: "branch@company.com",
+          reply_at: nowIso
+        })
+        .eq("id", t.rowId);
+
+      if(error){
+        console.error("Save reply error:", error);
+        alert("Save reply failed: " + (error.message || "Unknown error"));
+        return;
+      }
 
       await loadTickets();
-      computeKPIs();
-      setView("tickets");
-    } catch (e) {
-      console.log("createTicket exception:", e);
-      createDemoTicket();
-      alert("Supabase error, demo ticket created instead.");
+      renderTickets();
+      alert("Reply saved ✅");
+    }catch(e){
+      console.error("saveReply exception:", e);
+      alert("Exception: " + (e.message || e));
     }
   }
 
-  function createDemoTicket() {
-    const now = Date.now();
-    const id = uid();
-    const branch = rand(BRANCHES);
+  async function markReplied(){
+    const t = (state.tickets || []).find(x => x.id === state.selectedId);
+    if (!t || !t.rowId) return;
 
-    const t = {
-      id,
-      subject: `${id} • Food Quality • ${branch}`,
-      status: "Open",
-      priority: "Medium",
-      branch,
-      category: "Food Quality",
-      source: "WhatsApp",
-      customerName: "New Customer",
-      customerPhone: "0500000000",
-      createdAt: now,
-      assignedTo: "",
-      description:
-        state.lang === "ar"
-          ? "تم إنشاء تذكرة جديدة (ديمو). لاحقًا نربط إنشاء التذاكر في Supabase/Dataverse."
-          : "New ticket created (demo). Later we will insert into Supabase/Dataverse.",
-      branchReply: "",
-      replyBy: "",
-      replyAt: null,
-      timeline: [{t:"Ticket created", d:"Created from Portal (demo).", m: fmtDate(now)}]
-    };
+    try{
+      const { error } = await supabaseClient
+        .from("tickets")
+        .update({ status:"Replied" })
+        .eq("id", t.rowId);
 
-    state.tickets.unshift(t);
-    state.selectedId = id;
-    state.sourceMode = "demo";
-    saveState();
-    computeKPIs();
-    setView("tickets");
-    renderTickets();
-  }
+      if(error){
+        console.error("Mark replied error:", error);
+        alert("Mark replied failed: " + (error.message || "Unknown error"));
+        return;
+      }
 
-  function simulateBranchReply(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId) || (state.tickets||[])[0];
-    if(!t) return;
-    const now = Date.now();
-    t.branchReply = state.lang==="ar"
-      ? "تم التواصل مع العميل، وتم التعويض حسب السياسة، وتم التأكيد على الفريق بالالتزام بالجودة."
-      : "Branch contacted the customer, provided compensation as per policy, and reinforced quality standards with the team.";
-    t.replyBy = "branch.supervisor@company.com";
-    t.replyAt = now;
-    t.status = "Replied";
-    t.timeline = t.timeline || [];
-    t.timeline.push({t:"Branch replied", d:"Reply captured (demo).", m: fmtDate(now)});
-    saveState();
-    computeKPIs();
-    renderTickets();
-  }
-
-  function saveReply(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t) return;
-    t.branchReply = $("branchReply").value || "";
-    if(t.branchReply && !t.replyAt){
-      t.replyAt = Date.now();
-      t.replyBy = "branch@company.com";
-      t.timeline.push({t:"Branch reply saved", d:"Reply saved from portal (demo).", m: fmtDate(t.replyAt)});
+      await loadTickets();
+      renderTickets();
+    }catch(e){
+      console.error("markReplied exception:", e);
+      alert("Exception: " + (e.message || e));
     }
-    saveState();
-    renderDetail();
-    computeKPIs();
   }
 
-  function markReplied(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t) return;
-    t.status = "Replied";
-    t.timeline.push({t:"Status updated", d:"Marked as Replied.", m: fmtDate(Date.now())});
-    saveState();
-    renderTickets();
-    computeKPIs();
-  }
+  async function closeTicket(){
+    const t = (state.tickets || []).find(x => x.id === state.selectedId);
+    if (!t || !t.rowId) return;
 
-  function closeTicket(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t) return;
-    t.status = "Closed";
-    t.timeline.push({t:"Ticket closed", d:"Closed by CX (demo).", m: fmtDate(Date.now())});
-    saveState();
-    renderTickets();
-    computeKPIs();
+    try{
+      const { error } = await supabaseClient
+        .from("tickets")
+        .update({ status:"Closed" })
+        .eq("id", t.rowId);
+
+      if(error){
+        console.error("Close ticket error:", error);
+        alert("Close failed: " + (error.message || "Unknown error"));
+        return;
+      }
+
+      await loadTickets();
+      renderTickets();
+    }catch(e){
+      console.error("closeTicket exception:", e);
+      alert("Exception: " + (e.message || e));
+    }
   }
 
   function assignTicket(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t) return;
-    const assignees = ["CX - Thamer","CX - Ahmed","Ops - Salem","QA - Areej"];
-    t.assignedTo = rand(assignees);
-    t.timeline.push({t:"Assigned", d:`Assigned to ${t.assignedTo}.`, m: fmtDate(Date.now())});
-    saveState();
-    renderDetail();
+    alert("Assign button ready. We can connect it later to Supabase assigned_to.");
   }
 
   function addNote(){
-    const t = (state.tickets||[]).find(x=>x.id===state.selectedId);
-    if(!t) return;
-    const note = prompt(state.lang==="ar" ? "اكتب ملاحظة:" : "Write a note:");
-    if(!note) return;
-    t.timeline.push({t:"Internal note", d: note.replaceAll("<","&lt;"), m: fmtDate(Date.now())});
-    saveState();
-    renderDetail();
+    alert("Add Note button ready. We can connect it later to Supabase note table.");
   }
 
   function exportJSON(){
     const data = {
       exportedAt: new Date().toISOString(),
-      sourceMode: state.sourceMode,
       tickets: state.tickets
     };
-    const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "cx_portal_export.json";
@@ -1497,18 +1095,8 @@
     URL.revokeObjectURL(a.href);
   }
 
-  function currentView(){
-    const tic = $("view-tickets").style.display !== "none";
-    const rep = $("view-reports").style.display !== "none";
-    const set = $("view-settings").style.display !== "none";
-    if(tic) return "tickets";
-    if(rep) return "reports";
-    if(set) return "settings";
-    return "dashboard";
-  }
-
   document.addEventListener("keydown", (e)=>{
-    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
       e.preventDefault();
       $("globalSearch").focus();
     }
@@ -1523,29 +1111,25 @@
   $("goSettings").onclick = ()=> setView("settings");
 
   ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
-    $(id).addEventListener("input", ()=> renderTickets());
-    $(id).addEventListener("change", ()=> renderTickets());
+    $(id).addEventListener("input", renderTickets);
+    $(id).addEventListener("change", renderTickets);
   });
 
-  $("globalSearch").addEventListener("input", ()=> renderTickets());
+  $("globalSearch").addEventListener("input", renderTickets);
 
   $("btnTheme").onclick = ()=>{
-    state.theme = (state.theme==="dark") ? "light" : "dark";
-    saveState();
+    state.theme = state.theme === "dark" ? "light" : "dark";
     applyTheme();
   };
 
   $("btnLang").onclick = ()=>{
-    state.lang = (state.lang==="en") ? "ar" : "en";
-    saveState();
+    state.lang = state.lang === "en" ? "ar" : "en";
     applyLang();
-    computeKPIs();
     renderTickets();
     setView(currentView());
   };
 
   $("btnNewTicket").onclick = createTicket;
-  $("btnMockReply").onclick = simulateBranchReply;
   $("btnExport").onclick = exportJSON;
   $("btnSaveReply").onclick = saveReply;
   $("btnMarkReplied").onclick = markReplied;
@@ -1557,9 +1141,8 @@
     const v = $("brandInput").value.trim();
     if(v){
       state.brandTitle = v;
-      saveState();
-      applyLang();
-      alert(state.lang==="ar" ? "تم حفظ الهوية ✅" : "Brand saved ✅");
+      $("brandTitle").textContent = v;
+      alert("Brand saved ✅");
     }
   };
 
@@ -1568,7 +1151,6 @@
     applyLang();
     computeKPIs();
     setView("dashboard");
-    renderTickets();
     await loadTickets();
   })();
 </script>
