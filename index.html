@@ -1327,11 +1327,29 @@ const supabaseClient = supabase.createClient(
     });
   }
 
-  function createTicket(){
-    const now = Date.now();
-    const id = uid();
-    const br = rand(BRANCHES);
-    const t = {
+  async function createTicket(){
+  const payload = {
+    customer_name: "New Customer",
+    customer_phone: "0500000000",
+    branch_name: "Salamah",
+  };
+
+  const { data, error } = await supabaseClient
+    .from("tickets")
+    .insert([payload])
+    .select("*");
+
+  if (error) {
+    console.log("Insert error:", error);
+    alert("Ticket creation failed");
+    return;
+  }
+
+  console.log("Ticket inserted:", data);
+
+  await loadTickets();
+  setView("tickets");
+}
       id,
       subject: `${id} • Food Quality • ${br}`,
       status:"Open",
