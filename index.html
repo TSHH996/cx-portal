@@ -962,7 +962,49 @@
         status: $("newStatus").value || "Open"
       };
     }
+async function sendBranchEmail(ticket) {
+  try {
+    const { data: branchData, error: branchError } = await supabaseClient
+      .from("branches")
+      .select("branch_email")
+      .eq("branch_name", ticket.branch_name)
+      .single();
 
+    if (branchError || !branchData?.branch_email) {
+      console.error("Branch email not found:", branchError);
+      return;
+    }
+
+    const response = await fetch(
+      "https://zwowuhfsorfnhmhvoqsm.supabase.co/functions/v1/send-branch-email",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          ticket_no: ticket.ticket_no,
+          branch_name: ticket.branch_name,
+          branch_email: branchData.branch_email,
+          customer_name: ticket.customer_name,
+          customer_phone: ticket.customer_phone,
+          feedback_type: ticket.feedback_type,
+          feedback_category: ticket.feedback_category,
+          sub_category: ticket.sub_category,
+          description: ticket.description,
+          priority: ticket.priority,
+          status: ticket.status
+        })
+      }
+    );
+
+    const result = await response.json();
+    console.log("Email function result:", result);
+  } catch (e) {
+    console.error("sendBranchEmail exception:", e);
+  }
+}
     async function createTicket(){
       try{
         const payload = getNewTicketPayload();
@@ -971,7 +1013,33 @@
           console.error("Insert error:", error);
           alert("Ticket creation failed: " + (error.message || "Unknown error"));
           return;
-        }
+    async function createTicket(){
+  try{
+    const payload = getNewTicketPayload();
+
+    const { data, error } = await supabaseClient.from("tickets").insert([payload]).select("*");
+
+    if(error){
+      console.error("Insert error:", error);
+      alert("Ticket creation failed: " + (error.message || "Unknown error"));
+      return;
+    }
+
+    if (data && data[0]) {
+      if (data[0].id) state.selectedId = data[0].id;
+      await sendBranchEmail(data[0]);
+    }
+
+    closeTicketModal();
+    await loadTickets();
+    setView("tickets");
+    renderTickets();
+    alert("Ticket created successfully ✅");
+  }catch(e){
+    console.error("createTicket exception:", e);
+    alert("Exception: " + (e.message || e));
+  }
+}    }
         if (data && data[0] && data[0].id) state.selectedId = data[0].id;
         closeTicketModal();
         await loadTickets();
