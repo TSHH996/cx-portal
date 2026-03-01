@@ -1,593 +1,1224 @@
-<script>
-  const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CX Portal — Tickets Dashboard</title>
+  <meta name="description" content="Customer Experience Ticketing Portal" />
 
-  const $ = (id) => document.getElementById(id);
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
-  const state = {
-    lang: "en",
-    theme: "dark",
-    brandTitle: "CX Portal",
-    tickets: [],
-    selectedId: null,
-    repliesByTicket: {}
-  };
-
-  function pad(n){ return String(n).padStart(2, "0"); }
-
-  function fmtDate(d){
-    if (!d) return "—";
-    const dt = new Date(d);
-    if (Number.isNaN(dt.getTime())) return "—";
-    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-  }
-
-  function uid(){
-    return "TKT-" + Math.floor(100000 + Math.random() * 900000);
-  }
-
-  function currentView(){
-    if ($("view-tickets").style.display !== "none") return "tickets";
-    if ($("view-reports").style.display !== "none") return "reports";
-    if ($("view-settings").style.display !== "none") return "settings";
-    return "dashboard";
-  }
-
-  function setView(view){
-    ["dashboard","tickets","reports","settings"].forEach(v=>{
-      $("view-" + v).style.display = (v === view) ? "" : "none";
-      document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v === view);
-    });
-
-    if (view === "dashboard") {
-      $("pageTitle").textContent = "Dashboard";
-      $("pageSub").textContent = "Monitor CX performance, ticket flow, and branch replies.";
+  <style>
+    :root{
+      --bg:#0b1020;
+      --bg2:#0e1630;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.65);
+      --muted2:rgba(255,255,255,.48);
+      --brand:#6ee7ff;
+      --brand2:#a78bfa;
+      --good:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --shadow:0 12px 30px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:26px;
+      --font:"Tajawal", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
-    if (view === "tickets") {
-      $("pageTitle").textContent = "Tickets Inbox";
-      $("pageSub").textContent = "Search, filter, assign, and update branch replies in one place.";
-      renderTickets();
+
+    [data-theme="light"]{
+      --bg:#f7f8ff;
+      --bg2:#eef2ff;
+      --card:rgba(10,20,60,.04);
+      --card2:rgba(10,20,60,.06);
+      --stroke:rgba(10,20,60,.10);
+      --text:rgba(10,20,60,.92);
+      --muted:rgba(10,20,60,.65);
+      --muted2:rgba(10,20,60,.50);
+      --shadow:0 10px 25px rgba(10,20,60,.12);
+      --brand:#0ea5e9;
+      --brand2:#7c3aed;
     }
-    if (view === "reports") {
-      $("pageTitle").textContent = "Reports";
-      $("pageSub").textContent = "Analytics area.";
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(900px 600px at 10% 10%, rgba(110,231,255,.20), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(167,139,250,.20), transparent 55%),
+        radial-gradient(900px 600px at 50% 95%, rgba(52,211,153,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color:var(--text);
+      overflow-x:hidden;
     }
-    if (view === "settings") {
-      $("pageTitle").textContent = "Settings";
-      $("pageSub").textContent = "Customize portal language, theme, and branding.";
-      $("brandInput").value = state.brandTitle;
+    body,input,textarea,select,button{font-family:var(--font)}
+    a{color:inherit;text-decoration:none}
+    button{transition:.18s ease}
+    button:hover{transform:translateY(-1px)}
+    button:active{transform:translateY(0)}
+
+    .app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+    .sidebar{
+      position:sticky;top:0;height:100vh;padding:18px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border-right:1px solid var(--stroke);backdrop-filter:blur(14px)
     }
-  }
+    .brandRow{display:flex;align-items:center;gap:12px;padding:10px 10px 16px 10px}
+    .logo{
+      width:42px;height:42px;border-radius:14px;
+      background:linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow:0 10px 25px rgba(0,0,0,.25);display:grid;place-items:center;color:#061026;font-weight:900
+    }
+    .brandText .t{font-weight:800}
+    .brandText .s{font-size:12px;color:var(--muted);margin-top:2px}
+    .nav{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+    .nav button{
+      width:100%;border:1px solid var(--stroke);background:transparent;color:var(--text);
+      padding:11px 12px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer
+    }
+    .nav button.active{background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));border-color:rgba(110,231,255,.30)}
+    .nav .left{display:flex;align-items:center;gap:10px}
+    .icon{width:28px;height:28px;border-radius:10px;background:var(--card);display:grid;place-items:center;border:1px solid var(--stroke);font-size:14px}
 
-  function applyTheme(){
-    document.body.setAttribute("data-theme", state.theme);
-    $("btnThemeTxt").textContent = state.theme === "dark" ? "Dark" : "Light";
-  }
+    .pill,.badge{
+      font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--stroke);
+      background:rgba(255,255,255,.04);color:var(--muted)
+    }
+    .badge.good{border-color:rgba(52,211,153,.35);color:rgba(52,211,153,.95)}
+    .badge.warn{border-color:rgba(251,191,36,.35);color:rgba(251,191,36,.95)}
+    .badge.bad{border-color:rgba(251,113,133,.35);color:rgba(251,113,133,.95)}
 
-  function applyLang(){
-    const isAr = state.lang === "ar";
-    document.documentElement.lang = isAr ? "ar" : "en";
-    document.documentElement.dir = isAr ? "rtl" : "ltr";
-    $("btnLang").innerHTML = (isAr ? "🇸🇦" : "🇺🇸") + ` <span id="btnLangTxt">${state.lang.toUpperCase()}</span>`;
-    $("brandTitle").textContent = state.brandTitle;
-  }
+    .sidebarFooter{
+      position:absolute;left:14px;right:14px;bottom:14px;padding:12px;border-radius:16px;
+      background:var(--card);border:1px solid var(--stroke)
+    }
+    .tinyRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .toggleRow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 
-  function statusBadgeClass(s){
-    if (s === "Replied") return "good";
-    if (s === "In Progress") return "warn";
-    if (s === "Open") return "warn";
-    if (s === "Closed") return "";
-    return "";
-  }
+    .btn{
+      border:1px solid var(--stroke);background:var(--card);color:var(--text);
+      padding:9px 10px;border-radius:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px
+    }
+    .btn.primary{background:linear-gradient(135deg, rgba(110,231,255,.20), rgba(167,139,250,.18));border-color:rgba(110,231,255,.28)}
+    .btn.ghost{background:transparent}
 
-  function prioBadgeClass(p){
-    if (p === "High") return "bad";
-    if (p === "Medium") return "warn";
-    return "good";
-  }
+    .main{padding:18px 18px 28px 18px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;
+      border-radius:var(--radius2);background:var(--card);border:1px solid var(--stroke);
+      box-shadow:var(--shadow);backdrop-filter:blur(14px)
+    }
+    .topbar .title .h{font-weight:850;font-size:18px}
+    .topbar .title .p{color:var(--muted);font-size:13px;margin-top:2px}
+    .topActions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .search{
+      display:flex;align-items:center;gap:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);
+      padding:9px 12px;border-radius:14px;min-width:320px;max-width:420px
+    }
+    .search input{width:100%;border:none;outline:none;background:transparent;color:var(--text);font-size:14px}
 
-  function getRepliesForTicket(ticketUuid){
-    return state.repliesByTicket[ticketUuid] || [];
-  }
+    .grid{margin-top:16px;display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    .card{
+      border:1px solid var(--stroke);background:var(--card);border-radius:var(--radius2);
+      box-shadow:var(--shadow);backdrop-filter:blur(14px)
+    }
+    .cardHeader{padding:14px 14px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .cardHeader .h{font-weight:850}
+    .cardHeader .s{color:var(--muted);font-size:13px}
+    .cardBody{padding:14px}
 
-  function getLatestReply(ticketUuid){
-    const replies = getRepliesForTicket(ticketUuid);
-    return replies.length ? replies[replies.length - 1] : null;
-  }
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi{padding:14px;border-radius:18px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:6px}
+    .kpi .v{font-size:22px;font-weight:900}
+    .kpi .l{color:var(--muted);font-size:12px}
+    .kpi .trend{color:var(--muted2);font-size:12px}
 
-  function buildTimeline(ticket){
-    const timeline = [
-      {
+    .ticketsLayout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+    .list,.detail{border-radius:var(--radius2);border:1px solid var(--stroke);background:rgba(255,255,255,.03);overflow:hidden;min-height:520px}
+    .listTop,.detailHead{padding:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+
+    select,.chipInput,.textarea,.field,input[type="text"],input[type="tel"]{
+      border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--text);
+      padding:9px 10px;border-radius:14px;outline:none;font-size:13px
+    }
+    .rows{max-height:620px;overflow:auto}
+    .row{padding:12px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+    .row.active{background:linear-gradient(135deg, rgba(110,231,255,.16), rgba(167,139,250,.14));border-bottom-color:rgba(110,231,255,.22)}
+    .row .meta{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .row .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px}
+    .row .meta .b{display:flex;gap:8px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:12px}
+    .rightMeta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;color:var(--muted);font-size:12px;white-space:nowrap}
+
+    .detailHead .left{display:flex;flex-direction:column;gap:4px;min-width:260px}
+    .detailHead .left .h{font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+    .detailHead .left .s{color:var(--muted);font-size:12px}
+    .detailHead .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    .twoCols{display:grid;grid-template-columns:1fr;gap:12px;padding:12px}
+    .panel{border:1px solid var(--stroke);background:rgba(255,255,255,.04);border-radius:18px;padding:12px}
+    .panel .ph{font-weight:850;margin-bottom:8px}
+    .kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--muted)}
+    .kv div{padding:8px 10px;border:1px dashed rgba(255,255,255,.12);border-radius:14px}
+    .kv b{color:var(--text)}
+    .textarea{width:100%;min-height:100px;resize:vertical}
+
+    .timeline{display:flex;flex-direction:column;gap:10px}
+    .event{display:flex;gap:10px;align-items:flex-start}
+    .dot{width:10px;height:10px;border-radius:999px;margin-top:6px;background:var(--brand);box-shadow:0 0 0 4px rgba(110,231,255,.12)}
+    .event .box{flex:1;border:1px solid var(--stroke);background:rgba(255,255,255,.03);border-radius:16px;padding:10px 12px}
+    .event .box .t{font-weight:850;font-size:13px}
+    .event .box .d{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+    .event .box .m{color:var(--muted2);font-size:11px;margin-top:8px}
+
+    .chart{height:210px;width:100%;border-radius:18px;border:1px solid var(--stroke);background:rgba(255,255,255,.03);padding:10px;position:relative;overflow:hidden}
+    .bars{display:flex;gap:10px;align-items:flex-end;height:100%;padding:10px}
+    .bar{flex:1;border-radius:12px 12px 6px 6px;background:linear-gradient(180deg, rgba(110,231,255,.70), rgba(167,139,250,.55));border:1px solid rgba(110,231,255,.20);min-width:14px}
+    .barLabel{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;color:var(--muted2);font-size:11px}
+    .footerNote{margin-top:14px;color:var(--muted2);font-size:12px;text-align:center}
+
+    .formGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .full{grid-column:1/-1}
+    .statusNote{margin-top:8px;font-size:12px;color:var(--muted)}
+
+    .modalBackdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+      display:none;align-items:center;justify-content:center;padding:20px;z-index:40
+    }
+    .modalBackdrop.open{display:flex}
+    .modal{
+      width:min(760px, 100%);max-height:90vh;overflow:auto;background:linear-gradient(180deg, rgba(11,16,32,.96), rgba(14,22,48,.96));
+      border:1px solid var(--stroke);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:18px
+    }
+    [data-theme="light"] .modal{background:linear-gradient(180deg, rgba(247,248,255,.98), rgba(238,242,255,.98))}
+    .modalHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .modalTitle{font-size:20px;font-weight:900}
+    .modalSub{font-size:13px;color:var(--muted);margin-top:2px}
+    .modalActions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+    .fieldWrap{display:flex;flex-direction:column;gap:6px}
+    .fieldWrap label{font-size:12px;color:var(--muted)}
+
+    .reportGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .miniPanel{padding:14px;border-radius:18px;border:1px solid var(--stroke);background:rgba(255,255,255,.04)}
+    .miniPanel .v{font-size:20px;font-weight:900}
+    .miniPanel .l{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .emptyState{padding:26px;color:var(--muted);text-align:center}
+
+    [dir="rtl"] .app{grid-template-columns:1fr 290px}
+    [dir="rtl"] .sidebar{border-right:none;border-left:1px solid var(--stroke)}
+    [dir="rtl"] .topbar,
+    [dir="rtl"] .search,
+    [dir="rtl"] .row,
+    [dir="rtl"] .detailHead,
+    [dir="rtl"] .kv,
+    [dir="rtl"] .barLabel,
+    [dir="rtl"] .formGrid,
+    [dir="rtl"] .modalHeader{direction:rtl}
+    [dir="rtl"] .row .rightMeta{align-items:flex-start}
+
+    @media (max-width:1100px){
+      .app{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+      [dir="rtl"] .app{grid-template-columns:1fr}
+      .grid,.ticketsLayout,.reportGrid{grid-template-columns:1fr}
+      .search{min-width:220px;width:100%;max-width:none}
+      .topbar{flex-direction:column;align-items:stretch}
+      .topActions{justify-content:space-between}
+      .kpis{grid-template-columns:repeat(2,1fr)}
+      .formGrid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brandRow">
+        <div class="logo">CX</div>
+        <div class="brandText">
+          <div class="t" id="brandTitle">CX Portal</div>
+          <div class="s" id="brandSub">Tickets • Branch Replies • Reports</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="active" data-view="dashboard">
+          <div class="left"><div class="icon">📊</div><div>Dashboard</div></div>
+          <span class="pill">Live</span>
+        </button>
+        <button data-view="tickets">
+          <div class="left"><div class="icon">🎫</div><div>Tickets</div></div>
+          <span class="pill">Inbox</span>
+        </button>
+        <button data-view="reports">
+          <div class="left"><div class="icon">📈</div><div>Reports</div></div>
+          <span class="pill">Weekly</span>
+        </button>
+        <button data-view="settings">
+          <div class="left"><div class="icon">⚙️</div><div>Settings</div></div>
+          <span class="pill">UI</span>
+        </button>
+      </div>
+
+      <div class="sidebarFooter">
+        <div class="tinyRow">
+          <div style="display:flex;gap:10px;align-items:center">
+            <span class="badge">CX Team</span>
+            <span class="badge">60+ Branches</span>
+          </div>
+          <span class="badge">v2</span>
+        </div>
+
+        <div class="toggleRow">
+          <button class="btn" id="btnTheme">🌙 <span id="btnThemeTxt">Dark</span></button>
+          <button class="btn" id="btnLang">🇸🇦 <span id="btnLangTxt">AR</span></button>
+          <button class="btn primary" id="btnNewTicket">＋ <span id="btnNewTicketTxt">New Ticket</span></button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <div class="h" id="pageTitle">Dashboard</div>
+          <div class="p" id="pageSub">Monitor CX performance, ticket flow, and branch replies.</div>
+        </div>
+        <div class="topActions">
+          <div class="search">
+            🔎
+            <input id="globalSearch" placeholder="Search tickets, branches, customers..." />
+            <span class="pill">Ctrl/⌘ K</span>
+          </div>
+          <button class="btn" id="btnRefresh">🔄 Refresh</button>
+          <button class="btn" id="btnExport">⬇️ Export</button>
+        </div>
+      </div>
+
+      <section id="view-dashboard">
+        <div class="grid">
+          <div class="card">
+            <div class="cardHeader">
+              <div>
+                <div class="h">Today Overview</div>
+                <div class="s" id="kpiSub">Live snapshot</div>
+              </div>
+              <span class="badge" id="dbBadge">Supabase Connected</span>
+            </div>
+            <div class="cardBody">
+              <div class="kpis">
+                <div class="kpi">
+                  <div class="v" id="kpiOpen">0</div>
+                  <div class="l">Open Tickets</div>
+                  <div class="trend" id="kpiOpenT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiReplied">0</div>
+                  <div class="l">Branch Replied</div>
+                  <div class="trend" id="kpiRepliedT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiSla">0%</div>
+                  <div class="l">SLA Compliance</div>
+                  <div class="trend" id="kpiSlaT">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="v" id="kpiAvg">0h</div>
+                  <div class="l">Avg Response</div>
+                  <div class="trend" id="kpiAvgT">—</div>
+                </div>
+              </div>
+
+              <div style="margin-top:14px" class="chart">
+                <div class="bars" id="bars"></div>
+                <div class="barLabel">
+                  <span>Ticket Volume</span>
+                  <span>Live</span>
+                </div>
+              </div>
+
+              <div class="footerNote" id="systemMsg">Connecting…</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="cardHeader">
+              <div>
+                <div class="h">Quick Actions</div>
+                <div class="s">What do you want to do now?</div>
+              </div>
+            </div>
+            <div class="cardBody">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button class="btn primary" id="goTickets">🎫 Go to Tickets Inbox</button>
+                <button class="btn" id="goReports">📈 Open Reports</button>
+                <button class="btn" id="goSettings">⚙️ Customize UI</button>
+                <div class="panel" style="margin-top:6px">
+                  <div class="ph">Database Note</div>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.6">
+                    New Ticket inserts directly into <b>tickets</b> and replies save in <b>ticket_replies</b>.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-tickets" style="display:none">
+        <div class="ticketsLayout">
+          <div class="list">
+            <div class="listTop">
+              <select id="filterStatus">
+                <option value="all">All Status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Replied">Replied</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <select id="filterPriority">
+                <option value="all">All Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <input class="chipInput" id="filterBranch" placeholder="Branch contains..." />
+              <span class="badge" id="resultCount">0 tickets</span>
+            </div>
+            <div class="rows" id="ticketRows"></div>
+          </div>
+
+          <div class="detail">
+            <div class="detailHead">
+              <div class="left">
+                <div class="h" id="detailTitle">Select a ticket</div>
+                <div class="s" id="detailSub">Open a ticket to view details.</div>
+              </div>
+              <div class="actions">
+                <button class="btn" id="btnAssign">👤 Assign</button>
+                <button class="btn" id="btnClose">✅ Close</button>
+                <button class="btn primary" id="btnAddNote">📝 Add Note</button>
+              </div>
+            </div>
+
+            <div class="twoCols">
+              <div class="panel">
+                <div class="ph">Ticket Info</div>
+                <div class="kv" id="ticketInfo"></div>
+              </div>
+              <div class="panel">
+                <div class="ph">Description</div>
+                <div style="color:var(--muted);font-size:13px;line-height:1.6" id="ticketDesc">—</div>
+              </div>
+              <div class="panel">
+                <div class="ph">Branch Reply</div>
+                <div style="display:flex;gap:10px;flex-direction:column">
+                  <textarea class="textarea" id="branchReply" placeholder="Write branch reply here..."></textarea>
+                  <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn primary" id="btnSaveReply">💾 Save Reply</button>
+                    <button class="btn" id="btnMarkReplied">✳️ Mark as Replied</button>
+                  </div>
+                  <div style="color:var(--muted2);font-size:12px" id="replyMeta">—</div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="ph">Timeline</div>
+                <div class="timeline" id="timeline"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-reports" style="display:none">
+        <div class="card" style="margin-top:16px">
+          <div class="cardHeader">
+            <div>
+              <div class="h">Reports</div>
+              <div class="s">Live overview from current tickets</div>
+            </div>
+          </div>
+          <div class="cardBody">
+            <div class="reportGrid">
+              <div class="miniPanel">
+                <div class="v" id="reportTotalTickets">0</div>
+                <div class="l">Total Tickets</div>
+              </div>
+              <div class="miniPanel">
+                <div class="v" id="reportClosedTickets">0</div>
+                <div class="l">Closed Tickets</div>
+              </div>
+              <div class="miniPanel">
+                <div class="v" id="reportBranches">0</div>
+                <div class="l">Active Branches</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-settings" style="display:none">
+        <div class="card" style="margin-top:16px">
+          <div class="cardHeader">
+            <div>
+              <div class="h">Settings</div>
+              <div class="s">Customize this portal UI</div>
+            </div>
+          </div>
+          <div class="cardBody">
+            <div class="panel">
+              <div class="ph">Branding</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <input class="chipInput" id="brandInput" placeholder="Portal title" style="min-width:280px"/>
+                <button class="btn primary" id="saveBrand">💾 Save</button>
+              </div>
+              <div class="statusNote">Theme and language are saved in your browser for quick reuse.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modalBackdrop" id="ticketModal">
+    <div class="modal">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle">Create New Ticket</div>
+          <div class="modalSub">Insert a real complaint into Supabase</div>
+        </div>
+        <button class="btn ghost" id="btnCloseModal">✕</button>
+      </div>
+
+      <div class="formGrid">
+        <div class="fieldWrap">
+          <label for="newCustomerName">Customer Name</label>
+          <input class="field" id="newCustomerName" type="text" placeholder="Customer name" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newCustomerPhone">Customer Phone</label>
+          <input class="field" id="newCustomerPhone" type="tel" placeholder="05xxxxxxxx" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newBranchName">Branch</label>
+          <input class="field" id="newBranchName" type="text" placeholder="Salamah" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newFeedbackType">Feedback Type</label>
+          <input class="field" id="newFeedbackType" type="text" placeholder="Google review / WhatsApp / Call Center" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newFeedbackCategory">Feedback Category</label>
+          <input class="field" id="newFeedbackCategory" type="text" placeholder="Food Quality / Service Quality" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newSubCategory">Sub Category</label>
+          <input class="field" id="newSubCategory" type="text" placeholder="Cold Food / Cashier / Missing Item" />
+        </div>
+        <div class="fieldWrap">
+          <label for="newPriority">Priority</label>
+          <select id="newPriority">
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div class="fieldWrap">
+          <label for="newStatus">Status</label>
+          <select id="newStatus">
+            <option value="Open" selected>Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Replied">Replied</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+        <div class="fieldWrap full">
+          <label for="newDescription">Description</label>
+          <textarea class="textarea" id="newDescription" placeholder="Complaint details..."></textarea>
+        </div>
+      </div>
+
+      <div class="modalActions">
+        <button class="btn" id="btnCancelModal">Cancel</button>
+        <button class="btn primary" id="btnSubmitTicket">Create Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const SUPABASE_URL = "https://zwowuhfsorfnhmhvoqsm.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      lang: localStorage.getItem("cx_lang") || "en",
+      theme: localStorage.getItem("cx_theme") || "dark",
+      brandTitle: localStorage.getItem("cx_brand_title") || "CX Portal",
+      tickets: [],
+      selectedId: null,
+      repliesByTicket: {}
+    };
+
+    function pad(n){ return String(n).padStart(2, "0"); }
+
+    function fmtDate(d){
+      if (!d) return "—";
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return "—";
+      return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+    }
+
+    function uid(){ return "TKT-" + Math.floor(100000 + Math.random() * 900000); }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function currentView(){
+      if ($("view-tickets").style.display !== "none") return "tickets";
+      if ($("view-reports").style.display !== "none") return "reports";
+      if ($("view-settings").style.display !== "none") return "settings";
+      return "dashboard";
+    }
+
+    function setView(view){
+      ["dashboard","tickets","reports","settings"].forEach(v=>{
+        $("view-" + v).style.display = (v === view) ? "" : "none";
+        document.querySelector(`.nav button[data-view="${v}"]`).classList.toggle("active", v === view);
+      });
+
+      if (view === "dashboard") {
+        $("pageTitle").textContent = "Dashboard";
+        $("pageSub").textContent = "Monitor CX performance, ticket flow, and branch replies.";
+      }
+      if (view === "tickets") {
+        $("pageTitle").textContent = "Tickets Inbox";
+        $("pageSub").textContent = "Search, filter, assign, and update branch replies in one place.";
+        renderTickets();
+      }
+      if (view === "reports") {
+        $("pageTitle").textContent = "Reports";
+        $("pageSub").textContent = "Live overview from your current data.";
+        renderReports();
+      }
+      if (view === "settings") {
+        $("pageTitle").textContent = "Settings";
+        $("pageSub").textContent = "Customize portal language, theme, and branding.";
+        $("brandInput").value = state.brandTitle;
+      }
+    }
+
+    function applyTheme(){
+      document.body.setAttribute("data-theme", state.theme);
+      $("btnThemeTxt").textContent = state.theme === "dark" ? "Dark" : "Light";
+      localStorage.setItem("cx_theme", state.theme);
+    }
+
+    function applyLang(){
+      const isAr = state.lang === "ar";
+      document.documentElement.lang = isAr ? "ar" : "en";
+      document.documentElement.dir = isAr ? "rtl" : "ltr";
+      $("btnLang").innerHTML = (isAr ? "🇸🇦" : "🇺🇸") + ` <span id="btnLangTxt">${state.lang.toUpperCase()}</span>`;
+      $("brandTitle").textContent = state.brandTitle;
+      localStorage.setItem("cx_lang", state.lang);
+    }
+
+    function statusBadgeClass(s){
+      if(s === "Replied") return "good";
+      if(s === "In Progress") return "warn";
+      if(s === "Open") return "warn";
+      if(s === "Closed") return "";
+      return "";
+    }
+
+    function prioBadgeClass(p){
+      if(p === "High") return "bad";
+      if(p === "Medium") return "warn";
+      return "good";
+    }
+
+    function setSystemMessage(message, isError = false){
+      $("systemMsg").textContent = message;
+      $("dbBadge").textContent = isError ? "Connection Issue" : "Supabase Connected";
+      $("dbBadge").className = isError ? "badge bad" : "badge";
+    }
+
+    function getRepliesForTicket(ticketUuid){
+      return state.repliesByTicket[ticketUuid] || [];
+    }
+
+    function getLatestReply(ticketUuid){
+      const replies = getRepliesForTicket(ticketUuid);
+      return replies.length ? replies[replies.length - 1] : null;
+    }
+
+    function buildTimeline(ticket){
+      const timeline = [{
         t:"Ticket created",
         d:"Loaded from Supabase.",
         m: fmtDate(ticket.createdAt)
-      }
-    ];
+      }];
 
-    const replies = getRepliesForTicket(ticket.rowId);
-    replies.forEach(r => {
-      timeline.push({
-        t: r.reply_by ? `Reply by ${r.reply_by}` : "Reply added",
-        d: r.reply_text || "—",
-        m: fmtDate(r.created_at)
-      });
-
-      if (r.action_taken) {
+      const replies = getRepliesForTicket(ticket.rowId);
+      replies.forEach(r => {
         timeline.push({
-          t:"Action taken",
-          d:r.action_taken,
-          m:fmtDate(r.created_at)
+          t: r.reply_by ? `Reply by ${r.reply_by}` : "Reply added",
+          d: r.reply_text || "—",
+          m: fmtDate(r.created_at)
         });
+        if (r.action_taken) {
+          timeline.push({
+            t:"Action taken",
+            d:r.action_taken,
+            m:fmtDate(r.created_at)
+          });
+        }
+      });
+
+      if (ticket.status === "Replied") {
+        timeline.push({ t:"Ticket marked as Replied", d:"Status updated to Replied.", m:"Status update" });
       }
-    });
+      if (ticket.status === "Closed") {
+        timeline.push({ t:"Ticket closed", d:"Status updated to Closed.", m:"Status update" });
+      }
+      return timeline;
+    }
 
-    if (ticket.status === "Replied") {
-      timeline.push({
-        t:"Ticket marked as Replied",
-        d:"Status updated to Replied.",
-        m:"Status update"
+    function computeKPIs(){
+      const t = state.tickets || [];
+      const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
+      const replied = t.filter(x => x.status === "Replied" || x.status === "Closed" || getRepliesForTicket(x.rowId).length > 0).length;
+      const branches = new Set(t.map(x => x.branch).filter(Boolean));
+      const closed = t.filter(x => x.status === "Closed").length;
+
+      $("kpiOpen").textContent = open;
+      $("kpiReplied").textContent = replied;
+      $("kpiSla").textContent = t.length ? "100%" : "0%";
+      $("kpiAvg").textContent = t.length ? "2h" : "0h";
+      $("kpiOpenT").textContent = `${open} active`;
+      $("kpiRepliedT").textContent = `${replied} handled`;
+      $("kpiSlaT").textContent = "Live";
+      $("kpiAvgT").textContent = "Live";
+
+      $("reportTotalTickets").textContent = t.length;
+      $("reportClosedTickets").textContent = closed;
+      $("reportBranches").textContent = branches.size;
+
+      const bars = $("bars");
+      bars.innerHTML = "";
+      const branchCounts = {};
+      t.forEach(ticket => {
+        const branch = ticket.branch || "Other";
+        branchCounts[branch] = (branchCounts[branch] || 0) + 1;
+      });
+      const values = Object.values(branchCounts).slice(0, 7);
+      const displayValues = values.length ? values : [35, 50, 45, 70, 55, 80, 60];
+      const max = Math.max(...displayValues, 1);
+      displayValues.forEach(v=>{
+        const el = document.createElement("div");
+        el.className = "bar";
+        el.style.height = `${Math.max(12, (v / max) * 100)}%`;
+        bars.appendChild(el);
       });
     }
 
-    if (ticket.status === "Closed") {
-      timeline.push({
-        t:"Ticket closed",
-        d:"Status updated to Closed.",
-        m:"Status update"
+    async function loadRepliesMap(){
+      try{
+        const { data, error } = await supabaseClient
+          .from("ticket_replies")
+          .select("*")
+          .order("created_at", { ascending:true });
+
+        if(error){
+          console.error("Replies load error:", error);
+          return;
+        }
+
+        const grouped = {};
+        (data || []).forEach(reply => {
+          if (!reply.ticket_id) return;
+          if (!grouped[reply.ticket_id]) grouped[reply.ticket_id] = [];
+          grouped[reply.ticket_id].push(reply);
+        });
+
+        state.repliesByTicket = grouped;
+      }catch(e){
+        console.error("loadRepliesMap exception:", e);
+      }
+    }
+
+    async function loadTickets(){
+      try{
+        const { data, error } = await supabaseClient
+          .from("tickets")
+          .select("*")
+          .order("created_at", { ascending:false });
+
+        if(error){
+          console.error("Supabase load error:", error);
+          setSystemMessage("Load error: " + (error.message || "Unknown error"), true);
+          return;
+        }
+
+        state.tickets = (data || []).map(r => {
+          const ticketLabel = (r.ticket_no !== null && r.ticket_no !== undefined)
+            ? `#${r.ticket_no}`
+            : (r.id ? `#${String(r.id).slice(0,8)}` : uid());
+
+          return {
+            rowId: r.id || null,
+            id: ticketLabel,
+            ticketLabel,
+            subject: `${ticketLabel} • ${r.branch_name || "—"}`,
+            status: r.status || "Open",
+            priority: r.priority || "Medium",
+            branch: r.branch_name || "—",
+            category: r.feedback_category || "—",
+            source: r.feedback_type || "—",
+            customerName: r.customer_name || "—",
+            customerPhone: r.customer_phone || "—",
+            createdAt: r.created_at || new Date().toISOString(),
+            assignedTo: r.assign_to || "—",
+            description: r.description || "—"
+          };
+        });
+
+        if (!state.selectedId && state.tickets.length) {
+          state.selectedId = state.tickets[0].rowId;
+        }
+
+        await loadRepliesMap();
+        computeKPIs();
+        if (currentView() === "tickets") renderTickets();
+        renderDetail();
+        renderReports();
+        setSystemMessage(`Connected. Loaded ${state.tickets.length} ticket(s).`);
+      }catch(e){
+        console.error("loadTickets exception:", e);
+        setSystemMessage("Exception: " + (e.message || e), true);
+      }
+    }
+
+    function filterTickets(){
+      const q = ($("globalSearch").value || "").toLowerCase().trim();
+      const status = $("filterStatus").value;
+      const prio = $("filterPriority").value;
+      const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
+
+      return (state.tickets || []).filter(t => {
+        const hay = `${t.id} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.source} ${t.description}`.toLowerCase();
+        if (q && !hay.includes(q)) return false;
+        if (status !== "all" && t.status !== status) return false;
+        if (prio !== "all" && t.priority !== prio) return false;
+        if (branchQ && !String(t.branch || "").toLowerCase().includes(branchQ)) return false;
+        return true;
       });
     }
 
-    return timeline;
-  }
+    function renderTickets(){
+      const rows = $("ticketRows");
+      const list = filterTickets();
+      $("resultCount").textContent = `${list.length} tickets`;
 
-  function computeKPIs(){
-    const t = state.tickets || [];
-    const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
-    const replied = t.filter(x =>
-      x.status === "Replied" ||
-      x.status === "Closed" ||
-      getRepliesForTicket(x.rowId).length > 0
-    ).length;
+      if (!state.selectedId && list[0]) state.selectedId = list[0].rowId;
+      rows.innerHTML = "";
 
-    $("kpiOpen").textContent = open;
-    $("kpiReplied").textContent = replied;
-    $("kpiSla").textContent = t.length ? "100%" : "0%";
-    $("kpiAvg").textContent = t.length ? "2h" : "0h";
-    $("kpiOpenT").textContent = `${open} active`;
-    $("kpiRepliedT").textContent = `${replied} handled`;
-    $("kpiSlaT").textContent = "Live";
-    $("kpiAvgT").textContent = "Live";
-
-    const bars = $("bars");
-    bars.innerHTML = "";
-
-    const branchCounts = {};
-    t.forEach(ticket => {
-      const branch = ticket.branch || "Other";
-      branchCounts[branch] = (branchCounts[branch] || 0) + 1;
-    });
-
-    const values = Object.values(branchCounts).slice(0, 7);
-    const displayValues = values.length ? values : [35, 50, 45, 70, 55, 80, 60];
-    const max = Math.max(...displayValues, 1);
-
-    displayValues.forEach(v=>{
-      const el = document.createElement("div");
-      el.className = "bar";
-      el.style.height = `${Math.max(12, (v / max) * 100)}%`;
-      bars.appendChild(el);
-    });
-  }
-
-  async function loadRepliesMap(){
-    try{
-      const { data, error } = await supabaseClient
-        .from("ticket_replies")
-        .select("*")
-        .order("created_at", { ascending:true });
-
-      if(error){
-        console.error("Replies load error:", error);
+      if (!list.length) {
+        rows.innerHTML = '<div class="emptyState">No tickets found.</div>';
+        renderDetail();
         return;
       }
 
-      const grouped = {};
-      (data || []).forEach(reply => {
-        if (!reply.ticket_id) return;
-        if (!grouped[reply.ticket_id]) grouped[reply.ticket_id] = [];
-        grouped[reply.ticket_id].push(reply);
-      });
-
-      state.repliesByTicket = grouped;
-    }catch(e){
-      console.error("loadRepliesMap exception:", e);
-    }
-  }
-
-  async function loadTickets(){
-    try{
-      const { data, error } = await supabaseClient
-        .from("tickets")
-        .select("*")
-        .order("created_at", { ascending:false });
-
-      if(error){
-        console.error("Supabase load error:", error);
-        $("systemMsg").textContent = "Load error: " + (error.message || "Unknown error");
-        return;
-      }
-
-      state.tickets = (data || []).map(r => {
-        const ticketLabel = (r.ticket_no !== null && r.ticket_no !== undefined)
-          ? `#${r.ticket_no}`
-          : (r.id ? `#${String(r.id).slice(0,8)}` : uid());
-
-        const createdAt = r.created_at || new Date().toISOString();
-
-        return {
-          rowId: r.id || null,
-          id: ticketLabel,
-          ticketLabel,
-          subject: `${ticketLabel} • ${r.branch_name || "—"}`,
-          status: r.status || "Open",
-          priority: r.priority || "Medium",
-          branch: r.branch_name || "—",
-          category: r.feedback_category || "—",
-          source: r.feedback_type || "—",
-          customerName: r.customer_name || "—",
-          customerPhone: r.customer_phone || "—",
-          createdAt,
-          assignedTo: r.assign_to || "—",
-          description: r.description || "—"
+      list.forEach(t => {
+        const r = document.createElement("div");
+        r.className = "row" + (t.rowId === state.selectedId ? " active" : "");
+        r.onclick = () => {
+          state.selectedId = t.rowId;
+          renderTickets();
+          renderDetail();
         };
+
+        const left = document.createElement("div");
+        left.className = "meta";
+
+        const title = document.createElement("div");
+        title.className = "t";
+        title.textContent = t.subject;
+
+        const b = document.createElement("div");
+        b.className = "b";
+        b.innerHTML = `
+          <span class="badge ${prioBadgeClass(t.priority)}">${escapeHtml(t.priority)}</span>
+          <span class="badge ${statusBadgeClass(t.status)}">${escapeHtml(t.status)}</span>
+          <span class="badge">${escapeHtml(t.branch)}</span>
+        `;
+
+        left.appendChild(title);
+        left.appendChild(b);
+
+        const right = document.createElement("div");
+        right.className = "rightMeta";
+        right.innerHTML = `<div>${escapeHtml(t.id)}</div><div>${escapeHtml(fmtDate(t.createdAt))}</div>`;
+
+        r.appendChild(left);
+        r.appendChild(right);
+        rows.appendChild(r);
       });
 
-      if (!state.selectedId && state.tickets.length) {
-        state.selectedId = state.tickets[0].rowId;
+      renderDetail();
+    }
+
+    function renderDetail(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t) {
+        $("detailTitle").textContent = "Select a ticket";
+        $("detailSub").textContent = "Open a ticket to view details.";
+        $("ticketInfo").innerHTML = "";
+        $("ticketDesc").textContent = "—";
+        $("branchReply").value = "";
+        $("replyMeta").textContent = "—";
+        $("timeline").innerHTML = "";
+        return;
       }
 
-      await loadRepliesMap();
-      computeKPIs();
+      const latestReply = getLatestReply(t.rowId);
+      $("detailTitle").textContent = t.subject;
+      $("detailSub").textContent = `${t.id} • ${t.branch} • ${t.status}`;
 
-      if (currentView() === "tickets") renderTickets();
-      renderDetail();
+      const info = [
+        ["Ticket", t.id],
+        ["Status", t.status],
+        ["Priority", t.priority],
+        ["Branch", t.branch],
+        ["Category", t.category],
+        ["Source", t.source],
+        ["Customer", t.customerName],
+        ["Phone", t.customerPhone],
+        ["Assigned", t.assignedTo || "—"],
+        ["Created", fmtDate(t.createdAt)]
+      ];
 
-      $("systemMsg").textContent = `Connected. Loaded ${state.tickets.length} ticket(s).`;
-    }catch(e){
-      console.error("loadTickets exception:", e);
-      $("systemMsg").textContent = "Exception: " + (e.message || e);
+      $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</div>`).join("");
+      $("ticketDesc").textContent = t.description || "—";
+      $("branchReply").value = latestReply?.reply_text || "";
+
+      $("replyMeta").textContent = latestReply
+        ? `Reply by ${latestReply.reply_by || "—"} • ${fmtDate(latestReply.created_at)}${latestReply.action_taken ? " • " + latestReply.action_taken : ""}`
+        : "No branch reply yet.";
+
+      const tl = $("timeline");
+      tl.innerHTML = "";
+      buildTimeline(t).forEach(ev => {
+        const wrap = document.createElement("div");
+        wrap.className = "event";
+        wrap.innerHTML = `
+          <div class="dot"></div>
+          <div class="box">
+            <div class="t">${escapeHtml(ev.t)}</div>
+            <div class="d">${escapeHtml(ev.d)}</div>
+            <div class="m">${escapeHtml(ev.m)}</div>
+          </div>
+        `;
+        tl.appendChild(wrap);
+      });
     }
-  }
 
-  function filterTickets(){
-    const q = ($("globalSearch").value || "").toLowerCase().trim();
-    const status = $("filterStatus").value;
-    const prio = $("filterPriority").value;
-    const branchQ = ($("filterBranch").value || "").toLowerCase().trim();
+    function renderReports(){
+      computeKPIs();
+    }
 
-    return (state.tickets || []).filter(t => {
-      const hay = `${t.id} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.source} ${t.description}`.toLowerCase();
-      if (q && !hay.includes(q)) return false;
-      if (status !== "all" && t.status !== status) return false;
-      if (prio !== "all" && t.priority !== prio) return false;
-      if (branchQ && !String(t.branch || "").toLowerCase().includes(branchQ)) return false;
-      return true;
-    });
-  }
+    function openTicketModal(){
+      $("ticketModal").classList.add("open");
+    }
 
-  function renderTickets(){
-    const rows = $("ticketRows");
-    const list = filterTickets();
+    function closeTicketModal(){
+      $("ticketModal").classList.remove("open");
+    }
 
-    $("resultCount").textContent = `${list.length} tickets`;
+    function getNewTicketPayload(){
+      return {
+        customer_name: ($("newCustomerName").value || "New Customer").trim() || "New Customer",
+        customer_phone: ($("newCustomerPhone").value || "0500000000").trim() || "0500000000",
+        branch_name: ($("newBranchName").value || "Salamah").trim() || "Salamah",
+        feedback_type: ($("newFeedbackType").value || "Manual").trim() || "Manual",
+        feedback_category: ($("newFeedbackCategory").value || "General").trim() || "General",
+        sub_category: ($("newSubCategory").value || "General").trim() || "General",
+        description: ($("newDescription").value || "New ticket created from CX Portal").trim() || "New ticket created from CX Portal",
+        priority: $("newPriority").value || "Medium",
+        status: $("newStatus").value || "Open"
+      };
+    }
 
-    if (!state.selectedId && list[0]) state.selectedId = list[0].rowId;
+    async function createTicket(){
+      try{
+        const payload = getNewTicketPayload();
+        const { data, error } = await supabaseClient.from("tickets").insert([payload]).select("*");
+        if(error){
+          console.error("Insert error:", error);
+          alert("Ticket creation failed: " + (error.message || "Unknown error"));
+          return;
+        }
+        if (data && data[0] && data[0].id) state.selectedId = data[0].id;
+        closeTicketModal();
+        await loadTickets();
+        setView("tickets");
+        renderTickets();
+        alert("Ticket created successfully ✅");
+      }catch(e){
+        console.error("createTicket exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
 
-    rows.innerHTML = "";
-    list.forEach(t => {
-      const r = document.createElement("div");
-      r.className = "row" + (t.rowId === state.selectedId ? " active" : "");
-      r.onclick = () => {
-        state.selectedId = t.rowId;
+    async function saveReply(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t || !t.rowId) {
+        alert("Please select a ticket first.");
+        return;
+      }
+
+      const replyText = ($("branchReply").value || "").trim();
+      if (!replyText) {
+        alert("Please write a reply first.");
+        return;
+      }
+
+      try{
+        const { error } = await supabaseClient
+          .from("ticket_replies")
+          .insert([{
+            ticket_id: t.rowId,
+            reply_text: replyText,
+            reply_by: "Branch",
+            action_taken: "Reply saved"
+          }]);
+
+        if(error){
+          console.error("Save reply error:", error);
+          alert("Save reply failed: " + (error.message || "Unknown error"));
+          return;
+        }
+
+        await loadRepliesMap();
+        renderDetail();
+        computeKPIs();
+        alert("Reply saved ✅");
+      }catch(e){
+        console.error("saveReply exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
+
+    async function markReplied(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t || !t.rowId) return;
+
+      try{
+        const { error } = await supabaseClient
+          .from("tickets")
+          .update({ status:"Replied" })
+          .eq("id", t.rowId);
+
+        if(error){
+          console.error("Mark replied error:", error);
+          alert("Mark replied failed: " + (error.message || "Unknown error"));
+          return;
+        }
+
+        await loadTickets();
         renderTickets();
         renderDetail();
+        alert("Ticket marked as Replied ✅");
+      }catch(e){
+        console.error("markReplied exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
+
+    async function closeTicket(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t || !t.rowId) return;
+
+      try{
+        const { error } = await supabaseClient
+          .from("tickets")
+          .update({ status:"Closed" })
+          .eq("id", t.rowId);
+
+        if(error){
+          console.error("Close ticket error:", error);
+          alert("Close failed: " + (error.message || "Unknown error"));
+          return;
+        }
+
+        await loadTickets();
+        renderTickets();
+        renderDetail();
+        alert("Ticket closed ✅");
+      }catch(e){
+        console.error("closeTicket exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
+
+    async function assignTicket(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t || !t.rowId) {
+        alert("Please select a ticket first.");
+        return;
+      }
+      const assignee = prompt("Assign to:", t.assignedTo && t.assignedTo !== "—" ? t.assignedTo : "CX Team");
+      if (assignee === null) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from("tickets")
+          .update({ assign_to: assignee.trim() || "CX Team" })
+          .eq("id", t.rowId);
+
+        if (error) {
+          console.error("Assign error:", error);
+          alert("Assign failed: " + (error.message || "Unknown error"));
+          return;
+        }
+
+        await loadTickets();
+        renderTickets();
+        renderDetail();
+        alert("Assigned successfully ✅");
+      } catch (e) {
+        console.error("assignTicket exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
+
+    async function addNote(){
+      const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
+      if (!t || !t.rowId) {
+        alert("Please select a ticket first.");
+        return;
+      }
+      const note = prompt("Write a note:");
+      if (!note) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from("ticket_replies")
+          .insert([{
+            ticket_id: t.rowId,
+            reply_text: note,
+            reply_by: "CX",
+            action_taken: "Internal note"
+          }]);
+
+        if (error) {
+          console.error("Add note error:", error);
+          alert("Add note failed: " + (error.message || "Unknown error"));
+          return;
+        }
+
+        await loadRepliesMap();
+        renderDetail();
+        computeKPIs();
+        alert("Note added ✅");
+      } catch (e) {
+        console.error("addNote exception:", e);
+        alert("Exception: " + (e.message || e));
+      }
+    }
+
+    function exportJSON(){
+      const data = {
+        exportedAt: new Date().toISOString(),
+        tickets: state.tickets,
+        repliesByTicket: state.repliesByTicket
       };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "cx_portal_export.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
 
-      const left = document.createElement("div");
-      left.className = "meta";
-
-      const title = document.createElement("div");
-      title.className = "t";
-      title.textContent = t.subject;
-
-      const b = document.createElement("div");
-      b.className = "b";
-      b.innerHTML = `
-        <span class="badge ${prioBadgeClass(t.priority)}">${t.priority}</span>
-        <span class="badge ${statusBadgeClass(t.status)}">${t.status}</span>
-        <span class="badge">${t.branch}</span>
-      `;
-
-      left.appendChild(title);
-      left.appendChild(b);
-
-      const right = document.createElement("div");
-      right.className = "rightMeta";
-      right.innerHTML = `<div>${t.id}</div><div>${fmtDate(t.createdAt)}</div>`;
-
-      r.appendChild(left);
-      r.appendChild(right);
-      rows.appendChild(r);
+    document.addEventListener("keydown", (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+        e.preventDefault();
+        $("globalSearch").focus();
+      }
+      if (e.key === "Escape") closeTicketModal();
     });
 
-    renderDetail();
-  }
-
-  function renderDetail(){
-    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
-    if (!t) {
-      $("detailTitle").textContent = "Select a ticket";
-      $("detailSub").textContent = "Open a ticket to view details.";
-      $("ticketInfo").innerHTML = "";
-      $("ticketDesc").textContent = "—";
-      $("branchReply").value = "";
-      $("replyMeta").textContent = "—";
-      $("timeline").innerHTML = "";
-      return;
-    }
-
-    const latestReply = getLatestReply(t.rowId);
-
-    $("detailTitle").textContent = t.subject;
-    $("detailSub").textContent = `${t.id} • ${t.branch} • ${t.status}`;
-
-    const info = [
-      ["Ticket", t.id],
-      ["Status", t.status],
-      ["Priority", t.priority],
-      ["Branch", t.branch],
-      ["Category", t.category],
-      ["Source", t.source],
-      ["Customer", t.customerName],
-      ["Phone", t.customerPhone],
-      ["Assigned", t.assignedTo || "—"],
-      ["Created", fmtDate(t.createdAt)]
-    ];
-
-    $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
-    $("ticketDesc").textContent = t.description || "—";
-    $("branchReply").value = latestReply?.reply_text || "";
-
-    $("replyMeta").textContent = latestReply
-      ? `Reply by ${latestReply.reply_by || "—"} • ${fmtDate(latestReply.created_at)}${latestReply.action_taken ? " • " + latestReply.action_taken : ""}`
-      : "No branch reply yet.";
-
-    const tl = $("timeline");
-    tl.innerHTML = "";
-    buildTimeline(t).forEach(ev => {
-      const wrap = document.createElement("div");
-      wrap.className = "event";
-      wrap.innerHTML = `
-        <div class="dot"></div>
-        <div class="box">
-          <div class="t">${ev.t}</div>
-          <div class="d">${ev.d}</div>
-          <div class="m">${ev.m}</div>
-        </div>
-      `;
-      tl.appendChild(wrap);
+    document.querySelectorAll(".nav button").forEach(btn=>{
+      btn.addEventListener("click", ()=> setView(btn.dataset.view));
     });
-  }
 
-  async function createTicket(){
-    try{
-      const payload = {
-        customer_name: "New Customer",
-        customer_phone: "0500000000",
-        branch_name: "Salamah",
-        feedback_type: "Manual",
-        feedback_category: "General",
-        sub_category: "General",
-        description: "New ticket created from CX Portal",
-        priority: "Medium",
-        status: "Open"
-      };
+    $("goTickets").onclick = ()=> setView("tickets");
+    $("goReports").onclick = ()=> setView("reports");
+    $("goSettings").onclick = ()=> setView("settings");
 
-      const { data, error } = await supabaseClient
-        .from("tickets")
-        .insert([payload])
-        .select("*");
+    ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
+      $(id).addEventListener("input", renderTickets);
+      $(id).addEventListener("change", renderTickets);
+    });
 
-      if(error){
-        console.error("Insert error:", error);
-        alert("Ticket creation failed: " + (error.message || "Unknown error"));
-        return;
-      }
+    $("globalSearch").addEventListener("input", renderTickets);
 
-      if (data && data[0] && data[0].id) {
-        state.selectedId = data[0].id;
-      }
-
-      await loadTickets();
-      setView("tickets");
-      renderTickets();
-      alert("Ticket created successfully ✅");
-    }catch(e){
-      console.error("createTicket exception:", e);
-      alert("Exception: " + (e.message || e));
-    }
-  }
-
-  async function saveReply(){
-    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
-    if (!t || !t.rowId) {
-      alert("Please select a ticket first.");
-      return;
-    }
-
-    const replyText = ($("branchReply").value || "").trim();
-    if (!replyText) {
-      alert("Please write a reply first.");
-      return;
-    }
-
-    try{
-      const { error } = await supabaseClient
-        .from("ticket_replies")
-        .insert([{
-          ticket_id: t.rowId,
-          reply_text: replyText,
-          reply_by: "Branch",
-          action_taken: "Reply saved"
-        }]);
-
-      if(error){
-        console.error("Save reply error:", error);
-        alert("Save reply failed: " + (error.message || "Unknown error"));
-        return;
-      }
-
-      await loadRepliesMap();
-      renderDetail();
-      computeKPIs();
-      alert("Reply saved ✅");
-    }catch(e){
-      console.error("saveReply exception:", e);
-      alert("Exception: " + (e.message || e));
-    }
-  }
-
-  async function markReplied(){
-    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
-    if (!t || !t.rowId) return;
-
-    try{
-      const { error } = await supabaseClient
-        .from("tickets")
-        .update({ status:"Replied" })
-        .eq("id", t.rowId);
-
-      if(error){
-        console.error("Mark replied error:", error);
-        alert("Mark replied failed: " + (error.message || "Unknown error"));
-        return;
-      }
-
-      await loadTickets();
-      renderTickets();
-      renderDetail();
-      alert("Ticket marked as Replied ✅");
-    }catch(e){
-      console.error("markReplied exception:", e);
-      alert("Exception: " + (e.message || e));
-    }
-  }
-
-  async function closeTicket(){
-    const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
-    if (!t || !t.rowId) return;
-
-    try{
-      const { error } = await supabaseClient
-        .from("tickets")
-        .update({ status:"Closed" })
-        .eq("id", t.rowId);
-
-      if(error){
-        console.error("Close ticket error:", error);
-        alert("Close failed: " + (error.message || "Unknown error"));
-        return;
-      }
-
-      await loadTickets();
-      renderTickets();
-      renderDetail();
-      alert("Ticket closed ✅");
-    }catch(e){
-      console.error("closeTicket exception:", e);
-      alert("Exception: " + (e.message || e));
-    }
-  }
-
-  function assignTicket(){
-    alert("Assign button ready. Next step we can connect it later to Supabase assign_to.");
-  }
-
-  function addNote(){
-    alert("Add Note button ready. Next step we can connect it later to a notes table.");
-  }
-
-  function exportJSON(){
-    const data = {
-      exportedAt: new Date().toISOString(),
-      tickets: state.tickets,
-      repliesByTicket: state.repliesByTicket
+    $("btnTheme").onclick = ()=>{
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      applyTheme();
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "cx_portal_export.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
 
-  document.addEventListener("keydown", (e)=>{
-    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
-      e.preventDefault();
-      $("globalSearch").focus();
-    }
-  });
+    $("btnLang").onclick = ()=>{
+      state.lang = state.lang === "en" ? "ar" : "en";
+      applyLang();
+      renderTickets();
+      setView(currentView());
+    };
 
-  document.querySelectorAll(".nav button").forEach(btn=>{
-    btn.addEventListener("click", ()=> setView(btn.dataset.view));
-  });
+    $("btnNewTicket").onclick = openTicketModal;
+    $("btnCloseModal").onclick = closeTicketModal;
+    $("btnCancelModal").onclick = closeTicketModal;
+    $("btnSubmitTicket").onclick = createTicket;
+    $("btnExport").onclick = exportJSON;
+    $("btnRefresh").onclick = loadTickets;
+    $("btnSaveReply").onclick = saveReply;
+    $("btnMarkReplied").onclick = markReplied;
+    $("btnClose").onclick = closeTicket;
+    $("btnAssign").onclick = assignTicket;
+    $("btnAddNote").onclick = addNote;
 
-  $("goTickets").onclick = ()=> setView("tickets");
-  $("goReports").onclick = ()=> setView("reports");
-  $("goSettings").onclick = ()=> setView("settings");
+    $("saveBrand").onclick = ()=>{
+      const v = $("brandInput").value.trim();
+      if(v){
+        state.brandTitle = v;
+        $("brandTitle").textContent = v;
+        localStorage.setItem("cx_brand_title", v);
+        alert("Brand saved ✅");
+      }
+    };
 
-  ["filterStatus","filterPriority","filterBranch"].forEach(id=>{
-    $(id).addEventListener("input", renderTickets);
-    $(id).addEventListener("change", renderTickets);
-  });
-
-  $("globalSearch").addEventListener("input", renderTickets);
-
-  $("btnTheme").onclick = ()=>{
-    state.theme = state.theme === "dark" ? "light" : "dark";
-    applyTheme();
-  };
-
-  $("btnLang").onclick = ()=>{
-    state.lang = state.lang === "en" ? "ar" : "en";
-    applyLang();
-    renderTickets();
-    setView(currentView());
-  };
-
-  $("btnNewTicket").onclick = createTicket;
-  $("btnExport").onclick = exportJSON;
-  $("btnSaveReply").onclick = saveReply;
-  $("btnMarkReplied").onclick = markReplied;
-  $("btnClose").onclick = closeTicket;
-  $("btnAssign").onclick = assignTicket;
-  $("btnAddNote").onclick = addNote;
-
-  $("saveBrand").onclick = ()=>{
-    const v = $("brandInput").value.trim();
-    if(v){
-      state.brandTitle = v;
-      $("brandTitle").textContent = v;
-      alert("Brand saved ✅");
-    }
-  };
-
-  (async function init(){
-    applyTheme();
-    applyLang();
-    computeKPIs();
-    setView("dashboard");
-    await loadTickets();
-  })();
-</script>
+    (async function init(){
+      applyTheme();
+      applyLang();
+      computeKPIs();
+      setView("dashboard");
+      await loadTickets();
+    })();
+  </script>
+</body>
+</html>
