@@ -1780,14 +1780,20 @@
           return;
         }
 
-        if (data && data[0]) {
-          if (data[0].id) state.selectedId = data[0].id;
+  if (data && data[0]) {
+  if (data[0].id) state.selectedId = data[0].id;
 
-          const emailSent = await sendBranchEmail(data[0]);
-          if (!emailSent) {
-            console.warn("Ticket created but email was not sent.");
-          }
-        }
+  showToast("Debug", "sendBranchEmail is starting...", "warn");
+
+  const emailSent = await sendBranchEmail(data[0]);
+
+  if (!emailSent) {
+    console.warn("Ticket created but email was not sent.");
+    showToast("Debug", "sendBranchEmail returned false", "bad");
+  } else {
+    showToast("Debug", "sendBranchEmail returned true", "good");
+  }
+}
 
         closeTicketModal();
         await loadTickets();
