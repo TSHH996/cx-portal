@@ -1709,14 +1709,69 @@
       try {
         console.log("sendBranchEmail() ticket:", ticket);
 
-        const response = await fetch(
+ async function sendBranchEmail(ticket) {
+  try {
+    console.log("sendBranchEmail() ticket:", ticket);
+
+    const response = await fetch(
+      "https://zwowuhfsorfnhmhvoqsm.supabase.co/functions/v1/send-branch-email",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          ticket_no: ticket.ticket_no,
+          branch_name: ticket.branch_name,
+          branch_email: DIRECT_TEST_EMAIL,
+          customer_name: ticket.customer_name,
+          customer_phone: ticket.customer_phone,
+          feedback_type: ticket.feedback_type,
+          feedback_category: ticket.feedback_category,
+          sub_category: ticket.sub_category,
+          description: ticket.description,
+          priority: ticket.priority,
+          status: ticket.status
+        })
+      }
+    );
+
+    const rawText = await response.text();
+    console.log("Email function raw response:", rawText);
+
+    let result = {};
+    try {
+      result = rawText ? JSON.parse(rawText) : {};
+    } catch {
+      result = { raw: rawText };
+    }
+
+    if (!response.ok) {
+      console.error("Email sending failed:", result);
+      showToast("Email failed", rawText || "Unknown error", "bad");
+      return false;
+    }
+
+    console.log("Email function result:", result);
+    showToast("Email sent", `Email request sent to ${DIRECT_TEST_EMAIL} ✅`, "good");
+    return true;
+  } catch (e) {
+    console.error("sendBranchEmail exception:", e);
+    showToast("sendBranchEmail exception", e.message || String(e), "bad");
+    return false;
+  }
+}
+}
           "https://zwowuhfsorfnhmhvoqsm.supabase.co/functions/v1/send-branch-email",
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-            },
+          headers: {
+  "Content-Type": "application/json",
+  "apikey": SUPABASE_ANON_KEY,
+  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+}
             body: JSON.stringify({
               ticket_no: ticket.ticket_no,
               branch_name: ticket.branch_name,
@@ -1769,10 +1824,14 @@
           return;
         }
 
-        if (data && data[0]) {
-          if (data[0].id) state.selectedId = data[0].id;
-          await sendBranchEmail(data[0]);
-        }
+      if (data && data[0]) {
+  if (data[0].id) state.selectedId = data[0].id;
+
+  const emailSent = await sendBranchEmail(data[0]);
+  if (!emailSent) {
+    console.warn("Ticket created but email was not sent.");
+  }
+
 
         closeTicketModal();
         await loadTickets();
