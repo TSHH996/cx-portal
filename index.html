@@ -419,6 +419,41 @@
       width:100%;
     }
 
+    input[type="file"].input{
+      padding:8px 12px;
+    }
+
+    .attachmentList{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:6px;
+    }
+
+    .attachmentItem{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      color:var(--text);
+      max-width:100%;
+    }
+
+    .attachmentItem a{
+      color:var(--brand);
+      text-decoration:underline;
+      word-break:break-all;
+    }
+
+    .attachmentItem .meta{
+      color:var(--muted2);
+      font-size:11px;
+    }
+
     select option{
       color:#111827;
     }
@@ -1105,6 +1140,11 @@
               </div>
 
               <div class="panel">
+                <div class="ph">Attachments</div>
+                <div id="ticketAttachmentsList" class="attachmentList"></div>
+              </div>
+
+              <div class="panel">
                 <div class="ph">Branch Reply</div>
                 <div style="display:flex;gap:10px;flex-direction:column">
                   <textarea class="textarea" id="branchReply" placeholder="Write branch reply here..."></textarea>
@@ -1253,6 +1293,12 @@
           <textarea class="textarea" id="newDescription">test</textarea>
           <div class="helper">Use branch dropdown selection. Current direct test email mode will still send to your email for setup verification.</div>
         </div>
+
+        <div class="field full">
+          <label for="newTicketAttachments">Attachments</label>
+          <input class="input" type="file" id="newTicketAttachments" multiple />
+          <div class="helper">You can upload images, PDF, and documents. Max size depends on your Supabase bucket settings.</div>
+        </div>
       </div>
 
       <div class="modalActions">
@@ -1271,6 +1317,7 @@
     const SUPABASE_ANON_KEY = "sb_publishable_aqqVrDvfsxUFvN_CbfXwMg_3PpS3xw8";
 
     const DIRECT_TEST_EMAIL = "thamer.alshehri1@hotmail.com";
+    const ATTACHMENTS_BUCKET = "ticket_attachments";
 
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -1283,6 +1330,7 @@
       tickets: [],
       branches: [],
       repliesByTicketId: {},
+      attachmentsByTicketId: {},
       selectedId: null
     };
 
@@ -1302,12 +1350,36 @@
       renderBranchOptions();
     }
 
+    async function loadAttachments() {
+      try {
+        const { data, error } = await supabaseClient
+          .from("ticket_attachments")
+          .select("*")
+          .order("created_at", { ascending: true });
+
+        if (error) {
+          console.error("ticket_attachments load error:", error);
+          return;
+        }
+
+        const map = {};
+        (data || []).forEach(file => {
+          const key = file.ticket_id;
+          if (!map[key]) map[key] = [];
+          map[key].push(file);
+        });
+
+        state.attachmentsByTicketId = map;
+      } catch (e) {
+        console.error("loadAttachments exception:", e);
+      }
+    }
+
     function renderBranchOptions() {
       const branchSelect = $("newBranchName");
       if (!branchSelect) return;
 
       const currentValue = branchSelect.value || "";
-
       branchSelect.innerHTML = `<option value="">Select branch</option>`;
 
       state.branches.forEach(branch => {
@@ -1331,6 +1403,23 @@
       const dt = new Date(d);
       if (Number.isNaN(dt.getTime())) return "—";
       return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+    }
+
+    function formatFileSize(bytes){
+      if (!bytes || Number.isNaN(Number(bytes))) return "—";
+      const n = Number(bytes);
+      if (n < 1024) return `${n} B`;
+      if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+      return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
     function currentView(){
@@ -1467,7 +1556,7 @@
     async function loadTickets(){
       try{
         $("systemMsg").textContent = "Loading tickets...";
-        await loadReplies();
+        await Promise.all([loadReplies(), loadAttachments()]);
 
         const { data, error } = await supabaseClient
           .from("tickets")
@@ -1486,6 +1575,7 @@
           const ticketIdLabel = (r.ticket_no !== null && r.ticket_no !== undefined) ? `#${r.ticket_no}` : (r.id ? "#" + String(r.id).slice(0,8) : "#—");
           const replies = state.repliesByTicketId[r.id] || [];
           const latestReply = replies.length ? replies[replies.length - 1] : null;
+          const attachments = state.attachmentsByTicketId[r.id] || [];
 
           const timeline = [
             {
@@ -1494,6 +1584,14 @@
               m: fmtDate(createdAt)
             }
           ];
+
+          if (attachments.length) {
+            timeline.push({
+              t: "Attachments uploaded",
+              d: `${attachments.length} file(s) attached to this ticket.`,
+              m: fmtDate(attachments[0]?.created_at || createdAt)
+            });
+          }
 
           replies.forEach(rep => {
             timeline.push({
@@ -1531,6 +1629,7 @@
             replyBy: latestReply?.reply_by || "",
             replyAt: latestReply?.created_at ? new Date(latestReply.created_at).getTime() : null,
             actionTaken: latestReply?.action_taken || "",
+            attachments,
             timeline,
             raw: r
           };
@@ -1606,6 +1705,7 @@
           <span class="badge ${prioBadgeClass(t.priority)}">${t.priority}</span>
           <span class="badge ${statusBadgeClass(t.status)}">${t.status}</span>
           <span class="badge">${t.branch}</span>
+          ${t.attachments?.length ? `<span class="badge">${t.attachments.length} attachment(s)</span>` : ""}
         `;
 
         left.appendChild(title);
@@ -1623,6 +1723,37 @@
       renderDetail();
     }
 
+    function renderAttachments(ticket){
+      const wrap = $("ticketAttachmentsList");
+      wrap.innerHTML = "";
+
+      const files = ticket?.attachments || [];
+      if (!files.length) {
+        wrap.innerHTML = `<div class="helper">No attachments uploaded for this ticket.</div>`;
+        return;
+      }
+
+      files.forEach(file => {
+        const item = document.createElement("div");
+        item.className = "attachmentItem";
+
+        const safeName = escapeHtml(file.file_name || "file");
+        const safeUrl = escapeHtml(file.file_url || "#");
+        const safeSize = escapeHtml(formatFileSize(file.file_size));
+        const safeDate = escapeHtml(fmtDate(file.created_at));
+
+        item.innerHTML = `
+          <span>📎</span>
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeName}</a>
+            <span class="meta">${safeSize} • ${safeDate}</span>
+          </div>
+        `;
+
+        wrap.appendChild(item);
+      });
+    }
+
     function renderDetail(){
       const t = (state.tickets || []).find(x => x.rowId === state.selectedId);
 
@@ -1634,6 +1765,7 @@
         $("branchReply").value = "";
         $("replyMeta").textContent = "—";
         $("timeline").innerHTML = "";
+        $("ticketAttachmentsList").innerHTML = "";
         return;
       }
 
@@ -1663,6 +1795,8 @@
         $("replyMeta").textContent = "No branch reply yet.";
       }
 
+      renderAttachments(t);
+
       const tl = $("timeline");
       tl.innerHTML = "";
 
@@ -1686,6 +1820,19 @@
       $("newTicketModal").setAttribute("aria-hidden", "false");
     }
 
+    function resetNewTicketForm(){
+      $("newCustomerName").value = "Test Customer";
+      $("newCustomerPhone").value = "0500000000";
+      $("newBranchName").value = "";
+      $("newPriority").value = "Medium";
+      $("newFeedbackType").value = "WhatsApp";
+      $("newStatus").value = "Open";
+      $("newFeedbackCategory").value = "test";
+      $("newSubCategory").value = "test";
+      $("newDescription").value = "test";
+      $("newTicketAttachments").value = "";
+    }
+
     function closeTicketModal(){
       $("newTicketModal").classList.remove("show");
       $("newTicketModal").setAttribute("aria-hidden", "true");
@@ -1703,6 +1850,69 @@
         priority: $("newPriority").value || "Medium",
         status: $("newStatus").value || "Open"
       };
+    }
+
+    async function uploadAttachmentsForTicket(ticketRow){
+      const input = $("newTicketAttachments");
+      const files = input?.files ? Array.from(input.files) : [];
+
+      if (!files.length) return { uploaded: 0, failed: 0 };
+
+      let uploaded = 0;
+      let failed = 0;
+
+      for (const file of files) {
+        try {
+          const safeOriginalName = file.name.replace(/[^\w.\-]+/g, "_");
+          const ticketRef = ticketRow.ticket_no ?? ticketRow.id ?? Date.now();
+          const filePath = `tickets/${ticketRef}/${Date.now()}-${safeOriginalName}`;
+
+          const { error: uploadError } = await supabaseClient.storage
+            .from(ATTACHMENTS_BUCKET)
+            .upload(filePath, file, {
+              cacheControl: "3600",
+              upsert: false
+            });
+
+          if (uploadError) {
+            console.error("Upload error:", uploadError);
+            failed += 1;
+            continue;
+          }
+
+          const { data: publicUrlData } = supabaseClient.storage
+            .from(ATTACHMENTS_BUCKET)
+            .getPublicUrl(filePath);
+
+          const publicUrl = publicUrlData?.publicUrl || null;
+
+          const { error: insertError } = await supabaseClient
+            .from("ticket_attachments")
+            .insert([{
+              ticket_id: ticketRow.id,
+              file_name: file.name,
+              file_path: filePath,
+              file_url: publicUrl,
+              mime_type: file.type || null,
+              file_size: file.size || null,
+              source: "cx",
+              uploaded_by: "cx portal"
+            }]);
+
+          if (insertError) {
+            console.error("Attachment insert error:", insertError);
+            failed += 1;
+            continue;
+          }
+
+          uploaded += 1;
+        } catch (e) {
+          console.error("Attachment exception:", e);
+          failed += 1;
+        }
+      }
+
+      return { uploaded, failed };
     }
 
     async function sendBranchEmail(ticket) {
@@ -1769,6 +1979,10 @@
           return;
         }
 
+        const submitBtn = $("btnSubmitNewTicket");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Creating...";
+
         const { data, error } = await supabaseClient
           .from("tickets")
           .insert([payload])
@@ -1777,32 +1991,51 @@
         if(error){
           console.error("Insert error:", error);
           alert("Ticket creation failed: " + (error.message || "Unknown error"));
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Create Ticket";
           return;
         }
 
-  if (data && data[0]) {
-  if (data[0].id) state.selectedId = data[0].id;
+        let uploadedCount = 0;
+        let failedCount = 0;
 
-  showToast("Debug", "sendBranchEmail is starting...", "warn");
+        if (data && data[0]) {
+          if (data[0].id) state.selectedId = data[0].id;
 
-  const emailSent = await sendBranchEmail(data[0]);
+          const attachmentResult = await uploadAttachmentsForTicket(data[0]);
+          uploadedCount = attachmentResult.uploaded;
+          failedCount = attachmentResult.failed;
 
-  if (!emailSent) {
-    console.warn("Ticket created but email was not sent.");
-    showToast("Debug", "sendBranchEmail returned false", "bad");
-  } else {
-    showToast("Debug", "sendBranchEmail returned true", "good");
-  }
-}
+          showToast("Debug", "sendBranchEmail is starting...", "warn");
 
+          const emailSent = await sendBranchEmail(data[0]);
+
+          if (!emailSent) {
+            console.warn("Ticket created but email was not sent.");
+            showToast("Debug", "sendBranchEmail returned false", "bad");
+          } else {
+            showToast("Debug", "sendBranchEmail returned true", "good");
+          }
+        }
+
+        resetNewTicketForm();
         closeTicketModal();
         await loadTickets();
         setView("tickets");
         renderTickets();
-        alert("Ticket created successfully ✅");
+
+        let successMessage = "Ticket created successfully ✅";
+        if (uploadedCount > 0) successMessage += `\nAttachments uploaded: ${uploadedCount}`;
+        if (failedCount > 0) successMessage += `\nAttachments failed: ${failedCount}`;
+
+        alert(successMessage);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create Ticket";
       }catch(e){
         console.error("createTicket exception:", e);
         alert("Exception: " + (e.message || e));
+        $("btnSubmitNewTicket").disabled = false;
+        $("btnSubmitNewTicket").textContent = "Create Ticket";
       }
     }
 
