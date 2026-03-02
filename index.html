@@ -1204,7 +1204,9 @@
         <div class="grid2">
           <div class="field">
             <label for="newBranchName">Branch Name</label>
-            <input class="input" id="newBranchName" value="Salamah" />
+            <select class="input" id="newBranchName">
+              <option value="">Select branch</option>
+            </select>
           </div>
 
           <div class="field">
@@ -1249,7 +1251,7 @@
         <div class="field full">
           <label for="newDescription">Description</label>
           <textarea class="textarea" id="newDescription">test</textarea>
-          <div class="helper">Use branch name exactly as stored in your data. Current direct test email mode will still send to your email for setup verification.</div>
+          <div class="helper">Use branch dropdown selection. Current direct test email mode will still send to your email for setup verification.</div>
         </div>
       </div>
 
@@ -1279,9 +1281,46 @@
       theme: "dark",
       brandTitle: "CX Portal",
       tickets: [],
+      branches: [],
       repliesByTicketId: {},
       selectedId: null
     };
+
+    async function loadBranches() {
+      const { data, error } = await supabaseClient
+        .from("branches")
+        .select("*")
+        .order("branch_name", { ascending: true });
+
+      if (error) {
+        console.error("Error loading branches:", error);
+        showToast("Branches load error", error.message || "Could not load branches", "bad");
+        return;
+      }
+
+      state.branches = data || [];
+      renderBranchOptions();
+    }
+
+    function renderBranchOptions() {
+      const branchSelect = $("newBranchName");
+      if (!branchSelect) return;
+
+      const currentValue = branchSelect.value || "";
+
+      branchSelect.innerHTML = `<option value="">Select branch</option>`;
+
+      state.branches.forEach(branch => {
+        const option = document.createElement("option");
+        option.value = branch.branch_name;
+        option.textContent = branch.branch_name;
+        branchSelect.appendChild(option);
+      });
+
+      if (currentValue && state.branches.some(b => b.branch_name === currentValue)) {
+        branchSelect.value = currentValue;
+      }
+    }
 
     function pad(n){
       return String(n).padStart(2, "0");
@@ -1656,7 +1695,7 @@
       return {
         customer_name: ($("newCustomerName").value || "Test Customer").trim() || "Test Customer",
         customer_phone: ($("newCustomerPhone").value || "0500000000").trim() || "0500000000",
-        branch_name: ($("newBranchName").value || "Salamah").trim() || "Salamah",
+        branch_name: ($("newBranchName").value || "").trim(),
         feedback_type: ($("newFeedbackType").value || "WhatsApp").trim() || "WhatsApp",
         feedback_category: ($("newFeedbackCategory").value || "test").trim() || "test",
         sub_category: ($("newSubCategory").value || "test").trim() || "test",
@@ -1713,6 +1752,11 @@
     async function createTicket(){
       try{
         const payload = getNewTicketPayload();
+
+        if (!payload.branch_name) {
+          alert("Please select a branch first.");
+          return;
+        }
 
         const { data, error } = await supabaseClient
           .from("tickets")
@@ -1901,9 +1945,10 @@
     $("btnSubmitNewTicket").onclick = createTicket;
 
     $("btnRefresh").onclick = async () => {
+      await loadBranches();
       await loadTickets();
       renderTickets();
-      showToast("Refreshed", "Tickets reloaded from Supabase.", "good");
+      showToast("Refreshed", "Tickets and branches reloaded from Supabase.", "good");
     };
 
     $("btnExport").onclick = exportJSON;
@@ -1931,6 +1976,7 @@
       applyLang();
       computeKPIs();
       setView("dashboard");
+      await loadBranches();
       await loadTickets();
     })();
   </script>
