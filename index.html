@@ -220,6 +220,12 @@
                 <div style="color:var(--muted);font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word" id="ticketDesc">—</div>
               </div>
 
+              <!-- ✅ NEW: Attachments panel in Ticket Details -->
+              <div class="panel">
+                <div class="ph">Attachments</div>
+                <div id="ticketAttachmentsList" style="display:flex;flex-direction:column;gap:8px"></div>
+              </div>
+
               <div class="panel">
                 <div class="ph">Branch Reply</div>
                 <div style="display:flex;gap:10px;flex-direction:column">
@@ -368,6 +374,13 @@
           <label for="newDescription">Description</label>
           <textarea class="textarea" id="newDescription">test</textarea>
           <div class="helper">Use branch dropdown selection. Current direct test email mode will still send to your email for setup verification.</div>
+        </div>
+
+        <!-- ✅ NEW: Attachments input (NO OLD IDs CHANGED) -->
+        <div class="field full">
+          <label for="newTicketAttachments">Attachments</label>
+          <input class="input" type="file" id="newTicketAttachments" multiple />
+          <div class="helper">Upload images, PDFs, or documents. (Uploaded via Edge Function)</div>
         </div>
       </div>
 
