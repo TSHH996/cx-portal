@@ -279,11 +279,13 @@ async function uploadAttachmentsViaFunction(ticketRow){
       let result = {};
       try { result = rawText ? JSON.parse(rawText) : {}; } catch { result = { raw: rawText }; }
 
-      if (!response.ok) {
-        console.error("upload-ticket-attachment failed:", result);
-        failed += 1;
-        continue;
-      }
+    if (!response.ok) {
+  const msg = result?.error || result?.raw || JSON.stringify(result);
+  console.error("upload-ticket-attachment failed:", msg, result);
+  showToast("Attachment upload error", msg, "bad");
+  failed += 1;
+  continue;
+}
 
       uploaded += 1;
       if (result?.attachment) attachments.push(result.attachment);
