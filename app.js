@@ -16,7 +16,7 @@ const state = {
   tickets: [],
   branches: [],
   repliesByTicketId: {},
-  attachmentsByTicketId: {}, // ✅ NEW
+  attachmentsByTicketId: {}, // keyed by ticket UUID now
   selectedId: null
 };
 
@@ -86,7 +86,7 @@ function showToast(title, text, variant = "good"){
 
   setTimeout(() => {
     el.remove();
-  }, 4200);
+  }, 5200);
 }
 
 function setView(view){
@@ -198,7 +198,6 @@ async function loadReplies(){
   }
 }
 
-// ✅ NEW: Load attachments from table
 async function loadAttachments(){
   try{
     const { data, error } = await supabaseClient
@@ -213,7 +212,8 @@ async function loadAttachments(){
 
     const map = {};
     (data || []).forEach(a => {
-      const key = a.ticket_id;
+      const key = a.ticket_uuid || null; // ✅ UUID key
+      if (!key) return;
       if (!map[key]) map[key] = [];
       map[key].push(a);
     });
@@ -224,7 +224,6 @@ async function loadAttachments(){
   }
 }
 
-// ✅ NEW: File -> base64
 async function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -238,7 +237,6 @@ async function fileToBase64(file) {
   });
 }
 
-// ✅ NEW: Upload attachments via Edge Function (Service Role)
 async function uploadAttachmentsViaFunction(ticketRow){
   const input = $("newTicketAttachments");
   const files = input?.files ? Array.from(input.files) : [];
@@ -263,7 +261,7 @@ async function uploadAttachmentsViaFunction(ticketRow){
             "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
           },
           body: JSON.stringify({
-            ticket_id: ticketRow.id,
+            ticket_id: ticketRow.id, // UUID
             ticket_no: ticketRow.ticket_no,
             file_name: file.name,
             mime_type: file.type || "application/octet-stream",
@@ -279,26 +277,25 @@ async function uploadAttachmentsViaFunction(ticketRow){
       let result = {};
       try { result = rawText ? JSON.parse(rawText) : {}; } catch { result = { raw: rawText }; }
 
-    if (!response.ok) {
-  const msg = result?.error || result?.raw || JSON.stringify(result);
-  console.error("upload-ticket-attachment failed:", msg, result);
-  showToast("Attachment upload error", msg, "bad");
-  failed += 1;
-  continue;
-}
+      if (!response.ok) {
+        const msg = result?.error || result?.raw || JSON.stringify(result);
+        console.error("upload-ticket-attachment failed:", msg, result);
+        showToast("Attachment upload error", msg, "bad");
+        failed += 1;
+        continue;
+      }
 
       uploaded += 1;
       if (result?.attachment) attachments.push(result.attachment);
 
     } catch (e) {
       console.error("uploadAttachmentsViaFunction exception:", e);
+      showToast("Attachment exception", e?.message || String(e), "bad");
       failed += 1;
     }
   }
 
-  // ✅ تنظيف input بعد الرفع
   try { if ($("newTicketAttachments")) $("newTicketAttachments").value = ""; } catch {}
-
   return { uploaded, failed, attachments };
 }
 
@@ -306,7 +303,7 @@ async function loadTickets(){
   try{
     $("systemMsg").textContent = "Loading tickets...";
     await loadReplies();
-    await loadAttachments(); // ✅ NEW
+    await loadAttachments();
 
     const { data, error } = await supabaseClient
       .from("tickets")
@@ -327,33 +324,18 @@ async function loadTickets(){
       const latestReply = replies.length ? replies[replies.length - 1] : null;
 
       const timeline = [
-        {
-          t:"Ticket created",
-          d:"Loaded from Supabase.",
-          m: fmtDate(createdAt)
-        }
+        { t:"Ticket created", d:"Loaded from Supabase.", m: fmtDate(createdAt) }
       ];
 
       replies.forEach(rep => {
-        timeline.push({
-          t: "Reply by Branch",
-          d: rep.reply_text || "—",
-          m: fmtDate(rep.created_at)
-        });
-
-        if (rep.action_taken) {
-          timeline.push({
-            t: "Action taken",
-            d: rep.action_taken,
-            m: fmtDate(rep.created_at)
-          });
-        }
+        timeline.push({ t: "Reply by Branch", d: rep.reply_text || "—", m: fmtDate(rep.created_at) });
+        if (rep.action_taken) timeline.push({ t: "Action taken", d: rep.action_taken, m: fmtDate(rep.created_at) });
       });
 
-      const attachments = state.attachmentsByTicketId[r.id] || []; // ✅ NEW
+      const attachments = state.attachmentsByTicketId[r.id] || []; // ✅ uuid map
 
       return {
-        rowId: r.id || null,
+        rowId: r.id || null, // UUID
         id: ticketIdLabel,
         ticketNo: r.ticket_no ?? null,
         subject: `${ticketIdLabel} • ${r.branch_name || "—"}`,
@@ -372,7 +354,7 @@ async function loadTickets(){
         replyBy: latestReply?.reply_by || "",
         replyAt: latestReply?.created_at ? new Date(latestReply.created_at).getTime() : null,
         actionTaken: latestReply?.action_taken || "",
-        attachments, // ✅ NEW
+        attachments,
         timeline,
         raw: r
       };
@@ -400,12 +382,10 @@ function filterTickets(){
 
   return (state.tickets || []).filter(t => {
     const hay = `${t.id} ${t.subject} ${t.branch} ${t.customerName} ${t.customerPhone} ${t.category} ${t.source} ${t.description}`.toLowerCase();
-
     if (q && !hay.includes(q)) return false;
     if (status !== "all" && t.status !== status) return false;
     if (prio !== "all" && t.priority !== prio) return false;
     if (branchQ && !String(t.branch || "").toLowerCase().includes(branchQ)) return false;
-
     return true;
   });
 }
@@ -413,7 +393,6 @@ function filterTickets(){
 function renderTickets(){
   const rows = $("ticketRows");
   const list = filterTickets();
-
   $("resultCount").textContent = `${list.length} tickets`;
 
   if (!state.selectedId && list[0]) state.selectedId = list[0].rowId;
@@ -501,13 +480,9 @@ function renderDetail(){
   $("ticketDesc").textContent = t.description || "—";
   $("branchReply").value = t.branchReply || "";
 
-  if (t.replyAt) {
-    $("replyMeta").textContent = `Reply by ${t.replyBy || "Branch"} • ${fmtDate(t.replyAt)}`;
-  } else {
-    $("replyMeta").textContent = "No branch reply yet.";
-  }
+  if (t.replyAt) $("replyMeta").textContent = `Reply by ${t.replyBy || "Branch"} • ${fmtDate(t.replyAt)}`;
+  else $("replyMeta").textContent = "No branch reply yet.";
 
-  // ✅ NEW: Render attachments in ticket details
   const attWrap = $("ticketAttachmentsList");
   if (attWrap) {
     const files = t.attachments || [];
@@ -524,7 +499,6 @@ function renderDetail(){
 
   const tl = $("timeline");
   tl.innerHTML = "";
-
   (t.timeline || []).forEach(ev => {
     const wrap = document.createElement("div");
     wrap.className = "event";
@@ -564,7 +538,6 @@ function getNewTicketPayload(){
   };
 }
 
-// ✅ UPDATED: sendBranchEmail supports attachment links
 async function sendBranchEmail(ticket, attachmentsList = []) {
   try {
     const attachment_links = (attachmentsList || [])
@@ -592,7 +565,7 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
           description: ticket.description,
           priority: ticket.priority,
           status: ticket.status,
-          attachment_links // ✅ NEW
+          attachment_links
         })
       }
     );
@@ -636,15 +609,10 @@ async function createTicket(){
     if (data && data[0]) {
       if (data[0].id) state.selectedId = data[0].id;
 
-      // ✅ NEW: Upload attachments after ticket created
       const attachmentResult = await uploadAttachmentsViaFunction(data[0]);
-      if (attachmentResult.failed > 0) {
-        showToast("Attachments", `Failed: ${attachmentResult.failed}`, "bad");
-      } else if (attachmentResult.uploaded > 0) {
-        showToast("Attachments", `Uploaded: ${attachmentResult.uploaded}`, "good");
-      }
+      if (attachmentResult.failed > 0) showToast("Attachments", `Failed: ${attachmentResult.failed}`, "bad");
+      else if (attachmentResult.uploaded > 0) showToast("Attachments", `Uploaded: ${attachmentResult.uploaded}`, "good");
 
-      // ✅ Email includes links (if uploaded)
       await sendBranchEmail(data[0], attachmentResult.attachments || []);
     }
 
@@ -753,20 +721,11 @@ async function closeTicket(){
   }
 }
 
-function assignTicket(){
-  showToast("Assign", "Assign action is ready for future connection.", "good");
-}
-
-function addNote(){
-  showToast("Add Note", "Notes action is ready for future connection.", "good");
-}
+function assignTicket(){ showToast("Assign", "Assign action is ready for future connection.", "good"); }
+function addNote(){ showToast("Add Note", "Notes action is ready for future connection.", "good"); }
 
 function exportJSON(){
-  const data = {
-    exportedAt: new Date().toISOString(),
-    tickets: state.tickets
-  };
-
+  const data = { exportedAt: new Date().toISOString(), tickets: state.tickets };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -780,10 +739,7 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     $("globalSearch").focus();
   }
-
-  if (e.key === "Escape" && $("newTicketModal").classList.contains("show")) {
-    closeTicketModal();
-  }
+  if (e.key === "Escape" && $("newTicketModal").classList.contains("show")) closeTicketModal();
 });
 
 document.querySelectorAll(".nav button").forEach(btn => {
@@ -801,10 +757,7 @@ $("goSettings").onclick = () => setView("settings");
 
 $("globalSearch").addEventListener("input", renderTickets);
 
-$("btnTheme").onclick = () => {
-  state.theme = state.theme === "dark" ? "light" : "dark";
-  applyTheme();
-};
+$("btnTheme").onclick = () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyTheme(); };
 
 $("btnLang").onclick = () => {
   state.lang = state.lang === "en" ? "ar" : "en";
