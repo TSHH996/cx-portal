@@ -12,7 +12,6 @@
 
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body data-theme="dark">
   <div class="app">
     <aside class="sidebar">
@@ -144,6 +143,21 @@
               <button class="btn primary" id="goTickets">🎫 Go to Tickets Inbox</button>
               <button class="btn" id="goReports">📈 Open Reports</button>
               <button class="btn" id="goSettings">⚙️ Customize UI</button>
+
+              <div class="panel">
+                <div class="panel-title">Current Setup</div>
+                <div class="helper">
+                  New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function
+                  <b>send-branch-email</b>.
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-title">Current Email Mode</div>
+                <div class="helper">
+                  Direct test mode is active for reliable delivery during setup.
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -274,7 +288,6 @@
           <div class="modal-title">Create New Ticket</div>
           <div class="modal-subtitle">Enter customer complaint details and send to branch</div>
         </div>
-
         <button class="btn" id="btnCloseNewTicketModal">✖ Close</button>
       </div>
 
@@ -282,12 +295,12 @@
         <div class="grid-2">
           <div class="field">
             <label for="newCustomerName">Customer Name</label>
-            <input class="input" id="newCustomerName" />
+            <input class="input" id="newCustomerName" value="Test Customer" />
           </div>
 
           <div class="field">
             <label for="newCustomerPhone">Customer Phone</label>
-            <input class="input" id="newCustomerPhone" />
+            <input class="input" id="newCustomerPhone" value="0500000000" />
           </div>
         </div>
 
@@ -312,7 +325,7 @@
         <div class="grid-2">
           <div class="field">
             <label for="newFeedbackType">Feedback Type</label>
-            <input class="input" id="newFeedbackType" />
+            <input class="input" id="newFeedbackType" value="WhatsApp" />
           </div>
 
           <div class="field">
@@ -329,18 +342,18 @@
         <div class="grid-2">
           <div class="field">
             <label for="newFeedbackCategory">Feedback Category</label>
-            <input class="input" id="newFeedbackCategory" />
+            <input class="input" id="newFeedbackCategory" value="test" />
           </div>
 
           <div class="field">
             <label for="newSubCategory">Sub Category</label>
-            <input class="input" id="newSubCategory" />
+            <input class="input" id="newSubCategory" value="test" />
           </div>
         </div>
 
         <div class="field full">
           <label for="newDescription">Description</label>
-          <textarea class="textarea" id="newDescription"></textarea>
+          <textarea class="textarea" id="newDescription">test</textarea>
         </div>
 
         <div class="field full">
