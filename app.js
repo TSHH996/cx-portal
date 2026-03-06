@@ -483,6 +483,7 @@ function renderDetail(){
   if (t.replyAt) $("replyMeta").textContent = `Reply by ${t.replyBy || "Branch"} • ${fmtDate(t.replyAt)}`;
   else $("replyMeta").textContent = "No branch reply yet.";
 
+  // ✅ FIX: show attachment link using any available URL field
   const attWrap = $("ticketAttachmentsList");
   if (attWrap) {
     const files = t.attachments || [];
@@ -490,10 +491,10 @@ function renderDetail(){
       attWrap.innerHTML = `<div style="color:var(--muted2);font-size:12px">No attachments.</div>`;
     } else {
       attWrap.innerHTML = files.map(f => {
-        const url = f.file_url || "#";
+        const url = f.public_url || f.file_url || f.url || f.storage_path || "#";
         const name = f.file_name || "file";
         return `<a href="${url}" target="_blank" style="color:var(--brand);text-decoration:underline">${name}</a>`;
-      }).join("");
+      }).join("<br/>");
     }
   }
 
@@ -540,8 +541,12 @@ function getNewTicketPayload(){
 
 async function sendBranchEmail(ticket, attachmentsList = []) {
   try {
+    // ✅ FIX: attachments may store url as public_url / file_url / url
     const attachment_links = (attachmentsList || [])
-      .map(a => ({ name: a?.file_name, url: a?.file_url }))
+      .map(a => ({
+        name: a?.file_name,
+        url: a?.public_url || a?.file_url || a?.url || a?.publicUrl || null
+      }))
       .filter(x => x?.url);
 
     const response = await fetch(
@@ -554,6 +559,9 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
+          // ✅ IMPORTANT: required to generate Reply Link
+          ticket_id: ticket.id,
+
           ticket_no: ticket.ticket_no,
           branch_name: ticket.branch_name,
           branch_email: DIRECT_TEST_EMAIL,
@@ -571,13 +579,23 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
     );
 
     const rawText = await response.text();
+    let result = {};
+    try { result = rawText ? JSON.parse(rawText) : {}; } catch { result = { raw: rawText }; }
 
-    if (!response.ok) {
-      showToast("Email failed", rawText || "Unknown error", "bad");
+    if (!response.ok || !result?.success) {
+      showToast("Email failed", result?.error || result?.raw || "Unknown error", "bad");
+      console.error("send-branch-email failed:", result);
       return false;
     }
 
-    showToast("Email sent", `Email request sent to ${DIRECT_TEST_EMAIL} ✅`, "good");
+    // ✅ NEW: show reply url in toast (for testing)
+    if (result.reply_url) {
+      showToast("Email sent", `Sent to ${DIRECT_TEST_EMAIL} ✅ (Reply link ready)`, "good");
+      console.log("Reply URL:", result.reply_url);
+    } else {
+      showToast("Email sent", `Email request sent to ${DIRECT_TEST_EMAIL} ✅`, "good");
+    }
+
     return true;
   } catch (e) {
     console.error("sendBranchEmail exception:", e);
