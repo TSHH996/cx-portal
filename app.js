@@ -560,7 +560,7 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
         },
         body: JSON.stringify({
           // ✅ IMPORTANT: required to generate Reply Link
-          ticket_id: ticket.id,
+         ticket_id: ticket.id || ticket.rowId || ticket.uuid || ticket.ticket_uuid,
 
           ticket_no: ticket.ticket_no,
           branch_name: ticket.branch_name,
