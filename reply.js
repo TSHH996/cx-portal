@@ -1,4 +1,4 @@
-// reply.js
+// reply.js (debug-friendly)
 const SUPABASE_FUNCTION_BASE = "https://zwowuhfsorfnhmhvoqsm.supabase.co/functions/v1";
 
 function qs(name) {
@@ -19,6 +19,10 @@ async function fileToBase64(file) {
   return btoa(binary);
 }
 
+async function safeReadText(res) {
+  try { return await res.text(); } catch { return ""; }
+}
+
 async function loadTicket() {
   const ticket = qs("ticket");
   const token = qs("token");
@@ -31,15 +35,37 @@ async function loadTicket() {
   setMsg("Loading ticket…");
 
   const url = `${SUPABASE_FUNCTION_BASE}/branch-reply-api?ticket=${encodeURIComponent(ticket)}&token=${encodeURIComponent(token)}`;
-  const res = await fetch(url);
-  const data = await res.json().catch(() => ({}));
 
-  if (!res.ok || data.error) {
-    setMsg(data.error || "Failed to load ticket.", "error");
+  let res;
+  try {
+    res = await fetch(url, { method: "GET" });
+  } catch (e) {
+    // ✅ هذا يمسك CORS/Network errors
+    setMsg(`Fetch failed (network/CORS). ${e?.message || e}`, "error");
     return;
   }
 
-  const t = data.ticket;
+  if (!res.ok) {
+    const txt = await safeReadText(res);
+    setMsg(`API Error ${res.status}: ${txt || "No response body"}`, "error");
+    return;
+  }
+
+  const txt = await safeReadText(res);
+  let data = {};
+  try {
+    data = txt ? JSON.parse(txt) : {};
+  } catch {
+    setMsg(`API returned non-JSON: ${txt.slice(0, 200)}`, "error");
+    return;
+  }
+
+  if (data.error) {
+    setMsg(data.error, "error");
+    return;
+  }
+
+  const t = data.ticket || {};
 
   document.getElementById("ticketNo").value = t.ticket_no || "";
   document.getElementById("branchName").value = t.branch_name || "";
@@ -76,14 +102,7 @@ async function submitReply(ticket_id, token) {
 
   setMsg("Submitting… please wait.");
 
-  const payload = {
-    ticket_id,
-    token,
-    reply_text,
-    action_taken,
-    status,
-    files: [],
-  };
+  const payload = { ticket_id, token, reply_text, action_taken, status, files: [] };
 
   for (const f of files) {
     const b64 = await fileToBase64(f);
@@ -95,16 +114,29 @@ async function submitReply(ticket_id, token) {
     });
   }
 
-  const res = await fetch(`${SUPABASE_FUNCTION_BASE}/branch-reply-api`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  let res;
+  try {
+    res = await fetch(`${SUPABASE_FUNCTION_BASE}/branch-reply-api`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) {
+    setMsg(`Submit failed (network/CORS). ${e?.message || e}`, "error");
+    return;
+  }
 
-  const data = await res.json().catch(() => ({}));
+  const txt = await safeReadText(res);
 
-  if (!res.ok || data.error) {
-    setMsg(data.error || "Failed to submit reply.", "error");
+  if (!res.ok) {
+    setMsg(`Submit API Error ${res.status}: ${txt || "No body"}`, "error");
+    return;
+  }
+
+  let data = {};
+  try { data = txt ? JSON.parse(txt) : {}; } catch {}
+  if (data.error) {
+    setMsg(data.error, "error");
     return;
   }
 
