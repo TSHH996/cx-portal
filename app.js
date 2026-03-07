@@ -22,10 +22,10 @@ const state = {
 
 /** ✅ SLA helper (Priority-based) */
 function computeSlaDueAt(priority){
-  let slaHours = 24;
-  if (priority === "High") slaHours = 4;
-  else if (priority === "Medium") slaHours = 12;
-  else if (priority === "Low") slaHours = 24;
+  let slaHours = 48;               // default
+  if (priority === "High") slaHours = 8;
+  else if (priority === "Medium") slaHours = 24;
+  else if (priority === "Low") slaHours = 48;
 
   return new Date(Date.now() + slaHours * 60 * 60 * 1000).toISOString();
 }
