@@ -20,9 +20,10 @@ const state = {
   selectedId: null
 };
 
-/** ✅ SLA helper (Priority-based) */
+// ✅ SLA helper (DOUBLED TIMES)
+// High = 8h, Medium = 24h, Low = 48h
 function computeSlaDueAt(priority){
-  let slaHours = 48;               // default
+  let slaHours = 48; // default
   if (priority === "High") slaHours = 8;
   else if (priority === "Medium") slaHours = 24;
   else if (priority === "Low") slaHours = 48;
@@ -343,28 +344,30 @@ async function loadTickets(){
         if (rep.action_taken) timeline.push({ t: "Action taken", d: rep.action_taken, m: fmtDate(rep.created_at) });
       });
 
+      // ✅ attachments keyed by UUID
       const attachments = state.attachmentsByTicketId[rowId] || [];
-// ✅ SLA computed (to show overdue even if branch didn’t reply)
-const slaDueAt = r.sla_due_at ? new Date(r.sla_due_at).getTime() : null;
-const now = Date.now();
 
-let slaComputedStatus = r.sla_status || "pending"; // pending | within_sla | breached
-let slaRemainingText = "—";
+      // ✅ SLA computed (show overdue even if no reply)
+      const slaDueAt = r.sla_due_at ? new Date(r.sla_due_at).getTime() : null;
+      const now = Date.now();
 
-if (slaDueAt) {
-  const diffMs = slaDueAt - now;
+      let slaComputedStatus = r.sla_status || "pending"; // pending | within_sla | breached
+      let slaRemainingText = "—";
 
-  // إذا لسه pending ووقتها انتهى => تعتبر breached (حتى بدون رد)
-  if ((slaComputedStatus === "pending" || !slaComputedStatus) && diffMs < 0) {
-    slaComputedStatus = "breached";
-  }
+      if (slaDueAt) {
+        const diffMs = slaDueAt - now;
 
-  const abs = Math.abs(diffMs);
-  const h = Math.floor(abs / (1000 * 60 * 60));
-  const m = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
+        if ((slaComputedStatus === "pending" || !slaComputedStatus) && diffMs < 0) {
+          slaComputedStatus = "breached";
+        }
 
-  slaRemainingText = diffMs >= 0 ? `Remaining ${h}h ${m}m` : `Overdue ${h}h ${m}m`;
-}
+        const abs = Math.abs(diffMs);
+        const h = Math.floor(abs / (1000 * 60 * 60));
+        const m = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
+
+        slaRemainingText = diffMs >= 0 ? `Remaining ${h}h ${m}m` : `Overdue ${h}h ${m}m`;
+      }
+
       return {
         rowId, // UUID
         id: ticketIdLabel,
@@ -387,10 +390,12 @@ if (slaDueAt) {
         actionTaken: latestReply?.action_taken || "",
         attachments,
         timeline,
+
         // ✅ SLA computed fields
-slaDueAt,
-slaComputedStatus,
-slaRemainingText,
+        slaDueAt,
+        slaComputedStatus,
+        slaRemainingText,
+
         raw: r
       };
     });
@@ -508,12 +513,17 @@ function renderDetail(){
     ["Customer", t.customerName],
     ["Phone", t.customerPhone],
     ["Assigned", t.assignedTo || "—"],
-    ["Created", fmtDate(t.createdAt)]
+    ["Created", fmtDate(t.createdAt)],
     ["SLA", t.slaRemainingText || "—"],
-["SLA Status", t.slaComputedStatus || "pending"],
+    ["SLA Status", t.slaComputedStatus || "pending"],
   ];
 
-  $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
+  // ✅ FIX: protect against undefined entries in info
+  $("ticketInfo").innerHTML = (info || [])
+    .filter(x => Array.isArray(x) && x.length >= 2)
+    .map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`)
+    .join("");
+
   $("ticketDesc").textContent = t.description || "—";
   $("branchReply").value = t.branchReply || "";
 
@@ -576,7 +586,7 @@ function getNewTicketPayload(){
     priority,
     status: $("newStatus").value || "Open",
 
-    /** ✅ SLA fields */
+    // ✅ SLA saved in DB on creation
     sla_due_at: computeSlaDueAt(priority),
     sla_status: "pending"
   };
