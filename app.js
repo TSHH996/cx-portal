@@ -344,7 +344,27 @@ async function loadTickets(){
       });
 
       const attachments = state.attachmentsByTicketId[rowId] || [];
+// ✅ SLA computed (to show overdue even if branch didn’t reply)
+const slaDueAt = r.sla_due_at ? new Date(r.sla_due_at).getTime() : null;
+const now = Date.now();
 
+let slaComputedStatus = r.sla_status || "pending"; // pending | within_sla | breached
+let slaRemainingText = "—";
+
+if (slaDueAt) {
+  const diffMs = slaDueAt - now;
+
+  // إذا لسه pending ووقتها انتهى => تعتبر breached (حتى بدون رد)
+  if ((slaComputedStatus === "pending" || !slaComputedStatus) && diffMs < 0) {
+    slaComputedStatus = "breached";
+  }
+
+  const abs = Math.abs(diffMs);
+  const h = Math.floor(abs / (1000 * 60 * 60));
+  const m = Math.floor((abs % (1000 * 60 * 60)) / (1000 * 60));
+
+  slaRemainingText = diffMs >= 0 ? `Remaining ${h}h ${m}m` : `Overdue ${h}h ${m}m`;
+}
       return {
         rowId, // UUID
         id: ticketIdLabel,
@@ -367,6 +387,10 @@ async function loadTickets(){
         actionTaken: latestReply?.action_taken || "",
         attachments,
         timeline,
+        // ✅ SLA computed fields
+slaDueAt,
+slaComputedStatus,
+slaRemainingText,
         raw: r
       };
     });
