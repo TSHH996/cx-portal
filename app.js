@@ -318,9 +318,10 @@ async function loadTickets(){
     }
 
     state.tickets = (data || []).map(r => {
+      const rowId = r.id || null; // ✅ UUID (single source of truth)
       const createdAt = r.created_at ? new Date(r.created_at).getTime() : Date.now();
-      const ticketIdLabel = (r.ticket_no !== null && r.ticket_no !== undefined) ? `#${r.ticket_no}` : (r.id ? "#" + String(r.id).slice(0,8) : "#—");
-      const replies = state.repliesByTicketId[r.id] || [];
+      const ticketIdLabel = (r.ticket_no !== null && r.ticket_no !== undefined) ? `#${r.ticket_no}` : (rowId ? "#" + String(rowId).slice(0,8) : "#—");
+      const replies = state.repliesByTicketId[rowId] || [];
       const latestReply = replies.length ? replies[replies.length - 1] : null;
 
       const timeline = [
@@ -332,10 +333,11 @@ async function loadTickets(){
         if (rep.action_taken) timeline.push({ t: "Action taken", d: rep.action_taken, m: fmtDate(rep.created_at) });
       });
 
-      const attachments = state.attachmentsByTicketId[r.id] || []; // ✅ uuid map
+      // ✅ FIX: attachments keyed by UUID
+      const attachments = state.attachmentsByTicketId[rowId] || [];
 
       return {
-        rowId: r.id || null, // UUID
+        rowId, // UUID
         id: ticketIdLabel,
         ticketNo: r.ticket_no ?? null,
         subject: `${ticketIdLabel} • ${r.branch_name || "—"}`,
@@ -483,7 +485,7 @@ function renderDetail(){
   if (t.replyAt) $("replyMeta").textContent = `Reply by ${t.replyBy || "Branch"} • ${fmtDate(t.replyAt)}`;
   else $("replyMeta").textContent = "No branch reply yet.";
 
-  // ✅ FIX: show attachment link using any available URL field
+  // ✅ FIX: attachments must be real URL (public_url)
   const attWrap = $("ticketAttachmentsList");
   if (attWrap) {
     const files = t.attachments || [];
@@ -491,10 +493,11 @@ function renderDetail(){
       attWrap.innerHTML = `<div style="color:var(--muted2);font-size:12px">No attachments.</div>`;
     } else {
       attWrap.innerHTML = files.map(f => {
-        const url = f.public_url || f.file_url || f.url || f.storage_path || "#";
+        const url = f.public_url || f.file_url || f.url || "#";
         const name = f.file_name || "file";
-        return `<a href="${url}" target="_blank" style="color:var(--brand);text-decoration:underline">${name}</a>`;
-      }).join("<br/>");
+        const tag = f.source ? ` <span style="opacity:.65;font-size:11px">(${f.source})</span>` : "";
+        return `<div><a href="${url}" target="_blank" style="color:var(--brand);text-decoration:underline">${name}</a>${tag}</div>`;
+      }).join("");
     }
   }
 
@@ -541,7 +544,6 @@ function getNewTicketPayload(){
 
 async function sendBranchEmail(ticket, attachmentsList = []) {
   try {
-    // ✅ FIX: attachments may store url as public_url / file_url / url
     const attachment_links = (attachmentsList || [])
       .map(a => ({
         name: a?.file_name,
@@ -559,9 +561,7 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
           "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
-          // ✅ IMPORTANT: required to generate Reply Link
-         ticket_id: ticket.id || ticket.rowId || ticket.uuid || ticket.ticket_uuid,
-
+          ticket_id: ticket.id || ticket.rowId || ticket.uuid || ticket.ticket_uuid,
           ticket_no: ticket.ticket_no,
           branch_name: ticket.branch_name,
           branch_email: DIRECT_TEST_EMAIL,
@@ -588,7 +588,6 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
       return false;
     }
 
-    // ✅ NEW: show reply url in toast (for testing)
     if (result.reply_url) {
       showToast("Email sent", `Sent to ${DIRECT_TEST_EMAIL} ✅ (Reply link ready)`, "good");
       console.log("Reply URL:", result.reply_url);
