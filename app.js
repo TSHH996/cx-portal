@@ -509,6 +509,8 @@ function renderDetail(){
     ["Phone", t.customerPhone],
     ["Assigned", t.assignedTo || "—"],
     ["Created", fmtDate(t.createdAt)]
+    ["SLA", t.slaRemainingText || "—"],
+["SLA Status", t.slaComputedStatus || "pending"],
   ];
 
   $("ticketInfo").innerHTML = info.map(([k,v]) => `<div><b>${k}:</b> ${v}</div>`).join("");
