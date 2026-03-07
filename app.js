@@ -820,6 +820,17 @@ $("newTicketModal").addEventListener("click", (e) => {
   applyLang();
   computeKPIs();
   setView("dashboard");
+
+  // ✅ 1) تحقق هل المستخدم مسجّل دخول؟
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  // ✅ 2) إذا ما فيه جلسة -> ودّه لصفحة الدخول
+  if (!session) {
+    location.href = "./login.html";
+    return;
+  }
+
+  // ✅ 3) إذا مسجّل دخول -> كمل تحميل الموقع
   await loadBranches();
   await loadTickets();
 })();
