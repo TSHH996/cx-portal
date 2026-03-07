@@ -20,6 +20,16 @@ const state = {
   selectedId: null
 };
 
+/** ✅ SLA helper (Priority-based) */
+function computeSlaDueAt(priority){
+  let slaHours = 24;
+  if (priority === "High") slaHours = 4;
+  else if (priority === "Medium") slaHours = 12;
+  else if (priority === "Low") slaHours = 24;
+
+  return new Date(Date.now() + slaHours * 60 * 60 * 1000).toISOString();
+}
+
 async function loadBranches() {
   const { data, error } = await supabaseClient
     .from("branches")
@@ -333,7 +343,6 @@ async function loadTickets(){
         if (rep.action_taken) timeline.push({ t: "Action taken", d: rep.action_taken, m: fmtDate(rep.created_at) });
       });
 
-      // ✅ FIX: attachments keyed by UUID
       const attachments = state.attachmentsByTicketId[rowId] || [];
 
       return {
@@ -485,7 +494,6 @@ function renderDetail(){
   if (t.replyAt) $("replyMeta").textContent = `Reply by ${t.replyBy || "Branch"} • ${fmtDate(t.replyAt)}`;
   else $("replyMeta").textContent = "No branch reply yet.";
 
-  // ✅ FIX: attachments must be real URL (public_url)
   const attWrap = $("ticketAttachmentsList");
   if (attWrap) {
     const files = t.attachments || [];
@@ -529,6 +537,8 @@ function closeTicketModal(){
 }
 
 function getNewTicketPayload(){
+  const priority = $("newPriority").value || "Medium";
+
   return {
     customer_name: ($("newCustomerName").value || "Test Customer").trim() || "Test Customer",
     customer_phone: ($("newCustomerPhone").value || "0500000000").trim() || "0500000000",
@@ -537,8 +547,12 @@ function getNewTicketPayload(){
     feedback_category: ($("newFeedbackCategory").value || "test").trim() || "test",
     sub_category: ($("newSubCategory").value || "test").trim() || "test",
     description: ($("newDescription").value || "test").trim() || "test",
-    priority: $("newPriority").value || "Medium",
-    status: $("newStatus").value || "Open"
+    priority,
+    status: $("newStatus").value || "Open",
+
+    /** ✅ SLA fields */
+    sla_due_at: computeSlaDueAt(priority),
+    sla_status: "pending"
   };
 }
 
@@ -821,16 +835,13 @@ $("newTicketModal").addEventListener("click", (e) => {
   computeKPIs();
   setView("dashboard");
 
-  // ✅ 1) تحقق هل المستخدم مسجّل دخول؟
   const { data: { session } } = await supabaseClient.auth.getSession();
 
-  // ✅ 2) إذا ما فيه جلسة -> ودّه لصفحة الدخول
   if (!session) {
     location.href = "./login.html";
     return;
   }
 
-  // ✅ 3) إذا مسجّل دخول -> كمل تحميل الموقع
   await loadBranches();
   await loadTickets();
 })();
