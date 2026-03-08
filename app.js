@@ -7,6 +7,29 @@ const DIRECT_TEST_EMAIL = "thamer.alshehri1@hotmail.com";
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = (id) => document.getElementById(id);
 
+const SUB_CATEGORIES = {
+  "Food Quality": ["Beef","Chicken","Fish","Shrimp","Sushi","Avocado","Katsu Curry","Rice","Salad","Noodles","Soup","Sichuan","Cold Food","Oily","Spicy Food","Soy Sauce","Curry","Portion Quantity Issue","Foreign Object","Taste","Wrong Order","Missing Item","No Sauce","Pickle","Satay","Undercooked/Overcooked","Expired Product","Small Portion","Presentation Issue"],
+  "Service Quality": ["Cashier","Service Provider","Service Delay","Order Delay","Manager Communication","Service","Rude Staff","Long Waiting Time","Incorrect Bill","Staff Appearance","No Greeting"],
+  "Ambiance": ["Hair","Insect","Hygiene","Noise Level","Temperature","Broken Furniture","Bad Smell","Parking Issue","Crowded"],
+  "Cleanliness": ["Dirty Tables","Dirty Utensils","Dirty Bathroom","Dirty Floor","Dirty Uniform"],
+  "Overall": ["Overall"],
+  "Foreign Object": ["Foreign Object"],
+  "Poisoning": ["Poisoning"],
+  "Delivery": ["Late Delivery","Wrong Address","Damaged Packaging","Cold Food on Arrival","Missing Items"],
+  "App/Online": ["App Crash","Payment Issue","Wrong Order on App","Promo Not Applied"],
+  "Pricing": ["Overcharged","Wrong Price on Menu","Hidden Fees"]
+};
+
+function updateSubCategoryOptions() {
+  const cat = $("newFeedbackCategory")?.value || "";
+  const subSelect = $("newSubCategory");
+  if (!subSelect) return;
+  const subs = SUB_CATEGORIES[cat] || [];
+  subSelect.innerHTML = subs.length
+    ? subs.map(s => `<option value="${s}">${s}</option>`).join("")
+    : `<option value="">—</option>`;
+}
+
 const translations = {
   en: {
     brandEyebrow: "PFC Internal",
@@ -108,6 +131,7 @@ const translations = {
     labelCustomerName: "Customer Name",
     labelCustomerPhone: "Customer Phone",
     labelBranchName: "Branch Name",
+    labelBrand: "Brand",
     labelPriority: "Priority",
     labelFeedbackType: "Feedback Type",
     labelStatus: "Status",
@@ -303,6 +327,7 @@ const translations = {
     labelCustomerName: "اسم العميل",
     labelCustomerPhone: "رقم العميل",
     labelBranchName: "اسم الفرع",
+    labelBrand: "العلامة التجارية",
     labelPriority: "الأولوية",
     labelFeedbackType: "نوع المصدر",
     labelStatus: "الحالة",
@@ -524,7 +549,7 @@ function renderStaticTranslations(){
   $("statAvgLabel").textContent = tr("statAvgLabel");
   $("overviewTitle").textContent = tr("overviewTitle");
   $("kpiSub").textContent = tr("kpiSub");
-  $("connectedBadge").textContent = tr("connectedBadge");
+  $("connectedBadge").innerHTML = `<span class="liveDot"></span>${tr("connectedBadge")}`;
   $("chartLeftLabel").textContent = tr("chartLeftLabel");
   $("chartRightLabel").textContent = tr("chartRightLabel");
   $("quickActionsTitle").textContent = tr("quickActionsTitle");
@@ -572,6 +597,7 @@ function renderStaticTranslations(){
   $("labelCustomerName").textContent = tr("labelCustomerName");
   $("labelCustomerPhone").textContent = tr("labelCustomerPhone");
   $("labelBranchName").textContent = tr("labelBranchName");
+  $("labelBrand").textContent = tr("labelBrand");
   $("labelPriority").textContent = tr("labelPriority");
   $("labelFeedbackType").textContent = tr("labelFeedbackType");
   $("labelStatus").textContent = tr("labelStatus");
@@ -1215,6 +1241,7 @@ function initSettingsMenu() {
 function openNewTicketModal(){
   $("newTicketModal").classList.add("show");
   $("newTicketModal").setAttribute("aria-hidden", "false");
+  updateSubCategoryOptions();
 }
 
 function closeTicketModal(){
@@ -1229,9 +1256,10 @@ function getNewTicketPayload(){
     customer_name: ($("newCustomerName").value || tr("customerNameDefault")).trim() || tr("customerNameDefault"),
     customer_phone: ($("newCustomerPhone").value || tr("customerPhoneDefault")).trim() || tr("customerPhoneDefault"),
     branch_name: ($("newBranchName").value || "").trim(),
-    feedback_type: ($("newFeedbackType").value || tr("feedbackTypeDefault")).trim() || tr("feedbackTypeDefault"),
-    feedback_category: ($("newFeedbackCategory").value || tr("feedbackCategoryDefault")).trim() || tr("feedbackCategoryDefault"),
-    sub_category: ($("newSubCategory").value || tr("subCategoryDefault")).trim() || tr("subCategoryDefault"),
+    brand: ($("newBrand").value || "").trim(),
+    feedback_type: ($("newFeedbackType").value || "").trim(),
+    feedback_category: ($("newFeedbackCategory").value || "").trim(),
+    sub_category: ($("newSubCategory").value || "").trim(),
     description: ($("newDescription").value || tr("descriptionDefault")).trim() || tr("descriptionDefault"),
     priority,
     status: $("newStatus").value || "Open",
@@ -1260,6 +1288,7 @@ async function sendBranchEmail(ticket, attachmentsList = []) {
         ticket_id: ticket.id || ticket.rowId || ticket.uuid || ticket.ticket_uuid,
         ticket_no: ticket.ticket_no,
         branch_name: ticket.branch_name,
+        brand: ticket.brand,
         branch_email: DIRECT_TEST_EMAIL,
         customer_name: ticket.customer_name,
         customer_phone: ticket.customer_phone,
@@ -1507,6 +1536,8 @@ $("goSettings").onclick = () => setView("settings");
   $(id).addEventListener("input", renderTickets);
   $(id).addEventListener("change", renderTickets);
 });
+
+$("newFeedbackCategory").addEventListener("change", updateSubCategoryOptions);
 
 $("globalSearch").addEventListener("input", renderTickets);
 
