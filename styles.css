@@ -636,7 +636,7 @@ select,.chipInput,.textarea,.input{
 select:focus,.chipInput:focus,.textarea:focus,.input:focus{
   border-color:var(--focus);box-shadow:0 0 0 4px rgba(124,58,237,.08);background:rgba(124,58,237,.03);
 }
-select option{color:#111827;background:#0c1525}
+select option{color:#1e293b;background:#f1f5f9}
 
 .rows{max-height:760px;overflow:auto}
 
