@@ -20,6 +20,70 @@ const SUB_CATEGORIES = {
   "Pricing": ["Overcharged","Wrong Price on Menu","Hidden Fees"]
 };
 
+function initCustomSelect(selectId) {
+  const select = $(selectId);
+  if (!select) return;
+  const wrapper = document.querySelector(`.cSelect[data-cselect="${selectId}"]`);
+  if (!wrapper) return;
+
+  const btn    = wrapper.querySelector('.cSelectBtn');
+  const valEl  = wrapper.querySelector('.cSelectVal');
+  const list   = wrapper.querySelector('.cSelectList');
+
+  function refresh() {
+    list.innerHTML = '';
+    const currentVal = select.value;
+    Array.from(select.options).forEach(opt => {
+      const li = document.createElement('li');
+      const isPlaceholder = !opt.value;
+      li.className = 'cSelectItem'
+        + (isPlaceholder ? ' is-placeholder' : '')
+        + (opt.value === currentVal && !isPlaceholder ? ' is-selected' : '');
+      li.textContent = opt.textContent;
+      li.dataset.value = opt.value;
+      if (!isPlaceholder) {
+        li.addEventListener('click', () => {
+          select.value = opt.value;
+          list.querySelectorAll('.cSelectItem').forEach(el => el.classList.remove('is-selected'));
+          li.classList.add('is-selected');
+          valEl.textContent = opt.textContent;
+          valEl.classList.remove('placeholder');
+          close();
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      }
+      list.appendChild(li);
+    });
+    // sync display label
+    const sel = select.options[select.selectedIndex];
+    if (sel && sel.value) {
+      valEl.textContent = sel.textContent;
+      valEl.classList.remove('placeholder');
+    } else if (select.options[0]) {
+      valEl.textContent = select.options[0].textContent;
+      valEl.classList.add('placeholder');
+    }
+  }
+
+  function open() {
+    document.querySelectorAll('.cSelect.open').forEach(el => el.classList.remove('open'));
+    wrapper.classList.add('open');
+  }
+  function close() { wrapper.classList.remove('open'); }
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    wrapper.classList.contains('open') ? close() : open();
+  });
+  wrapper.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('click', close);
+
+  // Auto-refresh when JS populates the hidden select (e.g. branches, status, sub-categories)
+  new MutationObserver(refresh).observe(select, { childList: true, subtree: true });
+
+  refresh();
+}
+
 function updateSubCategoryOptions() {
   const cat = $("newFeedbackCategory")?.value || "";
   const subSelect = $("newSubCategory");
@@ -1579,6 +1643,8 @@ $("newTicketModal").addEventListener("click", (e) => {
   renderStaticTranslations();
   initSettingsMenu();
   renderSettingsContent();
+  ["newBranchName","newBrand","newPriority","newStatus","newFeedbackType","newFeedbackCategory","newSubCategory"]
+    .forEach(initCustomSelect);
   computeKPIs();
   setView("dashboard");
 

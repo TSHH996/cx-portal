@@ -399,15 +399,29 @@
 
         <div class="grid2">
           <div class="field">
-            <label for="newBranchName" id="labelBranchName">Branch Name</label>
-            <select class="input" id="newBranchName">
+            <label id="labelBranchName">Branch Name</label>
+            <div class="cSelect" data-cselect="newBranchName">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal placeholder">Select branch</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newBranchName" hidden>
               <option value="">Select branch</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="newBrand" id="labelBrand">Brand</label>
-            <select id="newBrand">
+            <label id="labelBrand">Brand</label>
+            <div class="cSelect" data-cselect="newBrand">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal placeholder">Select brand</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newBrand" hidden>
               <option value="">Select brand</option>
               <option value="Asian Hub">Asian Hub</option>
               <option value="Baytoti">Baytoti</option>
@@ -422,8 +436,15 @@
 
         <div class="grid2">
           <div class="field">
-            <label for="newPriority" id="labelPriority">Priority</label>
-            <select id="newPriority">
+            <label id="labelPriority">Priority</label>
+            <div class="cSelect" data-cselect="newPriority">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal">Medium</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newPriority" hidden>
               <option value="High">High</option>
               <option value="Medium" selected>Medium</option>
               <option value="Low">Low</option>
@@ -431,8 +452,15 @@
           </div>
 
           <div class="field">
-            <label for="newStatus" id="labelStatus">Status</label>
-            <select id="newStatus">
+            <label id="labelStatus">Status</label>
+            <div class="cSelect" data-cselect="newStatus">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal">Open</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newStatus" hidden>
               <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
               <option value="Replied">Replied</option>
@@ -442,8 +470,15 @@
         </div>
 
         <div class="field full">
-          <label for="newFeedbackType" id="labelFeedbackType">Feedback Type</label>
-          <select id="newFeedbackType">
+          <label id="labelFeedbackType">Feedback Type</label>
+          <div class="cSelect" data-cselect="newFeedbackType">
+            <button class="cSelectBtn" type="button">
+              <span class="cSelectVal">WhatsApp</span>
+              <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+          </div>
+          <select id="newFeedbackType" hidden>
             <option value="Google Review">Google Review</option>
             <option value="Dine In Survey (0-6)">Dine In Survey (0-6)</option>
             <option value="App Survey (0-6)">App Survey (0-6)</option>
@@ -456,8 +491,15 @@
 
         <div class="grid2">
           <div class="field">
-            <label for="newFeedbackCategory" id="labelFeedbackCategory">Feedback Category</label>
-            <select id="newFeedbackCategory">
+            <label id="labelFeedbackCategory">Feedback Category</label>
+            <div class="cSelect" data-cselect="newFeedbackCategory">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal placeholder">Select category</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newFeedbackCategory" hidden>
               <option value="">Select category</option>
               <option value="Food Quality">Food Quality</option>
               <option value="Service Quality">Service Quality</option>
@@ -473,8 +515,15 @@
           </div>
 
           <div class="field">
-            <label for="newSubCategory" id="labelSubCategory">Sub Category</label>
-            <select id="newSubCategory">
+            <label id="labelSubCategory">Sub Category</label>
+            <div class="cSelect" data-cselect="newSubCategory">
+              <button class="cSelectBtn" type="button">
+                <span class="cSelectVal placeholder">Select category first</span>
+                <svg class="cSelectIcon" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="cSelectMenu"><ul class="cSelectList"></ul></div>
+            </div>
+            <select id="newSubCategory" hidden>
               <option value="">Select category first</option>
             </select>
           </div>
