@@ -1338,10 +1338,20 @@ async function createTicket(){
       return;
     }
 
-    const { data, error } = await supabaseClient
+    let { data, error } = await supabaseClient
       .from("tickets")
       .insert([payload])
       .select("*");
+
+    // If new columns don't exist yet in the schema, retry without them
+    if (error && error.message && error.message.includes("schema cache")) {
+      console.warn("Schema mismatch — retrying without new columns:", error.message);
+      const { brand, feedback_type, feedback_category, sub_category, ...basePayload } = payload;
+      ({ data, error } = await supabaseClient
+        .from("tickets")
+        .insert([basePayload])
+        .select("*"));
+    }
 
     if(error){
       console.error("Insert error:", error);
