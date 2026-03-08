@@ -128,25 +128,37 @@
       <section id="view-dashboard">
         <div class="statsGrid">
           <div class="statCard">
-            <div class="statLabel" id="statOpenLabel">Open Tickets</div>
+            <div class="statCardTop">
+              <div class="statLabel" id="statOpenLabel">Open Tickets</div>
+              <div class="statIconBadge">🎫</div>
+            </div>
             <div class="statValue" id="kpiOpen">0</div>
             <div class="statMeta" id="kpiOpenT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel" id="statRepliedLabel">Branch Replied</div>
+            <div class="statCardTop">
+              <div class="statLabel" id="statRepliedLabel">Branch Replied</div>
+              <div class="statIconBadge">💬</div>
+            </div>
             <div class="statValue" id="kpiReplied">0</div>
             <div class="statMeta" id="kpiRepliedT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel" id="statClosedLabel">Closed Tickets</div>
+            <div class="statCardTop">
+              <div class="statLabel" id="statClosedLabel">Closed Tickets</div>
+              <div class="statIconBadge">✅</div>
+            </div>
             <div class="statValue" id="kpiClosed">0</div>
             <div class="statMeta" id="kpiClosedT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel" id="statAvgLabel">Avg Response</div>
+            <div class="statCardTop">
+              <div class="statLabel" id="statAvgLabel">Avg Response</div>
+              <div class="statIconBadge">⚡</div>
+            </div>
             <div class="statValue" id="kpiAvg">0h</div>
             <div class="statMeta" id="kpiAvgT">—</div>
           </div>
@@ -159,7 +171,7 @@
                 <div class="h" id="overviewTitle">Today Overview</div>
                 <div class="s" id="kpiSub">Live snapshot</div>
               </div>
-              <span class="badge" id="connectedBadge">Connected</span>
+              <span class="badge good" id="connectedBadge"><span class="liveDot"></span>Connected</span>
             </div>
 
             <div class="cardBody">

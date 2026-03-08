@@ -6,83 +6,301 @@
   <title>CX Portal — Branch Reply</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    body{font-family:Tajawal,system-ui,Arial;background:#0b0f17;color:#e9eef7;margin:0}
-    .wrap{max-width:900px;margin:0 auto;padding:20px}
-    .card{background:#121a2a;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin:12px 0}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{display:block;font-size:14px;opacity:.9;margin:8px 0 6px}
-    input, textarea, select{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid rgba(255,255,255,.12);
-      background:#0e1524;color:#e9eef7;padding:10px 12px;outline:none}
-    textarea{min-height:120px;resize:vertical}
-    .btn{display:inline-block;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer}
-    .btn-primary{background:#ffffff;color:#0b0f17}
-    .muted{opacity:.75;font-size:13px}
-    .error{color:#ffb4b4}
-    .ok{color:#b8ffcf}
-    @media(max-width:780px){.row{grid-template-columns:1fr}}
+    :root{
+      --bg:#05090f;
+      --surface:#0c1525;
+      --card:rgba(11,19,36,.96);
+      --stroke:rgba(255,255,255,.08);
+      --text:#eef2ff;
+      --muted:#8896b5;
+      --muted2:#576480;
+      --brand:#7c3aed;
+      --brand2:#38bdf8;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --shadow:0 20px 60px rgba(0,0,0,.55),0 4px 16px rgba(0,0,0,.3);
+      --radius:18px;
+      --font:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+      --t:.2s cubic-bezier(.4,0,.2,1);
+    }
+
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes logoPulse{0%,100%{box-shadow:0 6px 20px rgba(124,58,237,.35)}50%{box-shadow:0 6px 32px rgba(124,58,237,.6),0 0 0 6px rgba(124,58,237,.07)}}
+    @keyframes liveBlip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.5)}}
+
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;min-height:100%}
+    body{
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(ellipse 900px 600px at -5% -5%, rgba(124,58,237,.13), transparent 55%),
+        radial-gradient(ellipse 800px 500px at 105% 5%, rgba(56,189,248,.09), transparent 50%),
+        linear-gradient(165deg, var(--bg) 0%, #080e1c 100%);
+      min-height:100vh;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;
+      background-image:radial-gradient(circle, rgba(255,255,255,.022) 1px, transparent 1px);
+      background-size:28px 28px;pointer-events:none;z-index:0;
+    }
+
+    *::-webkit-scrollbar{width:5px}
+    *::-webkit-scrollbar-track{background:transparent}
+    *::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:999px}
+
+    .page{
+      position:relative;z-index:1;
+      max-width:860px;margin:0 auto;
+      padding:32px 20px 60px;
+    }
+
+    /* Header */
+    .header{
+      display:flex;align-items:center;gap:14px;
+      margin-bottom:32px;
+      animation:fadeInUp .4s ease both;
+    }
+    .logo{
+      width:46px;height:46px;border-radius:15px;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
+      display:grid;place-items:center;
+      color:#fff;font-weight:900;font-size:14px;letter-spacing:.04em;
+      animation:logoPulse 3.5s ease-in-out infinite;
+      position:relative;flex-shrink:0;
+    }
+    .logo::after{
+      content:'';position:absolute;inset:-2px;border-radius:17px;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
+      opacity:.35;filter:blur(10px);z-index:-1;
+    }
+    .headerText .eyebrow{
+      font-size:10px;text-transform:uppercase;letter-spacing:.2em;
+      color:var(--muted2);font-weight:700;margin-bottom:3px;
+    }
+    .headerText .title{font-size:22px;font-weight:900;line-height:1.15}
+    .headerText .sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+
+    /* Message card */
+    .msgCard{
+      border-radius:var(--radius);border:1px solid var(--stroke);
+      background:var(--card);
+      padding:16px 20px;margin-bottom:16px;
+      color:var(--muted);font-size:13px;line-height:1.7;
+      backdrop-filter:blur(12px);
+      animation:fadeInUp .4s ease .05s both;
+    }
+    .msgCard.error{border-color:rgba(239,68,68,.28);color:#fca5a5;background:rgba(239,68,68,.06)}
+    .msgCard.success{border-color:rgba(34,197,94,.28);color:#86efac;background:rgba(34,197,94,.06)}
+
+    /* Main card */
+    .card{
+      border:1px solid var(--stroke);
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      overflow:hidden;
+      animation:fadeInUp .45s ease .08s both;
+    }
+
+    .cardSection{
+      padding:22px 24px;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .cardSection:last-child{border-bottom:none}
+
+    .sectionLabel{
+      display:flex;align-items:center;gap:8px;
+      font-size:11px;text-transform:uppercase;letter-spacing:.18em;
+      color:var(--muted2);font-weight:700;margin-bottom:16px;
+    }
+    .sectionLabel::before{
+      content:'';width:3px;height:14px;border-radius:2px;
+      background:linear-gradient(180deg,var(--brand),var(--brand2));
+      flex-shrink:0;
+    }
+
+    /* Grid row */
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .row:last-child{margin-bottom:0}
+
+    label{
+      display:block;font-size:11px;color:var(--muted);
+      font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+      margin-bottom:7px;
+    }
+
+    input,textarea,select{
+      width:100%;border:1px solid var(--stroke);
+      background:rgba(255,255,255,.04);
+      color:var(--text);padding:12px 14px;
+      border-radius:14px;font-size:13.5px;
+      font-family:var(--font);
+      outline:none;transition:var(--t);
+      -webkit-appearance:none;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:rgba(124,58,237,.45);
+      box-shadow:0 0 0 4px rgba(124,58,237,.1);
+      background:rgba(124,58,237,.04);
+    }
+    input[readonly],textarea[readonly]{
+      background:rgba(255,255,255,.025);
+      color:var(--muted);
+      border-color:rgba(255,255,255,.05);
+      cursor:default;
+    }
+    textarea{min-height:120px;resize:vertical;line-height:1.75}
+    select option{background:#0c1525;color:#eef2ff}
+
+    .divider{
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);
+      margin:4px 0;
+    }
+
+    /* Reply section accent */
+    .replySection{
+      background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(56,189,248,.02));
+    }
+
+    .required{color:var(--bad);margin-left:3px}
+
+    /* File input */
+    input[type="file"]{
+      padding:10px 14px;
+      cursor:pointer;
+      color:var(--muted);
+    }
+    input[type="file"]::file-selector-button{
+      background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(56,189,248,.15));
+      border:1px solid rgba(124,58,237,.3);
+      color:var(--text);border-radius:10px;
+      padding:6px 14px;font-size:12px;font-weight:700;
+      cursor:pointer;margin-right:12px;
+      transition:var(--t);
+    }
+    input[type="file"]::file-selector-button:hover{
+      background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(56,189,248,.25));
+    }
+
+    .hint{font-size:11.5px;color:var(--muted2);margin-top:6px;line-height:1.6}
+
+    /* Submit button */
+    .submitWrap{padding:20px 24px}
+    .submitBtn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:15px 32px;border-radius:16px;border:none;cursor:pointer;
+      background:linear-gradient(135deg,var(--brand),#5b21b6);
+      color:#fff;font-size:15px;font-weight:800;
+      box-shadow:0 4px 24px rgba(124,58,237,.35);
+      transition:var(--t);font-family:var(--font);
+      position:relative;overflow:hidden;
+    }
+    .submitBtn::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+      opacity:0;transition:var(--t);
+    }
+    .submitBtn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,.5)}
+    .submitBtn:hover::after{opacity:1}
+    .submitBtn:active{transform:translateY(0)}
+    .submitBtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    @media(max-width:720px){
+      .page{padding:20px 14px 40px}
+      .row{grid-template-columns:1fr}
+      .cardSection{padding:18px}
+      .submitWrap{padding:16px 18px}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h2 style="margin:10px 0 6px">Branch Reply Form</h2>
-    <div class="muted">Open from the email link and submit your reply.</div>
+  <div class="page">
 
-    <div id="msg" class="card muted">Loading…</div>
+    <div class="header">
+      <div class="logo">CX</div>
+      <div class="headerText">
+        <div class="eyebrow">PFC Internal</div>
+        <div class="title">Branch Reply Form</div>
+        <div class="sub">Open from the email link and submit your branch reply.</div>
+      </div>
+    </div>
+
+    <div id="msg" class="msgCard">Loading ticket details…</div>
 
     <div class="card" id="ticketCard" style="display:none">
-      <div class="row">
-        <div>
-          <label>Ticket No</label>
-          <input id="ticketNo" readonly />
+
+      <!-- Ticket Info -->
+      <div class="cardSection">
+        <div class="sectionLabel">Ticket Information</div>
+        <div class="row">
+          <div>
+            <label>Ticket No</label>
+            <input id="ticketNo" readonly />
+          </div>
+          <div>
+            <label>Branch Name</label>
+            <input id="branchName" readonly />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Customer Name</label>
+            <input id="customerName" readonly />
+          </div>
+          <div>
+            <label>Customer Phone</label>
+            <input id="customerPhone" readonly />
+          </div>
         </div>
         <div>
-          <label>Branch Name</label>
-          <input id="branchName" readonly />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Customer Name</label>
-          <input id="customerName" readonly />
-        </div>
-        <div>
-          <label>Customer Phone</label>
-          <input id="customerPhone" readonly />
-        </div>
-      </div>
-
-      <label>Ticket Description</label>
-      <textarea id="ticketDesc" readonly></textarea>
-
-      <hr style="border:0;border-top:1px solid rgba(255,255,255,.08);margin:14px 0">
-
-      <label>Reply Text <span class="error">*</span></label>
-      <textarea id="replyText" placeholder="Write your reply…"></textarea>
-
-      <label>Action Taken (optional)</label>
-      <textarea id="actionTaken" placeholder="What action was taken?"></textarea>
-
-      <div class="row">
-        <div>
-          <label>Status after reply</label>
-          <select id="status">
-            <option value="Replied">Replied</option>
-            <option value="Closed">Closed</option>
-          </select>
-        </div>
-        <div>
-          <label>Attachments (optional)</label>
-          <input id="files" type="file" multiple />
-          <div class="muted" id="filesHint"></div>
+          <label>Ticket Description</label>
+          <textarea id="ticketDesc" readonly></textarea>
         </div>
       </div>
 
-      <div style="margin-top:14px">
-        <button class="btn btn-primary" id="submitBtn">Submit Reply</button>
+      <!-- Reply -->
+      <div class="cardSection replySection">
+        <div class="sectionLabel">Your Reply</div>
+
+        <div style="margin-bottom:14px">
+          <label>Reply Text <span class="required">*</span></label>
+          <textarea id="replyText" placeholder="Write your detailed reply here…"></textarea>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <label>Action Taken <span style="color:var(--muted2);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="actionTaken" placeholder="Describe the action taken to resolve this complaint…" style="min-height:90px"></textarea>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Status After Reply</label>
+            <select id="status">
+              <option value="Replied">Replied</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div>
+            <label>Attachments <span style="color:var(--muted2);font-weight:500;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <input id="files" type="file" multiple />
+            <div class="hint" id="filesHint"></div>
+          </div>
+        </div>
       </div>
+
+      <!-- Submit -->
+      <div class="submitWrap">
+        <button class="submitBtn" id="submitBtn">
+          <span>Submit Reply</span>
+        </button>
+      </div>
+
     </div>
   </div>
 
