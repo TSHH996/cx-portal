@@ -82,20 +82,24 @@ a{ color:inherit; text-decoration:none; }
 .appShell{
   display:grid;
   grid-template-columns:280px minmax(0, 1fr);
+  grid-template-areas:"sidebar main";
   min-height:100vh;
 }
 
 .sidebar{
+  grid-area:sidebar;
   position:sticky;
   top:0;
   height:100vh;
   display:flex;
   flex-direction:column;
   min-width:0;
+  width:280px;
   padding:18px 14px;
-  background:linear-gradient(180deg, rgba(11,16,32,.95), rgba(15,23,40,.95));
+  background:linear-gradient(180deg, rgba(11,16,32,.98), rgba(15,23,40,.98));
   border-right:1px solid var(--stroke);
   backdrop-filter:blur(12px);
+  z-index:2;
 }
 
 .sidebarTop{padding-bottom:8px}
@@ -200,12 +204,17 @@ a{ color:inherit; text-decoration:none; }
   flex-shrink:0;
 }
 
-.navText{min-width:0;text-align:left}
+.navText{
+  min-width:0;
+  text-align:left;
+}
+
 .navText .nt{
   font-size:14px;
   font-weight:700;
   color:var(--text);
 }
+
 .navText .ns{
   font-size:12px;
   color:var(--muted2);
@@ -282,18 +291,32 @@ a{ color:inherit; text-decoration:none; }
 
 .toggleRow .btn{
   width:100%;
-  min-height:46px;
-  border-radius:16px;
+  min-height:48px;
+  border-radius:18px;
   justify-content:center;
-  font-weight:700;
+  font-weight:800;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+[data-theme="dark"] .toggleRow .btn{
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  color:#eef2ff;
+}
+
+[data-theme="light"] .toggleRow .btn{
+  background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(245,247,252,.98));
+  color:#172033;
 }
 
 .sidebarCTA{margin-top:12px}
 
 .sidebarCTA .btn.wide{
-  min-height:50px;
+  min-height:52px;
   font-size:15px;
   font-weight:800;
+  border-radius:18px;
 }
 
 .btn{
@@ -344,8 +367,10 @@ a{ color:inherit; text-decoration:none; }
 }
 
 .main{
+  grid-area:main;
   padding:18px;
   min-width:0;
+  width:100%;
 }
 
 .topbar{
@@ -1054,11 +1079,17 @@ html[lang="ar"] .inlineActions{
 
 [dir="rtl"] .appShell{
   grid-template-columns:minmax(0, 1fr) 280px;
+  grid-template-areas:"main sidebar";
 }
 
 [dir="rtl"] .sidebar{
+  grid-area:sidebar;
   border-right:none;
   border-left:1px solid var(--stroke);
+}
+
+[dir="rtl"] .main{
+  grid-area:main;
 }
 
 [dir="rtl"] .topbar,
@@ -1070,29 +1101,63 @@ html[lang="ar"] .inlineActions{
   direction:rtl;
 }
 
-[dir="rtl"] .topActions{ justify-content:flex-start; }
-[dir="rtl"] .row .rightMeta{ align-items:flex-start; }
-[dir="rtl"] .detailHead .actions{ justify-content:flex-start; }
-[dir="rtl"] .modalActions{ justify-content:flex-start; }
+[dir="rtl"] .topActions{
+  justify-content:flex-start;
+}
+
+[dir="rtl"] .row .rightMeta{
+  align-items:flex-start;
+}
+
+[dir="rtl"] .detailHead .actions{
+  justify-content:flex-start;
+}
+
+[dir="rtl"] .modalActions{
+  justify-content:flex-start;
+}
 
 [dir="rtl"] .brandRow,
 [dir="rtl"] .brandText,
 [dir="rtl"] .cardHeader,
 [dir="rtl"] .panel .ph,
 [dir="rtl"] .modalTitle,
-[dir="rtl"] .title{
+[dir="rtl"] .title,
+[dir="rtl"] .sectionTitle,
+[dir="rtl"] .sectionSub,
+[dir="rtl"] .detailEyebrow,
+[dir="rtl"] .detailHead .left,
+[dir="rtl"] .panel,
+[dir="rtl"] .panelText,
+[dir="rtl"] .helper,
+[dir="rtl"] .metaText,
+[dir="rtl"] .field label,
+[dir="rtl"] .userMeta,
+[dir="rtl"] .settingsItem{
   text-align:right;
 }
 
-[dir="rtl"] .navText{text-align:right}
-[dir="rtl"] .settingsItem{text-align:right}
-[dir="rtl"] .row .meta .b{ flex-direction:row-reverse; }
+[dir="rtl"] .navText{
+  text-align:right;
+}
+
+[dir="rtl"] .settingsItem{
+  text-align:right;
+}
+
+[dir="rtl"] .row .meta .b{
+  flex-direction:row-reverse;
+}
 
 [dir="rtl"] .textarea,
 [dir="rtl"] .input,
 [dir="rtl"] select,
 [dir="rtl"] .search input{
   text-align:right;
+}
+
+[dir="rtl"] .search{
+  flex-direction:row-reverse;
 }
 
 @media (max-width:1280px){
@@ -1116,14 +1181,34 @@ html[lang="ar"] .inlineActions{
 }
 
 @media (max-width:1100px){
-  .appShell{ grid-template-columns:1fr; }
+  .appShell{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "sidebar"
+      "main";
+  }
 
   .sidebar{
     position:relative;
     height:auto;
+    width:100%;
+    border-right:none;
+    border-left:none;
+    border-bottom:1px solid var(--stroke);
   }
 
-  [dir="rtl"] .appShell{ grid-template-columns:1fr; }
+  [dir="rtl"] .appShell{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "sidebar"
+      "main";
+  }
+
+  [dir="rtl"] .sidebar{
+    border-left:none;
+    border-right:none;
+    border-bottom:1px solid var(--stroke);
+  }
 
   .dashboardGrid,
   .settingsLayout,
@@ -1142,10 +1227,21 @@ html[lang="ar"] .inlineActions{
     align-items:stretch;
   }
 
-  .topActions{ justify-content:space-between; }
-  .statsGrid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
-  .settingsCards{ grid-template-columns:1fr; }
-  .grid2{ grid-template-columns:1fr; }
+  .topActions{
+    justify-content:space-between;
+  }
+
+  .statsGrid{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+  }
+
+  .settingsCards{
+    grid-template-columns:1fr;
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
 }
 
 @media (max-width:720px){
