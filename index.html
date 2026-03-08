@@ -20,58 +20,58 @@
         <div class="brandRow">
           <div class="logo">CX</div>
           <div class="brandText">
-            <div class="eyebrow">PFC Internal</div>
+            <div class="eyebrow" id="brandEyebrow">PFC Internal</div>
             <div class="t" id="brandTitle">CX Portal</div>
             <div class="s" id="brandSub">Tickets • Branch Replies • Reports</div>
           </div>
         </div>
       </div>
 
-      <div class="sidebarSectionLabel">Workspace</div>
+      <div class="sidebarSectionLabel" id="workspaceLabel">Workspace</div>
 
       <div class="nav">
         <button class="active" data-view="dashboard">
           <div class="left">
             <div class="icon">📊</div>
             <div class="navText">
-              <div class="nt">Dashboard</div>
-              <div class="ns">Overview & KPIs</div>
+              <div class="nt" id="navDashboardTitle">Dashboard</div>
+              <div class="ns" id="navDashboardSub">Overview & KPIs</div>
             </div>
           </div>
-          <span class="pill">Live</span>
+          <span class="pill" id="navDashboardPill">Live</span>
         </button>
 
         <button data-view="tickets">
           <div class="left">
             <div class="icon">🎫</div>
             <div class="navText">
-              <div class="nt">Tickets</div>
-              <div class="ns">Inbox & details</div>
+              <div class="nt" id="navTicketsTitle">Tickets</div>
+              <div class="ns" id="navTicketsSub">Inbox & details</div>
             </div>
           </div>
-          <span class="pill">Inbox</span>
+          <span class="pill" id="navTicketsPill">Inbox</span>
         </button>
 
         <button data-view="reports">
           <div class="left">
             <div class="icon">📈</div>
             <div class="navText">
-              <div class="nt">Reports</div>
-              <div class="ns">Analytics & trends</div>
+              <div class="nt" id="navReportsTitle">Reports</div>
+              <div class="ns" id="navReportsSub">Analytics & trends</div>
             </div>
           </div>
-          <span class="pill">Weekly</span>
+          <span class="pill" id="navReportsPill">Weekly</span>
         </button>
 
         <button data-view="settings">
           <div class="left">
             <div class="icon">⚙️</div>
             <div class="navText">
-              <div class="nt">Settings</div>
-              <div class="ns">Profile & portal</div>
+              <div class="nt" id="navSettingsTitle">Settings</div>
+              <div class="ns" id="navSettingsSub">Profile & portal</div>
             </div>
           </div>
-          <span class="pill">UI</span>
+          <span class="pill" id="navSettingsPill">UI</span>
         </button>
       </div>
 
@@ -81,14 +81,14 @@
         <div class="userCard">
           <div class="userAvatar">CX</div>
           <div class="userMeta">
-            <div class="u1">CX Team</div>
-            <div class="u2">Customer Experience Operations</div>
+            <div class="u1" id="userTeamTitle">CX Team</div>
+            <div class="u2" id="userTeamSub">Customer Experience Operations</div>
           </div>
         </div>
 
         <div class="tinyRow">
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span class="badge">60+ Branches</span>
+            <span class="badge" id="branchesBadge">60+ Branches</span>
             <span class="badge">Supabase</span>
           </div>
           <span class="badge" id="versionBadge">v2</span>
@@ -108,7 +108,7 @@
     <main class="main">
       <div class="topbar">
         <div class="title">
-          <div class="eyebrow">Customer Experience Portal</div>
+          <div class="eyebrow" id="topbarEyebrow">Customer Experience Portal</div>
           <div class="h" id="pageTitle">Dashboard</div>
           <div class="p" id="pageSub">Monitor CX performance, ticket flow, and branch replies.</div>
         </div>
@@ -120,33 +120,33 @@
             <span class="pill">Ctrl/⌘ K</span>
           </div>
 
-          <button class="btn" id="btnRefresh">🔄 Refresh</button>
-          <button class="btn" id="btnExport">⬇️ Export</button>
+          <button class="btn" id="btnRefresh">🔄 <span id="btnRefreshTxt">Refresh</span></button>
+          <button class="btn" id="btnExport">⬇️ <span id="btnExportTxt">Export</span></button>
         </div>
       </div>
 
       <section id="view-dashboard">
         <div class="statsGrid">
           <div class="statCard">
-            <div class="statLabel">Open Tickets</div>
+            <div class="statLabel" id="statOpenLabel">Open Tickets</div>
             <div class="statValue" id="kpiOpen">0</div>
             <div class="statMeta" id="kpiOpenT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel">Branch Replied</div>
+            <div class="statLabel" id="statRepliedLabel">Branch Replied</div>
             <div class="statValue" id="kpiReplied">0</div>
             <div class="statMeta" id="kpiRepliedT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel">Closed Tickets</div>
+            <div class="statLabel" id="statClosedLabel">Closed Tickets</div>
             <div class="statValue" id="kpiClosed">0</div>
             <div class="statMeta" id="kpiClosedT">—</div>
           </div>
 
           <div class="statCard">
-            <div class="statLabel">Avg Response</div>
+            <div class="statLabel" id="statAvgLabel">Avg Response</div>
             <div class="statValue" id="kpiAvg">0h</div>
             <div class="statMeta" id="kpiAvgT">—</div>
           </div>
@@ -156,10 +156,10 @@
           <div class="card heroCard">
             <div class="cardHeader">
               <div>
-                <div class="h">Today Overview</div>
+                <div class="h" id="overviewTitle">Today Overview</div>
                 <div class="s" id="kpiSub">Live snapshot</div>
               </div>
-              <span class="badge">Connected</span>
+              <span class="badge" id="connectedBadge">Connected</span>
             </div>
 
             <div class="cardBody">
@@ -167,8 +167,8 @@
                 <div class="chart">
                   <div class="bars" id="bars"></div>
                   <div class="barLabel">
-                    <span>Ticket Volume</span>
-                    <span>Live</span>
+                    <span id="chartLeftLabel">Ticket Volume</span>
+                    <span id="chartRightLabel">Live</span>
                   </div>
                 </div>
               </div>
@@ -182,27 +182,26 @@
           <div class="card">
             <div class="cardHeader">
               <div>
-                <div class="h">Quick Actions</div>
-                <div class="s">What do you want to do now?</div>
+                <div class="h" id="quickActionsTitle">Quick Actions</div>
+                <div class="s" id="quickActionsSub">What do you want to do now?</div>
               </div>
             </div>
 
             <div class="cardBody stack">
-              <button class="btn primary wide" id="goTickets">🎫 Go to Tickets Inbox</button>
-              <button class="btn wide" id="goReports">📈 Open Reports</button>
-              <button class="btn wide" id="goSettings">⚙️ Customize UI</button>
+              <button class="btn primary wide" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
+              <button class="btn wide" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
+              <button class="btn wide" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
 
               <div class="panel">
-                <div class="ph">Current Setup</div>
-                <div class="panelText">
-                  New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function
-                  <b>send-branch-email</b>.
+                <div class="ph" id="currentSetupTitle">Current Setup</div>
+                <div class="panelText" id="currentSetupText">
+                  New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function <b>send-branch-email</b>.
                 </div>
               </div>
 
               <div class="panel">
-                <div class="ph">Current Email Mode</div>
-                <div class="panelText">
+                <div class="ph" id="emailModeTitle">Current Email Mode</div>
+                <div class="panelText" id="emailModeText">
                   Direct test mode is active for reliable delivery during setup.
                 </div>
               </div>
@@ -215,7 +214,7 @@
         <div class="ticketsLayout">
           <div class="ticketSidebar">
             <div class="panel filterPanel">
-              <div class="ph">Filters</div>
+              <div class="ph" id="filtersTitle">Filters</div>
 
               <div class="filterStack">
                 <select id="filterStatus">
@@ -242,8 +241,8 @@
             </div>
 
             <div class="panel slaPanel">
-              <div class="ph">SLA Focus</div>
-              <div class="panelText">
+              <div class="ph" id="slaFocusTitle">SLA Focus</div>
+              <div class="panelText" id="slaFocusText">
                 Track pending tickets, identify replies at risk, and monitor first-response compliance.
               </div>
             </div>
@@ -252,8 +251,8 @@
           <div class="list">
             <div class="listTop">
               <div>
-                <div class="sectionTitle">Tickets Inbox</div>
-                <div class="sectionSub">Live ticket stream across branches</div>
+                <div class="sectionTitle" id="ticketsInboxTitle">Tickets Inbox</div>
+                <div class="sectionSub" id="ticketsInboxSub">Live ticket stream across branches</div>
               </div>
             </div>
 
@@ -263,42 +262,42 @@
           <div class="detail">
             <div class="detailHead">
               <div class="left">
-                <div class="detailEyebrow">Ticket Details</div>
+                <div class="detailEyebrow" id="detailEyebrow">Ticket Details</div>
                 <div class="h" id="detailTitle">Select a ticket</div>
                 <div class="s" id="detailSub">Open a ticket to view details.</div>
               </div>
 
               <div class="actions">
-                <button class="btn" id="btnAssign">👤 Assign</button>
-                <button class="btn good" id="btnClose">✅ Close</button>
-                <button class="btn primary" id="btnAddNote">📝 Add Note</button>
+                <button class="btn" id="btnAssign">👤 <span id="btnAssignTxt">Assign</span></button>
+                <button class="btn good" id="btnClose">✅ <span id="btnCloseTxt">Close</span></button>
+                <button class="btn primary" id="btnAddNote">📝 <span id="btnAddNoteTxt">Add Note</span></button>
               </div>
             </div>
 
             <div class="detailBody">
               <div class="panel">
-                <div class="ph">Ticket Info</div>
+                <div class="ph" id="ticketInfoTitle">Ticket Info</div>
                 <div class="kv" id="ticketInfo"></div>
               </div>
 
               <div class="panel">
-                <div class="ph">Description</div>
+                <div class="ph" id="descriptionTitle">Description</div>
                 <div class="panelText monoBlock" id="ticketDesc">—</div>
               </div>
 
               <div class="panel">
-                <div class="ph">Attachments</div>
+                <div class="ph" id="attachmentsTitle">Attachments</div>
                 <div id="ticketAttachmentsList" class="attachmentsList"></div>
               </div>
 
               <div class="panel">
-                <div class="ph">Branch Reply</div>
+                <div class="ph" id="branchReplyTitle">Branch Reply</div>
                 <div class="replyBox">
                   <textarea class="textarea" id="branchReply" placeholder="Write branch reply here..."></textarea>
 
                   <div class="inlineActions">
-                    <button class="btn primary" id="btnSaveReply">💾 Save Reply</button>
-                    <button class="btn warn" id="btnMarkReplied">✳️ Mark as Replied</button>
+                    <button class="btn primary" id="btnSaveReply">💾 <span id="btnSaveReplyTxt">Save Reply</span></button>
+                    <button class="btn warn" id="btnMarkReplied">✳️ <span id="btnMarkRepliedTxt">Mark as Replied</span></button>
                   </div>
 
                   <div class="metaText" id="replyMeta">—</div>
@@ -306,7 +305,7 @@
               </div>
 
               <div class="panel">
-                <div class="ph">Timeline</div>
+                <div class="ph" id="timelineTitle">Timeline</div>
                 <div class="timeline" id="timeline"></div>
               </div>
             </div>
@@ -319,15 +318,15 @@
           <div class="card">
             <div class="cardHeader">
               <div>
-                <div class="h">Reports</div>
-                <div class="s">Analytics area</div>
+                <div class="h" id="reportsTitle">Reports</div>
+                <div class="s" id="reportsSub">Analytics area</div>
               </div>
             </div>
 
             <div class="cardBody">
               <div class="panel">
-                <div class="ph">Ready for analytics</div>
-                <div class="panelText">
+                <div class="ph" id="reportsReadyTitle">Ready for analytics</div>
+                <div class="panelText" id="reportsReadyText">
                   Add Power BI, Excel export, SLA reports, complaint categories, and branch performance.
                 </div>
               </div>
@@ -341,79 +340,21 @@
           <div class="settingsMenu card">
             <div class="cardHeader">
               <div>
-                <div class="h">Settings</div>
-                <div class="s">Customize this portal UI</div>
+                <div class="h" id="settingsMainTitle">Settings</div>
+                <div class="s" id="settingsMainSub">Customize this portal UI</div>
               </div>
             </div>
 
             <div class="cardBody settingsNav">
-              <button class="settingsItem active">Profile</button>
-              <button class="settingsItem">Branding</button>
-              <button class="settingsItem">Notifications</button>
-              <button class="settingsItem">Portal Preferences</button>
-              <button class="settingsItem">Email Mode</button>
+              <button class="settingsItem active" data-settings="profile" id="settingsItemProfile">Profile</button>
+              <button class="settingsItem" data-settings="branding" id="settingsItemBranding">Branding</button>
+              <button class="settingsItem" data-settings="notifications" id="settingsItemNotifications">Notifications</button>
+              <button class="settingsItem" data-settings="preferences" id="settingsItemPreferences">Portal Preferences</button>
+              <button class="settingsItem" data-settings="email" id="settingsItemEmail">Email Mode</button>
             </div>
           </div>
 
-          <div class="settingsContent">
-            <div class="card">
-              <div class="cardHeader">
-                <div>
-                  <div class="h">Branding</div>
-                  <div class="s">Update portal title and general interface identity</div>
-                </div>
-              </div>
-
-              <div class="cardBody">
-                <div class="panel">
-                  <div class="ph">Portal Title</div>
-                  <div class="fieldRow">
-                    <input class="chipInput" id="brandInput" placeholder="Portal title" />
-                    <button class="btn primary" id="saveBrand">💾 Save</button>
-                  </div>
-                </div>
-
-                <div class="panel">
-                  <div class="ph">Email Mode</div>
-                  <div class="helper">
-                    Current code uses direct email mode for testing. Once confirmed, we can switch back to reading from the branches table.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="settingsCards">
-              <div class="card">
-                <div class="cardHeader">
-                  <div>
-                    <div class="h">Appearance</div>
-                    <div class="s">Theme and language controls</div>
-                  </div>
-                </div>
-                <div class="cardBody stack">
-                  <button class="btn" id="settingsThemeMirror">🌙 Theme controlled from sidebar</button>
-                  <button class="btn" id="settingsLangMirror">🌐 Language controlled from sidebar</button>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="cardHeader">
-                  <div>
-                    <div class="h">Access</div>
-                    <div class="s">Login and permissions ready area</div>
-                  </div>
-                </div>
-                <div class="cardBody">
-                  <div class="panel">
-                    <div class="ph">Auth Ready</div>
-                    <div class="panelText">
-                      This layout is prepared for profile data, role visibility, and user preference controls.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="settingsContent" id="settingsContent"></div>
         </div>
       </section>
     </main>
@@ -423,37 +364,37 @@
     <div class="modalCard">
       <div class="modalHead">
         <div class="modalTitle">
-          <div class="eyebrow">Create Ticket</div>
-          <div class="h">Create New Ticket</div>
-          <div class="s">Enter customer complaint details and send to branch</div>
+          <div class="eyebrow" id="newTicketEyebrow">Create Ticket</div>
+          <div class="h" id="newTicketTitle">Create New Ticket</div>
+          <div class="s" id="newTicketSub">Enter customer complaint details and send to branch</div>
         </div>
 
-        <button class="btn" id="btnCloseNewTicketModal">✖ Close</button>
+        <button class="btn" id="btnCloseNewTicketModal">✖ <span id="btnCloseModalTxt">Close</span></button>
       </div>
 
       <div class="modalBody">
         <div class="grid2">
           <div class="field">
-            <label for="newCustomerName">Customer Name</label>
+            <label for="newCustomerName" id="labelCustomerName">Customer Name</label>
             <input class="input" id="newCustomerName" value="Test Customer" />
           </div>
 
           <div class="field">
-            <label for="newCustomerPhone">Customer Phone</label>
+            <label for="newCustomerPhone" id="labelCustomerPhone">Customer Phone</label>
             <input class="input" id="newCustomerPhone" value="0500000000" />
           </div>
         </div>
 
         <div class="grid2">
           <div class="field">
-            <label for="newBranchName">Branch Name</label>
+            <label for="newBranchName" id="labelBranchName">Branch Name</label>
             <select class="input" id="newBranchName">
               <option value="">Select branch</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="newPriority">Priority</label>
+            <label for="newPriority" id="labelPriority">Priority</label>
             <select id="newPriority">
               <option value="High">High</option>
               <option value="Medium" selected>Medium</option>
@@ -464,14 +405,14 @@
 
         <div class="grid2">
           <div class="field">
-            <label for="newFeedbackType">Feedback Type</label>
+            <label for="newFeedbackType" id="labelFeedbackType">Feedback Type</label>
             <input class="input" id="newFeedbackType" value="WhatsApp" />
           </div>
 
           <div class="field">
-            <label for="newStatus">Status</label>
+            <label for="newStatus" id="labelStatus">Status</label>
             <select id="newStatus">
-              <option value="Open" selected>Open</option>
+              <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
               <option value="Replied">Replied</option>
               <option value="Closed">Closed</option>
@@ -481,32 +422,32 @@
 
         <div class="grid2">
           <div class="field">
-            <label for="newFeedbackCategory">Feedback Category</label>
+            <label for="newFeedbackCategory" id="labelFeedbackCategory">Feedback Category</label>
             <input class="input" id="newFeedbackCategory" value="test" />
           </div>
 
           <div class="field">
-            <label for="newSubCategory">Sub Category</label>
+            <label for="newSubCategory" id="labelSubCategory">Sub Category</label>
             <input class="input" id="newSubCategory" value="test" />
           </div>
         </div>
 
         <div class="field full">
-          <label for="newDescription">Description</label>
+          <label for="newDescription" id="labelDescription">Description</label>
           <textarea class="textarea" id="newDescription">test</textarea>
-          <div class="helper">Use branch dropdown selection. Current direct test email mode will still send to your email for setup verification.</div>
+          <div class="helper" id="descriptionHelper">Use branch dropdown selection. Current direct test email mode will still send to your email for setup verification.</div>
         </div>
 
         <div class="field full">
-          <label for="newTicketAttachments">Attachments</label>
+          <label for="newTicketAttachments" id="labelAttachments">Attachments</label>
           <input class="input" type="file" id="newTicketAttachments" multiple />
-          <div class="helper">Upload images, PDFs, or documents. (Uploaded via Edge Function)</div>
+          <div class="helper" id="attachmentsHelper">Upload images, PDFs, or documents. (Uploaded via Edge Function)</div>
         </div>
       </div>
 
       <div class="modalActions">
-        <button class="btn" id="btnCancelNewTicket">Cancel</button>
-        <button class="btn primary" id="btnSubmitNewTicket">Create Ticket</button>
+        <button class="btn" id="btnCancelNewTicket"><span id="btnCancelTxt">Cancel</span></button>
+        <button class="btn primary" id="btnSubmitNewTicket"><span id="btnCreateTxt">Create Ticket</span></button>
       </div>
     </div>
   </div>
