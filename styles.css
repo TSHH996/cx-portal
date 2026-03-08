@@ -750,48 +750,6 @@ select option{color:#1e293b;background:#f1f5f9}
 .full{grid-column:1 / -1}
 .modalActions{padding:0 24px 24px;display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 
-/* ── CUSTOM SELECT ── */
-.cSelect{position:relative;width:100%}
-
-.cSelectBtn{
-  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:11px 13px;
-  border:1px solid var(--stroke);background:var(--surface3);color:var(--text);
-  border-radius:14px;font-size:13px;font-family:var(--font);
-  cursor:pointer;transition:var(--t);text-align:left;
-}
-.cSelectBtn:hover{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.07)}
-.cSelect.open .cSelectBtn{border-color:var(--focus);box-shadow:0 0 0 4px rgba(124,58,237,.1)}
-
-.cSelectVal{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-.cSelectVal.placeholder{color:var(--muted2)}
-
-.cSelectIcon{width:11px;height:7px;flex-shrink:0;color:var(--muted2);transition:transform .18s ease}
-.cSelect.open .cSelectIcon{transform:rotate(180deg)}
-
-.cSelectMenu{
-  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:500;
-  background:#1e2d48;
-  border:1px solid rgba(124,58,237,.2);
-  border-radius:16px;
-  box-shadow:0 20px 56px rgba(0,0,0,.6),0 0 0 1px rgba(124,58,237,.08);
-  overflow:hidden;display:none;
-  max-height:240px;overflow-y:auto;
-}
-.cSelect.open .cSelectMenu{display:block;animation:fadeInUp .15s ease both}
-
-.cSelectList{list-style:none;margin:0;padding:6px}
-
-.cSelectItem{
-  padding:9px 12px;border-radius:10px;cursor:pointer;
-  font-size:13px;color:#cbd5e1;transition:background .12s,color .12s;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.cSelectItem:hover{background:rgba(124,58,237,.22);color:#fff}
-.cSelectItem.is-selected{background:rgba(124,58,237,.28);color:#ddd6fe;font-weight:700}
-.cSelectItem.is-placeholder{color:#64748b;font-style:italic;cursor:default}
-.cSelectItem.is-placeholder:hover{background:transparent;color:#64748b}
-
 /* ── TOAST ── */
 .toastWrap{position:fixed;right:20px;bottom:20px;z-index:1200;display:flex;flex-direction:column;gap:10px;pointer-events:none}
 .toast{
