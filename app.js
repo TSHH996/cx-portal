@@ -76,15 +76,72 @@ const translations = {
     connectedBadge: "Connected",
     chartLeftLabel: "Ticket Volume",
     chartRightLabel: "Live",
-    quickActionsTitle: "Quick Actions",
-    quickActionsSub: "What do you want to do now?",
-    goTicketsTxt: "Go to Tickets Inbox",
-    goReportsTxt: "Open Reports",
-    goSettingsTxt: "Customize UI",
-    currentSetupTitle: "Current Setup",
-    currentSetupText: 'New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function <b>send-branch-email</b>.',
-    emailModeTitle: "Current Email Mode",
-    emailModeText: "Direct test mode is active for reliable delivery during setup.",
+    insightsTitle: "Smart CX Insights",
+    insightsSub: "Run guided live lookups and operational insight questions from current CX data.",
+    insightsBadge: "Live Data",
+    lookupTitle: "Customer Lookup",
+    lookupPlaceholder: "Enter customer phone number",
+    lookupHint: "Returns customer complaint history, latest branch, repeated category, and repeat-risk signal.",
+    btnCustomerLookupTxt: "Lookup",
+    insightsRangeLabel: "Date Range",
+    insightsBranchLabel: "Branch",
+    insightsBrandLabel: "Brand",
+    insightsRangeAll: "All time",
+    insightsRange7d: "Last 7 days",
+    insightsRange30d: "Last 30 days",
+    insightsRange90d: "Last 90 days",
+    insightsRangeMonth: "This month",
+    insightsAllBranches: "All Branches",
+    insightsAllBrands: "All Brands",
+    presetQuestionsTitle: "Preset Insight Questions",
+    resultsTitle: "Results",
+    insightsReady: "Choose a preset insight or run a customer lookup.",
+    insightsEmpty: "Use this panel to check customer history, top complaint drivers, SLA risks, branch backlog, first-reply speed, and current CX issues.",
+    insightsLoading: "Loading live insight...",
+    insightsErrorTitle: "Insight error",
+    lookupPhoneRequired: "Enter a customer phone number first.",
+    lookupNoResults: "No customer ticket history found for that phone number.",
+    insightsUpdated: "Updated from live data",
+    insightMostComplaintsTitle: "Which branch has the most complaints?",
+    insightMostComplaintsSub: "Top branch by total ticket volume.",
+    insightFoodQualityTitle: "Which branch has the most Food Quality complaints?",
+    insightFoodQualitySub: "Food Quality complaint concentration by branch.",
+    insightTopCategoriesTitle: "What are the top complaint categories?",
+    insightTopCategoriesSub: "Main issue mix across current data.",
+    insightTopSourceTitle: "Which source generates the most complaints?",
+    insightTopSourceSub: "Most active complaint intake channel.",
+    insightSlowestReplyTitle: "Which branches are slowest in first reply?",
+    insightSlowestReplySub: "Average first-reply speed by branch.",
+    insightNearSlaTitle: "Which tickets are near SLA breach?",
+    insightNearSlaSub: "Open tickets close to SLA cutoff.",
+    insightHighestOpenTitle: "Which branches have the highest open ticket count?",
+    insightHighestOpenSub: "Open backlog concentration by branch.",
+    insightBiggestIssuesTitle: "What are the biggest CX issues right now?",
+    insightBiggestIssuesSub: "Current operational risks and complaint themes.",
+    metricTotalTickets: "Total Tickets",
+    metricOpenTickets: "Open Tickets",
+    metricClosedTickets: "Closed Tickets",
+    metricLastComplaint: "Last Complaint",
+    metricLastBranch: "Last Branch",
+    metricRepeatStatus: "Repeat Signal",
+    metricTopCategory: "Top Category",
+    metricSource: "Top Source",
+    metricBranches: "Branches",
+    metricNearSla: "Near SLA",
+    metricOverdue: "Overdue",
+    metricAvgReply: "Avg First Reply",
+    repeatedYes: "Repeated complaints",
+    repeatedNo: "No repeat pattern",
+    btnCopyInsightTxt: "Copy",
+    btnExportInsightTxt: "Export",
+    insightsCopiedTitle: "Copied",
+    insightsCopiedText: "Insight result copied to clipboard.",
+    insightsCopyError: "Could not copy the result.",
+    insightsExportTitle: "Export ready",
+    insightsExportText: "Insight result exported to CSV.",
+    insightsExportEmpty: "No structured insight result is available to export.",
+    insightsScopeLabel: "Scope",
+    insightsScopeAll: "All live data",
     filtersTitle: "Filters",
     filterAllStatus: "All Status",
     filterOpen: "Open",
@@ -274,15 +331,72 @@ const translations = {
     connectedBadge: "متصل",
     chartLeftLabel: "حجم التذاكر",
     chartRightLabel: "مباشر",
-    quickActionsTitle: "إجراءات سريعة",
-    quickActionsSub: "ماذا تريد أن تفعل الآن؟",
-    goTicketsTxt: "الانتقال إلى صندوق التذاكر",
-    goReportsTxt: "فتح التقارير",
-    goSettingsTxt: "تخصيص الواجهة",
-    currentSetupTitle: "الوضع الحالي",
-    currentSetupText: 'إنشاء التذكرة يضيف مباشرة في جدول <b>tickets</b> ويرسل إيميل عبر Supabase Edge Function <b>send-branch-email</b>.',
-    emailModeTitle: "وضع الإيميل الحالي",
-    emailModeText: "وضع الإرسال التجريبي المباشر مفعل حاليًا لضمان وصول الرسائل أثناء الإعداد.",
+    insightsTitle: "لوحة Smart CX Insights",
+    insightsSub: "شغّل استعلامات مباشرة وأسئلة تشغيلية جاهزة من بيانات تجربة العميل الحالية.",
+    insightsBadge: "بيانات مباشرة",
+    lookupTitle: "بحث العميل",
+    lookupPlaceholder: "أدخل رقم جوال العميل",
+    lookupHint: "يعرض تاريخ الشكاوى، آخر فرع، أكثر تصنيف متكرر، وإشارة تكرار الشكوى.",
+    btnCustomerLookupTxt: "بحث",
+    insightsRangeLabel: "الفترة",
+    insightsBranchLabel: "الفرع",
+    insightsBrandLabel: "العلامة التجارية",
+    insightsRangeAll: "كل الوقت",
+    insightsRange7d: "آخر 7 أيام",
+    insightsRange30d: "آخر 30 يومًا",
+    insightsRange90d: "آخر 90 يومًا",
+    insightsRangeMonth: "هذا الشهر",
+    insightsAllBranches: "كل الفروع",
+    insightsAllBrands: "كل العلامات",
+    presetQuestionsTitle: "أسئلة جاهزة",
+    resultsTitle: "النتائج",
+    insightsReady: "اختر سؤالًا جاهزًا أو نفّذ بحث عميل.",
+    insightsEmpty: "يمكنك استخدام هذه اللوحة لمعرفة تاريخ العميل، أعلى أسباب الشكاوى، مخاطر SLA، تكدس الفروع، سرعة أول رد، وأبرز قضايا تجربة العميل الآن.",
+    insightsLoading: "جاري تحميل النتيجة المباشرة...",
+    insightsErrorTitle: "خطأ في النتيجة",
+    lookupPhoneRequired: "أدخل رقم العميل أولًا.",
+    lookupNoResults: "لم يتم العثور على سجل تذاكر لهذا الرقم.",
+    insightsUpdated: "محدث من البيانات المباشرة",
+    insightMostComplaintsTitle: "أي فرع لديه أكثر الشكاوى؟",
+    insightMostComplaintsSub: "أعلى فرع من حيث إجمالي التذاكر.",
+    insightFoodQualityTitle: "أي فرع لديه أكثر شكاوى Food Quality؟",
+    insightFoodQualitySub: "تركيز شكاوى Food Quality حسب الفرع.",
+    insightTopCategoriesTitle: "ما أعلى تصنيفات الشكاوى؟",
+    insightTopCategoriesSub: "مزيج المشكلات الرئيسية في البيانات الحالية.",
+    insightTopSourceTitle: "أي مصدر يولد أكثر الشكاوى؟",
+    insightTopSourceSub: "أكثر قناة استقبال للشكاوى نشاطًا.",
+    insightSlowestReplyTitle: "ما الفروع الأبطأ في أول رد؟",
+    insightSlowestReplySub: "متوسط سرعة أول رد حسب الفرع.",
+    insightNearSlaTitle: "ما التذاكر القريبة من تجاوز SLA؟",
+    insightNearSlaSub: "التذاكر المفتوحة القريبة من الحد الزمني.",
+    insightHighestOpenTitle: "ما الفروع ذات أعلى عدد تذاكر مفتوحة؟",
+    insightHighestOpenSub: "أماكن تركز التكدس المفتوح حسب الفرع.",
+    insightBiggestIssuesTitle: "ما أكبر قضايا CX الآن؟",
+    insightBiggestIssuesSub: "المخاطر التشغيلية الحالية وأعلى مسببات الشكاوى.",
+    metricTotalTickets: "إجمالي التذاكر",
+    metricOpenTickets: "التذاكر المفتوحة",
+    metricClosedTickets: "التذاكر المغلقة",
+    metricLastComplaint: "آخر شكوى",
+    metricLastBranch: "آخر فرع",
+    metricRepeatStatus: "إشارة التكرار",
+    metricTopCategory: "أعلى تصنيف",
+    metricSource: "أعلى مصدر",
+    metricBranches: "الفروع",
+    metricNearSla: "قريبة من SLA",
+    metricOverdue: "متأخرة",
+    metricAvgReply: "متوسط أول رد",
+    repeatedYes: "عميل متكرر الشكوى",
+    repeatedNo: "لا يوجد نمط تكرار",
+    btnCopyInsightTxt: "نسخ",
+    btnExportInsightTxt: "تصدير",
+    insightsCopiedTitle: "تم النسخ",
+    insightsCopiedText: "تم نسخ نتيجة المؤشر إلى الحافظة.",
+    insightsCopyError: "تعذر نسخ النتيجة.",
+    insightsExportTitle: "التصدير جاهز",
+    insightsExportText: "تم تصدير نتيجة المؤشر إلى CSV.",
+    insightsExportEmpty: "لا توجد نتيجة منظمة متاحة للتصدير.",
+    insightsScopeLabel: "النطاق",
+    insightsScopeAll: "كل البيانات المباشرة",
     filtersTitle: "الفلاتر",
     filterAllStatus: "كل الحالات",
     filterOpen: "مفتوح",
@@ -439,8 +553,26 @@ const state = {
   attachmentsByTicketId: {},
   selectedId: null,
   currentSettingsTab: "profile",
-  reportFilters: { dateFrom: "", dateTo: "", brand: "all", status: "all", source: "all", priority: "all", slaStatus: "all", category: "all" },
-  currentReportTab: "executive"
+  reportFilters: { dateFrom: "", dateTo: "", branch: "all", brand: "all", status: "all", source: "all", priority: "all", slaStatus: "all", category: "all" },
+  currentReportTab: "executive",
+  smartInsightsFilters: {
+    range: "30d",
+    branch: "all",
+    brand: "all"
+  },
+  smartInsights: {
+    mode: "",
+    activeKey: "",
+    phone: "",
+    title: "",
+    summary: "",
+    metrics: [],
+    items: [],
+    exportRows: [],
+    loading: false,
+    error: "",
+    meta: ""
+  }
 };
 
 function tr(key) {
@@ -487,6 +619,589 @@ function showToast(title, text, variant = "good"){
   `;
   wrap.appendChild(el);
   setTimeout(() => el.remove(), 5200);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function defaultInsightsState() {
+  return {
+    mode: "",
+    activeKey: "",
+    phone: "",
+    title: "",
+    summary: "",
+    metrics: [],
+    items: [],
+    exportRows: [],
+    loading: false,
+    error: "",
+    meta: ""
+  };
+}
+
+function getInsightPresets() {
+  return [
+    { key: "mostComplaints", title: tr("insightMostComplaintsTitle"), sub: tr("insightMostComplaintsSub") },
+    { key: "foodQuality", title: tr("insightFoodQualityTitle"), sub: tr("insightFoodQualitySub") },
+    { key: "topCategories", title: tr("insightTopCategoriesTitle"), sub: tr("insightTopCategoriesSub") },
+    { key: "topSource", title: tr("insightTopSourceTitle"), sub: tr("insightTopSourceSub") },
+    { key: "slowestReply", title: tr("insightSlowestReplyTitle"), sub: tr("insightSlowestReplySub") },
+    { key: "nearSla", title: tr("insightNearSlaTitle"), sub: tr("insightNearSlaSub") },
+    { key: "highestOpen", title: tr("insightHighestOpenTitle"), sub: tr("insightHighestOpenSub") },
+    { key: "biggestIssues", title: tr("insightBiggestIssuesTitle"), sub: tr("insightBiggestIssuesSub") }
+  ];
+}
+
+function getFirstReply(ticketId) {
+  const replies = state.repliesByTicketId[ticketId] || [];
+  return replies[0] || null;
+}
+
+function getInsightsFilterLabel() {
+  const f = state.smartInsightsFilters;
+  const rangeMap = {
+    all: tr("insightsRangeAll"),
+    "7d": tr("insightsRange7d"),
+    "30d": tr("insightsRange30d"),
+    "90d": tr("insightsRange90d"),
+    month: tr("insightsRangeMonth")
+  };
+  const bits = [rangeMap[f.range] || tr("insightsRange30d")];
+  if (f.branch !== "all") bits.push(f.branch);
+  if (f.brand !== "all") bits.push(f.brand);
+  return bits.join(" • ");
+}
+
+function getInsightsFilteredTickets() {
+  const f = state.smartInsightsFilters;
+  let list = [...(state.tickets || [])];
+  const now = Date.now();
+
+  if (f.range !== "all") {
+    let threshold = 0;
+    if (f.range === "7d") threshold = now - 7 * 86400000;
+    if (f.range === "30d") threshold = now - 30 * 86400000;
+    if (f.range === "90d") threshold = now - 90 * 86400000;
+    if (f.range === "month") {
+      const dt = new Date();
+      threshold = new Date(dt.getFullYear(), dt.getMonth(), 1).getTime();
+    }
+    if (threshold) list = list.filter(t => (t.createdAt || 0) >= threshold);
+  }
+
+  if (f.branch !== "all") list = list.filter(t => t.branch === f.branch);
+  if (f.brand !== "all") list = list.filter(t => t.brand === f.brand);
+  return list;
+}
+
+function populateInsightsFilters() {
+  const branchSel = $("insightsBranch");
+  if (branchSel) {
+    const current = state.smartInsightsFilters.branch;
+    branchSel.innerHTML = `<option value="all">${tr("insightsAllBranches")}</option>`;
+    (state.branches || []).forEach(branch => {
+      const opt = document.createElement("option");
+      opt.value = branch.branch_name;
+      opt.textContent = branch.branch_name;
+      branchSel.appendChild(opt);
+    });
+    if (current === "all" || (state.branches || []).some(b => b.branch_name === current)) branchSel.value = current;
+  }
+
+  const brandSel = $("insightsBrand");
+  if (brandSel) {
+    const current = state.smartInsightsFilters.brand;
+    const brands = [...new Set((state.tickets || []).map(t => t.brand).filter(Boolean).filter(v => v !== "—"))].sort();
+    brandSel.innerHTML = `<option value="all">${tr("insightsAllBrands")}</option>`;
+    brands.forEach(brand => {
+      const opt = document.createElement("option");
+      opt.value = brand;
+      opt.textContent = brand;
+      brandSel.appendChild(opt);
+    });
+    if (current === "all" || brands.includes(current)) brandSel.value = current;
+  }
+
+  const rangeSel = $("insightsRange");
+  if (rangeSel) {
+    rangeSel.innerHTML = `
+      <option value="30d">${tr("insightsRange30d")}</option>
+      <option value="7d">${tr("insightsRange7d")}</option>
+      <option value="90d">${tr("insightsRange90d")}</option>
+      <option value="month">${tr("insightsRangeMonth")}</option>
+      <option value="all">${tr("insightsRangeAll")}</option>
+    `;
+    rangeSel.value = state.smartInsightsFilters.range;
+  }
+}
+
+function insightScopeMeta() {
+  return `${tr("insightsUpdated")} • ${tr("insightsScopeLabel")}: ${getInsightsFilterLabel()} • ${fmtDate(Date.now())}`;
+}
+
+function insightRowsToCSV(rows) {
+  if (!rows.length) return "";
+  const headers = Object.keys(rows[0]);
+  return [
+    headers.join(","),
+    ...rows.map(row => headers.map(h => `"${String(row[h] ?? "").replace(/"/g, '""')}"`).join(","))
+  ].join("\n");
+}
+
+function getInsightPlainText() {
+  if (!state.smartInsights.summary) return "";
+  const lines = [];
+  if (state.smartInsights.title) lines.push(state.smartInsights.title);
+  lines.push(state.smartInsights.summary);
+  if (state.smartInsights.meta) lines.push(state.smartInsights.meta);
+  (state.smartInsights.metrics || []).forEach(metric => lines.push(`${metric.label}: ${metric.value}`));
+  (state.smartInsights.items || []).forEach(item => lines.push(`- ${item.title}${item.value ? `: ${item.value}` : ""}${item.meta ? ` (${item.meta})` : ""}`));
+  return lines.join("\n");
+}
+
+async function copyInsightResult() {
+  const text = getInsightPlainText();
+  if (!text) {
+    showToast(tr("insightsErrorTitle"), tr("insightsExportEmpty"), "bad");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(tr("insightsCopiedTitle"), tr("insightsCopiedText"), "good");
+  } catch {
+    showToast(tr("insightsErrorTitle"), tr("insightsCopyError"), "bad");
+  }
+}
+
+function exportInsightResult() {
+  const rows = state.smartInsights.exportRows || [];
+  if (!rows.length) {
+    showToast(tr("insightsErrorTitle"), tr("insightsExportEmpty"), "bad");
+    return;
+  }
+  const csv = insightRowsToCSV(rows);
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cx_insight_${state.smartInsights.activeKey || state.smartInsights.mode || "result"}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(tr("insightsExportTitle"), tr("insightsExportText"), "good");
+}
+
+function setInsightsLoading(meta) {
+  state.smartInsights = {
+    ...state.smartInsights,
+    loading: true,
+    error: "",
+    meta: meta || tr("insightsLoading")
+  };
+  renderSmartInsights();
+}
+
+function finalizeInsights(result) {
+  state.smartInsights = {
+    ...defaultInsightsState(),
+    ...result,
+    loading: false,
+    error: "",
+    meta: insightScopeMeta()
+  };
+  renderSmartInsights();
+}
+
+function failInsights(message) {
+  state.smartInsights = {
+    ...state.smartInsights,
+    loading: false,
+    error: message || tr("insightsErrorTitle")
+  };
+  renderSmartInsights();
+}
+
+function renderSmartInsights() {
+  if (!$("insightsTitle")) return;
+  $("insightsTitle").textContent = tr("insightsTitle");
+  $("insightsSub").textContent = tr("insightsSub");
+  $("insightsBadge").textContent = tr("insightsBadge");
+  $("lookupTitle").textContent = tr("lookupTitle");
+  $("lookupHint").textContent = tr("lookupHint");
+  $("insightsRangeLabel").textContent = tr("insightsRangeLabel");
+  $("insightsBranchLabel").textContent = tr("insightsBranchLabel");
+  $("insightsBrandLabel").textContent = tr("insightsBrandLabel");
+  $("presetQuestionsTitle").textContent = tr("presetQuestionsTitle");
+  $("resultsTitle").textContent = tr("resultsTitle");
+  $("btnCustomerLookupTxt").textContent = tr("btnCustomerLookupTxt");
+  $("btnCopyInsightTxt").textContent = tr("btnCopyInsightTxt");
+  $("btnExportInsightTxt").textContent = tr("btnExportInsightTxt");
+  populateInsightsFilters();
+  if ($("customerLookupInput")) {
+    $("customerLookupInput").placeholder = tr("lookupPlaceholder");
+    if (state.smartInsights.phone && !$("customerLookupInput").value.trim()) {
+      $("customerLookupInput").value = state.smartInsights.phone;
+    }
+  }
+  if ($("btnCopyInsightResult")) $("btnCopyInsightResult").disabled = !state.smartInsights.summary;
+  if ($("btnExportInsightResult")) $("btnExportInsightResult").disabled = !(state.smartInsights.exportRows || []).length;
+
+  const presetWrap = $("presetInsightButtons");
+  if (presetWrap) {
+    presetWrap.innerHTML = getInsightPresets().map(preset => `
+      <button class="insightChip${state.smartInsights.activeKey === preset.key ? " active" : ""}" type="button" data-insight-key="${preset.key}">
+        <div class="insightChipTitle">${escapeHTML(preset.title)}</div>
+        <div class="insightChipSub">${escapeHTML(preset.sub)}</div>
+      </button>
+    `).join("");
+    presetWrap.querySelectorAll("[data-insight-key]").forEach(btn => {
+      btn.addEventListener("click", () => runPresetInsight(btn.getAttribute("data-insight-key")));
+    });
+  }
+
+  const meta = $("insightsResultMeta");
+  const content = $("insightsResultContent");
+  if (!meta || !content) return;
+
+  if (state.smartInsights.loading) {
+    meta.textContent = state.smartInsights.meta || tr("insightsLoading");
+    content.className = "insightsResultContent loading";
+    content.textContent = tr("insightsLoading");
+    return;
+  }
+
+  if (state.smartInsights.error) {
+    meta.textContent = tr("insightsErrorTitle");
+    content.className = "insightsResultContent error";
+    content.textContent = state.smartInsights.error;
+    return;
+  }
+
+  if (!state.smartInsights.summary) {
+    meta.textContent = tr("insightsReady");
+    content.className = "insightsResultContent empty";
+    content.textContent = tr("insightsEmpty");
+    return;
+  }
+
+  meta.textContent = state.smartInsights.meta || tr("insightsUpdated");
+  content.className = "insightsResultContent";
+  const metricsHtml = (state.smartInsights.metrics || []).length ? `
+    <div class="insightsMetrics">
+      ${(state.smartInsights.metrics || []).map(metric => `
+        <div class="insightsMetric">
+          <div class="insightsMetricLabel">${escapeHTML(metric.label)}</div>
+          <div class="insightsMetricValue">${escapeHTML(metric.value)}</div>
+        </div>
+      `).join("")}
+    </div>
+  ` : "";
+  const itemsHtml = (state.smartInsights.items || []).length ? `
+    <div class="insightsList">
+      ${(state.smartInsights.items || []).map(item => `
+        <div class="insightsListItem">
+          <div class="insightsListHead"><span>${escapeHTML(item.title)}</span><span>${escapeHTML(item.value || "")}</span></div>
+          ${item.meta ? `<div class="insightsListMeta">${escapeHTML(item.meta)}</div>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  ` : "";
+  content.innerHTML = `
+    ${state.smartInsights.title ? `<div class="insightsBlockLabel">${escapeHTML(state.smartInsights.title)}</div>` : ""}
+    <div class="insightsSummary">${escapeHTML(state.smartInsights.summary)}</div>
+    ${metricsHtml}
+    ${itemsHtml}
+  `;
+}
+
+function metric(label, value) {
+  return { label, value };
+}
+
+function listItem(title, value, meta = "") {
+  return { title, value, meta };
+}
+
+function syncInsightsFiltersFromDom() {
+  state.smartInsightsFilters.range = $("insightsRange")?.value || "30d";
+  state.smartInsightsFilters.branch = $("insightsBranch")?.value || "all";
+  state.smartInsightsFilters.brand = $("insightsBrand")?.value || "all";
+}
+
+function getPhoneMatches(phone) {
+  const digits = digitsOnly(phone);
+  const tail = digits.slice(-8);
+  return getInsightsFilteredTickets().filter(ticket => {
+    const ticketDigits = digitsOnly(ticket.customerPhone || ticket.raw?.customer_phone || "");
+    return tail && ticketDigits.includes(tail);
+  }).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+function buildCustomerLookup(phone) {
+  const matches = getPhoneMatches(phone);
+  if (!matches.length) return null;
+
+  const latest = matches[0];
+  const categoryCounts = countBy(matches, t => t.category, 5);
+  const repeated = matches.length > 1;
+  return {
+    mode: "lookup",
+    phone,
+    title: tr("lookupTitle"),
+    summary: state.lang === "ar"
+      ? `العميل لديه ${matches.length} تذكرة مسجلة، وآخر شكوى كانت في ${latest.branch}.`
+      : `This customer has ${matches.length} recorded ticket(s), and the latest complaint was linked to ${latest.branch}.`,
+    metrics: [
+      metric(tr("metricTotalTickets"), matches.length),
+      metric(tr("metricOpenTickets"), matches.filter(t => t.status !== "Closed").length),
+      metric(tr("metricClosedTickets"), matches.filter(t => t.status === "Closed").length),
+      metric(tr("metricLastComplaint"), fmtDate(latest.createdAt)),
+      metric(tr("metricLastBranch"), latest.branch || "—"),
+      metric(tr("metricRepeatStatus"), repeated ? tr("repeatedYes") : tr("repeatedNo"))
+    ],
+    items: [
+      listItem(
+        tr("metricTopCategory"),
+        categoryCounts[0]?.label || "—",
+        state.lang === "ar"
+          ? `الأكثر تكرارًا بعدد ${categoryCounts[0]?.count || 0} تذكرة`
+          : `Most repeated across ${categoryCounts[0]?.count || 0} ticket(s)`
+      ),
+      ...matches.slice(0, 5).map(ticket => listItem(
+        `${ticket.id} — ${ticket.branch}`,
+        ticket.status,
+        `${ticket.category} • ${fmtDate(ticket.createdAt)}`
+      ))
+    ],
+    exportRows: matches.map(ticket => ({
+      Ticket: ticket.id,
+      Branch: ticket.branch,
+      Brand: ticket.brand,
+      Status: ticket.status,
+      Category: ticket.category,
+      Source: ticket.source,
+      Created: fmtDate(ticket.createdAt)
+    }))
+  };
+}
+
+function buildMostComplaintsInsight(category = "") {
+  const relevant = getInsightsFilteredTickets().filter(t => !category || t.category === category);
+  const top = countBy(relevant, t => t.branch, 5);
+  const leader = top[0];
+  return {
+    mode: "preset",
+    activeKey: category ? "foodQuality" : "mostComplaints",
+    title: category ? tr("insightFoodQualityTitle") : tr("insightMostComplaintsTitle"),
+    summary: leader
+      ? (state.lang === "ar"
+          ? `${leader.label} يتصدر بعدد ${leader.count} تذكرة${category ? ` ضمن ${category}` : ""}.`
+          : `${leader.label} leads with ${leader.count} ticket(s)${category ? ` in ${category}` : ""}.`)
+      : (state.lang === "ar" ? "لا توجد بيانات كافية حاليًا." : "Not enough live data right now."),
+    metrics: [
+      metric(tr("metricBranches"), top.length),
+      metric(tr("metricTotalTickets"), relevant.length),
+      metric(tr("metricOpenTickets"), relevant.filter(t => t.status !== "Closed").length)
+    ],
+    items: top.map(row => listItem(row.label, row.count, state.lang === "ar" ? "إجمالي التذاكر" : "Total tickets")),
+    exportRows: top.map(row => ({ Branch: row.label, Tickets: row.count, Category: category || "All" }))
+  };
+}
+
+function buildTopCategoriesInsight() {
+  const scoped = getInsightsFilteredTickets();
+  const top = countBy(scoped, t => t.category, 5);
+  return {
+    mode: "preset",
+    activeKey: "topCategories",
+    title: tr("insightTopCategoriesTitle"),
+    summary: top[0]
+      ? (state.lang === "ar" ? `${top[0].label} هو الأعلى حاليًا بعدد ${top[0].count} تذكرة.` : `${top[0].label} is the leading complaint category with ${top[0].count} ticket(s).`)
+      : (state.lang === "ar" ? "لا توجد فئات متاحة بعد." : "No category data is available yet."),
+    metrics: [
+      metric(tr("metricTotalTickets"), scoped.length),
+      metric(tr("metricTopCategory"), top[0]?.label || "—")
+    ],
+    items: top.map(row => listItem(row.label, row.count, state.lang === "ar" ? "تذكرة" : "tickets")),
+    exportRows: top.map(row => ({ Category: row.label, Tickets: row.count }))
+  };
+}
+
+function buildTopSourceInsight() {
+  const scoped = getInsightsFilteredTickets();
+  const top = countBy(scoped, t => t.source, 5);
+  return {
+    mode: "preset",
+    activeKey: "topSource",
+    title: tr("insightTopSourceTitle"),
+    summary: top[0]
+      ? (state.lang === "ar" ? `${top[0].label} هو المصدر الأعلى للشكاوى بعدد ${top[0].count} تذكرة.` : `${top[0].label} is the highest complaint source with ${top[0].count} ticket(s).`)
+      : (state.lang === "ar" ? "لا توجد بيانات مصادر بعد." : "No source data is available yet."),
+    metrics: [
+      metric(tr("metricSource"), top[0]?.label || "—"),
+      metric(tr("metricTotalTickets"), scoped.length)
+    ],
+    items: top.map(row => listItem(row.label, row.count, state.lang === "ar" ? "تذكرة" : "tickets")),
+    exportRows: top.map(row => ({ Source: row.label, Tickets: row.count }))
+  };
+}
+
+function buildSlowestReplyInsight() {
+  const scoped = getInsightsFilteredTickets();
+  const branchRows = countBy(scoped, t => t.branch, 50).map(row => {
+    const tickets = scoped.filter(t => t.branch === row.label);
+    const hours = tickets.map(ticket => {
+      const reply = getFirstReply(ticket.rowId);
+      if (!reply?.created_at || !ticket.createdAt) return null;
+      return Math.max(0, (new Date(reply.created_at).getTime() - ticket.createdAt) / 3600000);
+    }).filter(v => v !== null);
+    const avg = hours.length ? (hours.reduce((sum, value) => sum + value, 0) / hours.length) : null;
+    return { branch: row.label, avg, tickets: tickets.length };
+  }).filter(row => row.avg !== null).sort((a, b) => b.avg - a.avg).slice(0, 5);
+
+  return {
+    mode: "preset",
+    activeKey: "slowestReply",
+    title: tr("insightSlowestReplyTitle"),
+    summary: branchRows[0]
+      ? (state.lang === "ar" ? `${branchRows[0].branch} هو الأبطأ حاليًا بمتوسط أول رد ${branchRows[0].avg.toFixed(1)} ساعة.` : `${branchRows[0].branch} is currently the slowest with an average first reply of ${branchRows[0].avg.toFixed(1)}h.`)
+      : (state.lang === "ar" ? "لا توجد ردود كافية لحساب سرعة أول رد." : "There are not enough reply records to calculate first-reply speed."),
+    metrics: [metric(tr("metricAvgReply"), branchRows[0] ? `${branchRows[0].avg.toFixed(1)}h` : "—")],
+    items: branchRows.map(row => listItem(row.branch, `${row.avg.toFixed(1)}h`, state.lang === "ar" ? `${row.tickets} تذكرة` : `${row.tickets} tickets`)),
+    exportRows: branchRows.map(row => ({ Branch: row.branch, AvgFirstReplyHours: row.avg.toFixed(1), Tickets: row.tickets }))
+  };
+}
+
+function buildNearSlaInsight() {
+  const now = Date.now();
+  const scoped = getInsightsFilteredTickets();
+  const near = scoped.filter(t => t.status !== "Closed" && t.slaDueAt && t.slaDueAt >= now && t.slaDueAt - now <= 4 * 60 * 60 * 1000);
+  const overdue = scoped.filter(t => t.status !== "Closed" && (t.slaComputedStatus === "breached" || (t.slaDueAt && t.slaDueAt < now)));
+  return {
+    mode: "preset",
+    activeKey: "nearSla",
+    title: tr("insightNearSlaTitle"),
+    summary: state.lang === "ar"
+      ? `يوجد ${near.length} تذكرة قريبة من تجاوز SLA و${overdue.length} تذكرة متأخرة حاليًا.`
+      : `There are ${near.length} ticket(s) near SLA breach and ${overdue.length} overdue ticket(s) right now.`,
+    metrics: [metric(tr("metricNearSla"), near.length), metric(tr("metricOverdue"), overdue.length)],
+    items: near.slice(0, 5).map(ticket => listItem(`${ticket.id} — ${ticket.branch}`, ticket.priority, `${ticket.status} • ${ticket.slaRemainingText}`)),
+    exportRows: [...near, ...overdue].slice(0, 20).map(ticket => ({
+      Ticket: ticket.id,
+      Branch: ticket.branch,
+      Priority: ticket.priority,
+      Status: ticket.status,
+      Sla: ticket.slaRemainingText,
+      SlaStatus: ticket.slaComputedStatus
+    }))
+  };
+}
+
+function buildHighestOpenInsight() {
+  const open = getInsightsFilteredTickets().filter(t => t.status !== "Closed");
+  const top = countBy(open, t => t.branch, 5);
+  return {
+    mode: "preset",
+    activeKey: "highestOpen",
+    title: tr("insightHighestOpenTitle"),
+    summary: top[0]
+      ? (state.lang === "ar" ? `${top[0].label} لديه أعلى رصيد مفتوح بعدد ${top[0].count} تذكرة.` : `${top[0].label} has the highest open backlog with ${top[0].count} ticket(s).`)
+      : (state.lang === "ar" ? "لا توجد تذاكر مفتوحة حاليًا." : "There are no open tickets right now."),
+    metrics: [metric(tr("metricOpenTickets"), open.length), metric(tr("metricBranches"), top.length)],
+    items: top.map(row => listItem(row.label, row.count, state.lang === "ar" ? "تذاكر مفتوحة" : "open tickets")),
+    exportRows: top.map(row => ({ Branch: row.label, OpenTickets: row.count }))
+  };
+}
+
+function buildBiggestIssuesInsight() {
+  const open = getInsightsFilteredTickets().filter(t => t.status !== "Closed");
+  const overdue = open.filter(t => t.slaComputedStatus === "breached" || (t.slaDueAt && t.slaDueAt < Date.now()));
+  const high = open.filter(t => t.priority === "High");
+  const topCategory = countBy(open, t => t.category, 3);
+  const topBranch = countBy(open, t => t.branch, 3);
+  const topSource = countBy(open, t => t.source, 3);
+  return {
+    mode: "preset",
+    activeKey: "biggestIssues",
+    title: tr("insightBiggestIssuesTitle"),
+    summary: state.lang === "ar"
+      ? `المشهد الحالي يتركز في ${overdue.length} تذكرة متأخرة، ${high.length} تذكرة عالية، وتصاعد في ${topCategory[0]?.label || "—"}.`
+      : `The current picture centers on ${overdue.length} overdue ticket(s), ${high.length} high-priority open ticket(s), and elevated pressure in ${topCategory[0]?.label || "—"}.`,
+    metrics: [
+      metric(tr("metricOverdue"), overdue.length),
+      metric(tr("metricOpenTickets"), open.length),
+      metric(tr("metricTopCategory"), topCategory[0]?.label || "—")
+    ],
+    items: [
+      ...topCategory.map(row => listItem(row.label, row.count, state.lang === "ar" ? "أعلى تصنيف مفتوح" : "top open category")),
+      ...topBranch.slice(0, 1).map(row => listItem(row.label, row.count, state.lang === "ar" ? "أعلى فرع مفتوح" : "highest open branch")),
+      ...topSource.slice(0, 1).map(row => listItem(row.label, row.count, state.lang === "ar" ? "أعلى مصدر حالي" : "highest active source"))
+    ],
+    exportRows: open.slice(0, 20).map(ticket => ({
+      Ticket: ticket.id,
+      Branch: ticket.branch,
+      Brand: ticket.brand,
+      Category: ticket.category,
+      Source: ticket.source,
+      Priority: ticket.priority,
+      Status: ticket.status,
+      SlaStatus: ticket.slaComputedStatus
+    }))
+  };
+}
+
+function computeInsightResult(key) {
+  if (key === "mostComplaints") return buildMostComplaintsInsight();
+  if (key === "foodQuality") return buildMostComplaintsInsight("Food Quality");
+  if (key === "topCategories") return buildTopCategoriesInsight();
+  if (key === "topSource") return buildTopSourceInsight();
+  if (key === "slowestReply") return buildSlowestReplyInsight();
+  if (key === "nearSla") return buildNearSlaInsight();
+  if (key === "highestOpen") return buildHighestOpenInsight();
+  return buildBiggestIssuesInsight();
+}
+
+async function runPresetInsight(key, silent = false) {
+  syncInsightsFiltersFromDom();
+  if (!silent) setInsightsLoading(tr("insightsLoading"));
+  await Promise.resolve();
+  finalizeInsights(computeInsightResult(key));
+}
+
+async function runCustomerLookup(silent = false) {
+  syncInsightsFiltersFromDom();
+  const phone = $("customerLookupInput")?.value || state.smartInsights.phone || "";
+  if (!digitsOnly(phone)) {
+    failInsights(tr("lookupPhoneRequired"));
+    return;
+  }
+  if (!silent) setInsightsLoading(tr("insightsLoading"));
+  await Promise.resolve();
+  const result = buildCustomerLookup(phone);
+  if (!result) {
+    failInsights(tr("lookupNoResults"));
+    return;
+  }
+  finalizeInsights(result);
+}
+
+function rerunSmartInsights() {
+  if (state.smartInsights.mode === "lookup" && state.smartInsights.phone) {
+    runCustomerLookup(true);
+  } else if (state.smartInsights.mode === "preset" && state.smartInsights.activeKey) {
+    runPresetInsight(state.smartInsights.activeKey, true);
+  } else {
+    renderSmartInsights();
+  }
 }
 
 function applyTheme(){
@@ -559,15 +1274,7 @@ function renderStaticTranslations(){
   $("connectedBadge").innerHTML = `<span class="liveDot"></span>${tr("connectedBadge")}`;
   $("chartLeftLabel").textContent = tr("chartLeftLabel");
   $("chartRightLabel").textContent = tr("chartRightLabel");
-  $("quickActionsTitle").textContent = tr("quickActionsTitle");
-  $("quickActionsSub").textContent = tr("quickActionsSub");
-  $("goTicketsTxt").textContent = tr("goTicketsTxt");
-  $("goReportsTxt").textContent = tr("goReportsTxt");
-  $("goSettingsTxt").textContent = tr("goSettingsTxt");
-  $("currentSetupTitle").textContent = tr("currentSetupTitle");
-  $("currentSetupText").innerHTML = tr("currentSetupText");
-  $("emailModeTitle").textContent = tr("emailModeTitle");
-  $("emailModeText").textContent = tr("emailModeText");
+  renderSmartInsights();
   $("filtersTitle").textContent = tr("filtersTitle");
   $("filterBranch").placeholder = tr("filterBranchPlaceholder");
   $("slaFocusTitle").textContent = tr("slaFocusTitle");
@@ -628,13 +1335,14 @@ function renderDashboardFilterCopy(){
     period: isAr ? "الفترة" : "Period",
     status: isAr ? "الحالة" : "Status",
     priority: isAr ? "الأولوية" : "Priority",
-    branchCity: isAr ? "الفرع / المدينة" : "Branch / City",
+    branch: isAr ? "الفرع" : "Branch",
+    brand: isAr ? "العلامة التجارية" : "Brand",
     reset: isAr ? "إعادة تعيين" : "Reset",
     allTime: isAr ? "كل الوقت" : "All Time",
     last24: isAr ? "آخر 24 ساعة" : "Last 24h",
     last7: isAr ? "آخر 7 أيام" : "Last 7 days",
     last30: isAr ? "آخر 30 يومًا" : "Last 30 days",
-    branchPlaceholder: isAr ? "فلترة حسب الفرع أو المدينة" : "Filter by branch or city"
+    branchPlaceholder: isAr ? "فلترة حسب الفرع" : "Filter by branch..."
   };
 
   const q = (selector) => document.querySelector(selector);
@@ -642,7 +1350,8 @@ function renderDashboardFilterCopy(){
   if (q('label[for="dashRange"]')) q('label[for="dashRange"]').textContent = labels.period;
   if (q('label[for="dashStatus"]')) q('label[for="dashStatus"]').textContent = labels.status;
   if (q('label[for="dashPriority"]')) q('label[for="dashPriority"]').textContent = labels.priority;
-  if (q('label[for="dashBranch"]')) q('label[for="dashBranch"]').textContent = labels.branchCity;
+  if (q('label[for="dashBranch"]')) q('label[for="dashBranch"]').textContent = labels.branch;
+  if (q('label[for="dashBrand"]')) q('label[for="dashBrand"]').textContent = labels.brand;
   if ($("dashResetFilters")) $("dashResetFilters").textContent = labels.reset;
   if ($("dashBranch")) $("dashBranch").placeholder = labels.branchPlaceholder;
 
@@ -668,6 +1377,7 @@ function applyLang(){
   renderSettingsContent();
   renderTickets();
   computeKPIs();
+  rerunSmartInsights();
 }
 
 function statusBadgeClass(s){
@@ -726,6 +1436,7 @@ function getDashboardFilteredTickets(){
   const status = $("dashStatus")?.value || "all";
   const priority = $("dashPriority")?.value || "all";
   const q = ($("dashBranch")?.value || "").toLowerCase().trim();
+  const brand = $("dashBrand")?.value || "all";
   const now = Date.now();
 
   let list = [...(state.tickets || [])];
@@ -743,6 +1454,7 @@ function getDashboardFilteredTickets(){
 
   if (status !== "all") list = list.filter(t => t.status === status);
   if (priority !== "all") list = list.filter(t => t.priority === priority);
+  if (brand !== "all") list = list.filter(t => t.brand === brand);
 
   if (q) {
     list = list.filter(t => {
@@ -866,7 +1578,7 @@ function renderRecentActivity(filtered){
   const wrap = $("dashboardRecentActivity");
   if (!wrap) return;
 
-  const prioritized = [...filtered].sort((a,b) => {
+  const prioritized = [...filtered].filter(t => t.status !== "Closed").sort((a,b) => {
     const aRisk = (a.slaComputedStatus === "breached" || (a.slaDueAt && a.slaDueAt < Date.now())) ? 1 : 0;
     const bRisk = (b.slaComputedStatus === "breached" || (b.slaDueAt && b.slaDueAt < Date.now())) ? 1 : 0;
     if (aRisk !== bRisk) return bRisk - aRisk;
@@ -890,6 +1602,35 @@ function renderRecentActivity(filtered){
       </div>
       <div class="activityBranch">${t.branch}</div>
       <div class="activityMeta">${fmtDate(t.createdAt)} ${t.slaRemainingText ? `- ${t.slaRemainingText}` : ""}</div>
+    </div>
+  `).join("");
+}
+
+function renderHighPriorityQueue(filtered) {
+  const el = $("highPriorityQueue");
+  if (!el) return;
+  const highLabel = state.lang === "ar" ? "عالية" : "High";
+  const noSlaLabel = state.lang === "ar" ? "بدون SLA" : "No SLA";
+  const highOpen = (filtered || [])
+    .filter(t => t.priority === "High" && t.status !== "Closed")
+    .sort((a, b) => {
+      if (a.slaDueAt && b.slaDueAt) return a.slaDueAt - b.slaDueAt;
+      if (a.slaDueAt) return -1;
+      if (b.slaDueAt) return 1;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    })
+    .slice(0, 5);
+  if (!highOpen.length) {
+    el.innerHTML = `<div class="emptyDash">${state.lang === "ar" ? "لا توجد تذاكر عالية الأولوية مفتوحة" : "No high priority open tickets."}</div>`;
+    return;
+  }
+  el.innerHTML = highOpen.map(t => `
+    <div class="compactRow">
+      <div class="compactHead">
+        <span>${t.id} — ${t.branch}</span>
+        <span class="badge bad" style="font-size:10px;padding:2px 7px;border-radius:6px">${highLabel}</span>
+      </div>
+      <div class="compactMeta">${t.status} · ${t.slaRemainingText || noSlaLabel}</div>
     </div>
   `).join("");
 }
@@ -974,6 +1715,7 @@ function computeKPIs(){
   renderCompact("topBranches", countBy(filtered, t => t.branch), r => `${r.pct}%`);
   renderOperationalAlerts(filtered, near, overdue);
   renderRecentActivity(filtered);
+  renderHighPriorityQueue(filtered);
 }
 
 async function loadBranches() {
@@ -990,6 +1732,7 @@ async function loadBranches() {
 
   state.branches = data || [];
   renderBranchOptions();
+  populateReportBranchOptions();
 }
 
 function renderBranchOptions() {
@@ -1009,6 +1752,35 @@ function renderBranchOptions() {
   if (currentValue && state.branches.some(b => b.branch_name === currentValue)) {
     branchSelect.value = currentValue;
   }
+}
+
+function populateDashBrandOptions() {
+  const sel = $("dashBrand");
+  if (!sel) return;
+  const current = sel.value;
+  const brands = [...new Set((state.tickets || []).map(t => t.brand).filter(b => b && b !== "—"))].sort();
+  sel.innerHTML = `<option value="all">${state.lang === "ar" ? "كل العلامات" : "All Brands"}</option>`;
+  brands.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
+    sel.appendChild(opt);
+  });
+  if (current && current !== "all" && brands.includes(current)) sel.value = current;
+}
+
+function populateReportBranchOptions() {
+  const sel = $("rptFBranch");
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = `<option value="all">${state.lang === "ar" ? "كل الفروع" : "All Branches"}</option>`;
+  (state.branches || []).forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b.branch_name;
+    opt.textContent = b.branch_name;
+    sel.appendChild(opt);
+  });
+  if (current && current !== "all" && state.branches.some(b => b.branch_name === current)) sel.value = current;
 }
 
 async function loadReplies(){
@@ -1224,6 +1996,8 @@ async function loadTickets(){
     }
 
     computeKPIs();
+    populateDashBrandOptions();
+    rerunSmartInsights();
     if (currentView() === "tickets") renderTickets();
     if (currentView() === "reports") renderReports(state.currentReportTab);
     $("systemMsg").textContent = state.lang === "ar"
@@ -1781,7 +2555,9 @@ async function closeTicket(){
 
     showToast(tr("closedTitle"), tr("closedText"), "good");
     await loadTickets();
+    computeKPIs();
     renderTickets();
+    renderDetail();
   }catch(e){
     console.error("closeTicket exception:", e);
     alert((state.lang === "ar" ? "استثناء: " : "Exception: ") + (e.message || e));
@@ -1798,6 +2574,7 @@ function getReportTickets() {
   const f = state.reportFilters;
   return (state.tickets || []).filter(t => {
     if (f.brand !== "all" && t.brand !== f.brand) return false;
+    if (f.branch !== "all" && t.branch !== f.branch) return false;
     if (f.status !== "all" && t.status !== f.status) return false;
     if (f.source !== "all" && t.source !== f.source) return false;
     if (f.priority !== "all" && t.priority !== f.priority) return false;
@@ -2534,13 +3311,14 @@ function initReports() {
   });
 
   // Filter controls — re-render on change
-  ["rptDateFrom","rptDateTo","rptFBrand","rptFStatus","rptFSource","rptFPriority","rptFSLA","rptFCategory"].forEach(id => {
+  ["rptDateFrom","rptDateTo","rptFBrand","rptFBranch","rptFStatus","rptFSource","rptFPriority","rptFSLA","rptFCategory"].forEach(id => {
     const el = $(id);
     if (!el) return;
     el.addEventListener("change", () => {
       state.reportFilters.dateFrom  = $("rptDateFrom")?.value || "";
       state.reportFilters.dateTo    = $("rptDateTo")?.value || "";
       state.reportFilters.brand     = $("rptFBrand")?.value || "all";
+      state.reportFilters.branch    = $("rptFBranch")?.value || "all";
       state.reportFilters.status    = $("rptFStatus")?.value || "all";
       state.reportFilters.source    = $("rptFSource")?.value || "all";
       state.reportFilters.priority  = $("rptFPriority")?.value || "all";
@@ -2554,8 +3332,8 @@ function initReports() {
   const resetBtn = $("btnRptReset");
   if (resetBtn) resetBtn.addEventListener("click", () => {
     ["rptDateFrom","rptDateTo"].forEach(id=>{const el=$(id);if(el)el.value="";});
-    ["rptFBrand","rptFStatus","rptFSource","rptFPriority","rptFSLA","rptFCategory"].forEach(id=>{const el=$(id);if(el)el.value="all";});
-    state.reportFilters = { dateFrom:"",dateTo:"",brand:"all",status:"all",source:"all",priority:"all",slaStatus:"all",category:"all" };
+    ["rptFBrand","rptFBranch","rptFStatus","rptFSource","rptFPriority","rptFSLA","rptFCategory"].forEach(id=>{const el=$(id);if(el)el.value="all";});
+    state.reportFilters = { dateFrom:"",dateTo:"",branch:"all",brand:"all",status:"all",source:"all",priority:"all",slaStatus:"all",category:"all" };
     renderReports(state.currentReportTab);
   });
 
@@ -2629,9 +3407,9 @@ document.querySelectorAll(".nav button").forEach(btn => {
   btn.addEventListener("click", () => setView(btn.dataset.view));
 });
 
-$("goTickets").onclick = () => setView("tickets");
-$("goReports").onclick = () => setView("reports");
-$("goSettings").onclick = () => setView("settings");
+$("goTickets")?.addEventListener("click", () => setView("tickets"));
+$("goReports")?.addEventListener("click", () => setView("reports"));
+$("goSettings")?.addEventListener("click", () => setView("settings"));
 
 ["filterStatus","filterPriority","filterBranch"].forEach(id => {
   $(id).addEventListener("input", renderTickets);
@@ -2641,11 +3419,13 @@ $("goSettings").onclick = () => setView("settings");
 $("dashRange")?.addEventListener("change", computeKPIs);
 $("dashStatus")?.addEventListener("change", computeKPIs);
 $("dashPriority")?.addEventListener("change", computeKPIs);
+$("dashBrand")?.addEventListener("change", computeKPIs);
 $("dashBranch")?.addEventListener("input", computeKPIs);
 $("dashResetFilters")?.addEventListener("click", () => {
   if ($("dashRange")) $("dashRange").value = "7d";
   if ($("dashStatus")) $("dashStatus").value = "all";
   if ($("dashPriority")) $("dashPriority").value = "all";
+  if ($("dashBrand")) $("dashBrand").value = "all";
   if ($("dashBranch")) $("dashBranch").value = "";
   computeKPIs();
 });
@@ -2675,6 +3455,22 @@ $("btnRefresh").onclick = async () => {
   renderTickets();
   showToast(tr("refreshedTitle"), tr("refreshedText"), "good");
 };
+
+$("btnCustomerLookup")?.addEventListener("click", () => runCustomerLookup());
+$("customerLookupInput")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    runCustomerLookup();
+  }
+});
+["insightsRange","insightsBranch","insightsBrand"].forEach(id => {
+  $(id)?.addEventListener("change", () => {
+    syncInsightsFiltersFromDom();
+    rerunSmartInsights();
+  });
+});
+$("btnCopyInsightResult")?.addEventListener("click", copyInsightResult);
+$("btnExportInsightResult")?.addEventListener("click", exportInsightResult);
 
 $("btnExport").onclick = exportJSON;
 $("btnSaveReply").onclick = saveReply;

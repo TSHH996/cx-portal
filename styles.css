@@ -768,6 +768,125 @@ body.dashboard-active .topbar .title .p{
   font-weight:700;
 }
 
+/* ── SMART INSIGHTS ── */
+.insightsBody{display:grid;gap:12px}
+.insightsControls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.insightsLookup,.insightsQuestions,.insightsResultPanel{min-width:0}
+.insightsControlGroup{min-width:0}
+.insightsBlockLabel{
+  display:block;
+  font-size:10.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--muted2);
+  margin-bottom:8px;
+}
+.insightsLookup{
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);
+  border-radius:18px;
+  padding:14px;
+}
+.insightsLookupRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+}
+.insightsLookupInput{min-width:0}
+.insightsLookupHint,.insightsResultMeta{color:var(--muted2);font-size:12px;line-height:1.6}
+.insightsLookupHint{margin-top:9px}
+.insightsSelect{width:100%}
+.insightsQuestionGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.insightChip{
+  border:1px solid rgba(124,58,237,.18);
+  background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(56,189,248,.05));
+  color:var(--text);
+  border-radius:16px;
+  padding:12px;
+  font-size:12px;
+  line-height:1.45;
+  cursor:pointer;
+  transition:var(--t);
+  text-align:left;
+}
+.insightChip:hover{
+  transform:translateY(-1px);
+  border-color:rgba(124,58,237,.32);
+  background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(56,189,248,.08));
+  box-shadow:var(--shadow);
+}
+.insightChip.active{
+  border-color:rgba(124,58,237,.34);
+  background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(56,189,248,.1));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),var(--shadow);
+}
+.insightChipTitle{font-weight:800;font-size:12.5px;color:var(--text)}
+.insightChipSub{margin-top:4px;font-size:11px;color:var(--muted);line-height:1.5}
+.insightsResultContent{
+  margin-top:10px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.02);
+  padding:14px 15px;
+  min-height:156px;
+  color:var(--text);
+  font-size:13px;
+  line-height:1.75;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.insightsResultContent.empty{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:var(--muted);
+}
+.insightsResultContent.loading{
+  color:var(--muted);
+  background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(255,255,255,.06),rgba(255,255,255,.03));
+  background-size:300% 100%;
+  animation:shimmer 1.8s linear infinite;
+}
+.insightsResultContent.error{
+  border-color:rgba(239,68,68,.22);
+  background:rgba(239,68,68,.06);
+  color:#fecaca;
+}
+.insightsResultHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.insightsResultActions{display:flex;gap:8px;flex-wrap:wrap}
+.insightsSummary{font-size:13px;color:var(--text);line-height:1.75}
+.insightsMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.insightsMetric{
+  border:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.02);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.insightsMetricLabel{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);font-weight:800}
+.insightsMetricValue{margin-top:6px;font-size:18px;font-weight:900;color:var(--text)}
+.insightsList{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.insightsListItem{
+  border:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.02);
+  border-radius:14px;
+  padding:10px 12px;
+}
+.insightsListHead{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:800}
+.insightsListMeta{margin-top:4px;font-size:11.5px;color:var(--muted);line-height:1.6}
+[data-theme="light"] .insightChip{
+  background:linear-gradient(135deg,rgba(109,40,217,.06),rgba(14,165,233,.05));
+}
+[data-theme="light"] .insightsLookup,
+[data-theme="light"] .insightsResultContent,
+[data-theme="light"] .insightsMetric,
+[data-theme="light"] .insightsListItem{background:rgba(15,23,42,.02)}
+[data-theme="light"] .insightsResultContent.loading{
+  background:linear-gradient(90deg,rgba(15,23,42,.03),rgba(15,23,42,.06),rgba(15,23,42,.03));
+}
+
 .chart{
   height:220px;
   border-radius:12px;
@@ -922,6 +1041,11 @@ body.dashboard-active .topbar .title .p{
 [dir="rtl"] .dashboardExecutiveRight{justify-content:flex-start}
 [dir="rtl"] .dashboardSelect,[dir="rtl"] .dashboardInput{text-align:right}
 [dir="rtl"] #view-dashboard .stack .btn{justify-content:flex-end}
+[dir="rtl"] .insightsLookupRow{grid-template-columns:auto minmax(0,1fr)}
+[dir="rtl"] .insightsResultHead,[dir="rtl"] .insightsResultActions{justify-content:flex-start}
+[dir="rtl"] .insightChip{text-align:right}
+[dir="rtl"] .insightsResultContent{text-align:right}
+[dir="rtl"] .insightsListHead{direction:rtl}
 [dir="rtl"] .alertRow::before{
   inset-inline-start:auto;
   inset-inline-end:0;
@@ -1165,6 +1289,10 @@ html[lang="ar"] .inlineActions{justify-content:flex-start}
   .filterBlock,.filterBlock.wide,.filterBlock.action{grid-column:span 1}
   .analyticsSplit{grid-template-columns:1fr}
   .dashboardSideCol{grid-template-columns:1fr}
+  .insightsControls{grid-template-columns:1fr}
+  .insightsLookupRow{grid-template-columns:1fr}
+  .insightsQuestionGrid{grid-template-columns:1fr}
+  .insightsMetrics{grid-template-columns:1fr}
 }
 @media (max-width:720px){
   .main{padding:10px}

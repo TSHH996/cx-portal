@@ -161,6 +161,12 @@
               </select>
             </div>
             <div class="filterBlock">
+              <label for="dashBrand">Brand</label>
+              <select id="dashBrand" class="dashboardSelect">
+                <option value="all">All Brands</option>
+              </select>
+            </div>
+            <div class="filterBlock">
               <label for="dashPriority">Priority</label>
               <select id="dashPriority" class="dashboardSelect">
                 <option value="all">All Priority</option>
@@ -169,9 +175,9 @@
                 <option value="Low">Low</option>
               </select>
             </div>
-            <div class="filterBlock wide">
-              <label for="dashBranch">Branch / City</label>
-              <input class="dashboardInput" id="dashBranch" placeholder="Filter by branch or city" />
+            <div class="filterBlock">
+              <label for="dashBranch">Branch</label>
+              <input class="dashboardInput" id="dashBranch" placeholder="Filter by branch..." />
             </div>
             <div class="filterBlock action">
               <button class="btn" id="dashResetFilters">Reset</button>
@@ -319,27 +325,63 @@
             <div class="card">
               <div class="cardHeader">
                 <div>
-                  <div class="h" id="quickActionsTitle">Quick Actions</div>
-                  <div class="s" id="quickActionsSub">What do you want to do now?</div>
+                  <div class="h" id="insightsTitle">Smart CX Insights</div>
+                  <div class="s" id="insightsSub">Run guided live lookups and operational insight questions from current CX data.</div>
                 </div>
+                <span class="badge" id="insightsBadge">Live Data</span>
               </div>
 
-              <div class="cardBody stack">
-                <button class="btn primary wide" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
-                <button class="btn wide" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
-                <button class="btn wide" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
-
-                <div class="panel">
-                  <div class="ph" id="currentSetupTitle">Current Setup</div>
-                  <div class="panelText" id="currentSetupText">
-                    New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function <b>send-branch-email</b>.
+              <div class="cardBody insightsBody">
+                <div class="insightsControls">
+                  <div class="insightsControlGroup">
+                    <label class="insightsBlockLabel" for="insightsRange" id="insightsRangeLabel">Date Range</label>
+                    <select class="dashboardSelect insightsSelect" id="insightsRange">
+                      <option value="30d">Last 30 days</option>
+                      <option value="7d">Last 7 days</option>
+                      <option value="90d">Last 90 days</option>
+                      <option value="month">This month</option>
+                      <option value="all">All time</option>
+                    </select>
+                  </div>
+                  <div class="insightsControlGroup">
+                    <label class="insightsBlockLabel" for="insightsBranch" id="insightsBranchLabel">Branch</label>
+                    <select class="dashboardSelect insightsSelect" id="insightsBranch">
+                      <option value="all">All Branches</option>
+                    </select>
+                  </div>
+                  <div class="insightsControlGroup">
+                    <label class="insightsBlockLabel" for="insightsBrand" id="insightsBrandLabel">Brand</label>
+                    <select class="dashboardSelect insightsSelect" id="insightsBrand">
+                      <option value="all">All Brands</option>
+                    </select>
                   </div>
                 </div>
 
-                <div class="panel">
-                  <div class="ph" id="emailModeTitle">Current Email Mode</div>
-                  <div class="panelText" id="emailModeText">
-                    Direct test mode is active for reliable delivery during setup.
+                <div class="insightsLookup">
+                  <div class="insightsBlockLabel" id="lookupTitle">Customer Lookup</div>
+                  <div class="insightsLookupRow">
+                    <input class="input insightsLookupInput" id="customerLookupInput" placeholder="Enter customer phone number" />
+                    <button class="btn primary" id="btnCustomerLookup">🔎 <span id="btnCustomerLookupTxt">Lookup</span></button>
+                  </div>
+                  <div class="insightsLookupHint" id="lookupHint">Returns customer complaint history, latest branch, repeated category, and repeat-risk signal.</div>
+                </div>
+
+                <div class="insightsQuestions">
+                  <div class="insightsBlockLabel" id="presetQuestionsTitle">Preset Insight Questions</div>
+                  <div class="insightsQuestionGrid" id="presetInsightButtons"></div>
+                </div>
+
+                <div class="panel insightsResultPanel">
+                  <div class="insightsResultHead">
+                    <div class="ph" id="resultsTitle">Results</div>
+                    <div class="insightsResultActions">
+                      <button class="btn" id="btnCopyInsightResult">⎘ <span id="btnCopyInsightTxt">Copy</span></button>
+                      <button class="btn" id="btnExportInsightResult">⬇ <span id="btnExportInsightTxt">Export</span></button>
+                    </div>
+                  </div>
+                  <div class="insightsResultMeta" id="insightsResultMeta">Choose a preset insight or run a customer lookup.</div>
+                  <div class="insightsResultContent empty" id="insightsResultContent">
+                    Use this panel to check customer history, top complaint drivers, SLA risks, branch backlog, first-reply speed, and current CX issues.
                   </div>
                 </div>
               </div>
@@ -565,6 +607,12 @@
           <option value="Delivery">Delivery</option>
           <option value="App/Online">App/Online</option>
           <option value="Pricing">Pricing</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Branch</label>
+        <select class="rptSelect" id="rptFBranch">
+          <option value="all">All Branches</option>
         </select>
       </div>
       <button class="btn" id="btnRptReset">↺ Reset</button>
