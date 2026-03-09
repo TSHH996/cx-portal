@@ -126,23 +126,76 @@
       </div>
 
       <section id="view-dashboard">
+        <div class="dashboardExecutiveHeader card">
+          <div class="cardBody">
+            <div class="dashboardExecutiveLeft">
+              <div class="dashEyebrow" id="overviewTitle">Today Overview</div>
+              <div class="dashHead" id="kpiSub">Executive operational view for customer experience.</div>
+            </div>
+            <div class="dashboardExecutiveRight">
+              <span class="badge good" id="connectedBadge"><span class="liveDot"></span>Connected</span>
+              <span class="badge" id="dashboardAsOf">As of now</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboardFilterRow card">
+          <div class="cardBody">
+            <div class="filterBlock">
+              <label for="dashRange">Period</label>
+              <select id="dashRange" class="dashboardSelect">
+                <option value="all">All Time</option>
+                <option value="24h">Last 24h</option>
+                <option value="7d" selected>Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+              </select>
+            </div>
+            <div class="filterBlock">
+              <label for="dashStatus">Status</label>
+              <select id="dashStatus" class="dashboardSelect">
+                <option value="all">All Status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Replied">Replied</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </div>
+            <div class="filterBlock">
+              <label for="dashPriority">Priority</label>
+              <select id="dashPriority" class="dashboardSelect">
+                <option value="all">All Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="filterBlock wide">
+              <label for="dashBranch">Branch / City</label>
+              <input class="dashboardInput" id="dashBranch" placeholder="Filter by branch or city" />
+            </div>
+            <div class="filterBlock action">
+              <button class="btn" id="dashResetFilters">Reset</button>
+            </div>
+          </div>
+        </div>
+
         <div class="statsGrid">
           <div class="statCard">
             <div class="statCardTop">
-              <div class="statLabel" id="statOpenLabel">Open Tickets</div>
-              <div class="statIconBadge">🎫</div>
+              <div class="statLabel" id="statTotalLabel">Total Tickets</div>
+              <div class="statIconBadge">Σ</div>
             </div>
-            <div class="statValue" id="kpiOpen">0</div>
-            <div class="statMeta" id="kpiOpenT">—</div>
+            <div class="statValue" id="kpiTotal">0</div>
+            <div class="statMeta" id="kpiTotalT">—</div>
           </div>
 
           <div class="statCard">
             <div class="statCardTop">
-              <div class="statLabel" id="statRepliedLabel">Branch Replied</div>
-              <div class="statIconBadge">💬</div>
+              <div class="statLabel" id="statOpenLabel">Open Tickets</div>
+              <div class="statIconBadge">📂</div>
             </div>
-            <div class="statValue" id="kpiReplied">0</div>
-            <div class="statMeta" id="kpiRepliedT">—</div>
+            <div class="statValue" id="kpiOpen">0</div>
+            <div class="statMeta" id="kpiOpenT">—</div>
           </div>
 
           <div class="statCard">
@@ -156,66 +209,163 @@
 
           <div class="statCard">
             <div class="statCardTop">
-              <div class="statLabel" id="statAvgLabel">Avg Response</div>
-              <div class="statIconBadge">⚡</div>
+              <div class="statLabel" id="statRepliedLabel">Near SLA Breach</div>
+              <div class="statIconBadge">⏱</div>
             </div>
-            <div class="statValue" id="kpiAvg">0h</div>
+            <div class="statValue" id="kpiReplied">0</div>
+            <div class="statMeta" id="kpiRepliedT">—</div>
+          </div>
+
+          <div class="statCard">
+            <div class="statCardTop">
+              <div class="statLabel" id="statAvgLabel">Overdue Tickets</div>
+              <div class="statIconBadge">⚠</div>
+            </div>
+            <div class="statValue" id="kpiAvg">0</div>
             <div class="statMeta" id="kpiAvgT">—</div>
           </div>
         </div>
 
         <div class="dashboardGrid">
-          <div class="card heroCard">
-            <div class="cardHeader">
-              <div>
-                <div class="h" id="overviewTitle">Today Overview</div>
-                <div class="s" id="kpiSub">Live snapshot</div>
-              </div>
-              <span class="badge good" id="connectedBadge"><span class="liveDot"></span>Connected</span>
-            </div>
-
-            <div class="cardBody">
-              <div class="chartWrap">
-                <div class="chart">
-                  <div class="bars" id="bars"></div>
-                  <div class="barLabel">
-                    <span id="chartLeftLabel">Ticket Volume</span>
-                    <span id="chartRightLabel">Live</span>
-                  </div>
+          <div class="dashboardMainCol">
+            <div class="card heroCard">
+              <div class="cardHeader">
+                <div>
+                  <div class="h">Ticket Volume Trend</div>
+                  <div class="s">Operational volume over time</div>
                 </div>
               </div>
 
-              <div class="footerNote" id="systemMsg">
-                Connected to Supabase tickets table.
+              <div class="cardBody">
+                <div class="chartWrap">
+                  <div class="chart">
+                    <div class="bars" id="bars"></div>
+                    <div class="barLabel">
+                      <span id="chartLeftLabel">Ticket Volume</span>
+                      <span id="chartRightLabel">Live</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="footerNote" id="systemMsg">Connected to Supabase tickets table.</div>
+              </div>
+            </div>
+
+            <div class="analyticsSplit">
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Breakdown by Source</div>
+                    <div class="s">Ticket intake channels</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="breakdownList" id="sourceBreakdown"></div></div>
+              </div>
+
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Breakdown by Brand</div>
+                    <div class="s">Brand-level distribution</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="breakdownList" id="brandBreakdown"></div></div>
+              </div>
+
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Breakdown by City</div>
+                    <div class="s">Geographic concentration</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="breakdownList" id="cityBreakdown"></div></div>
+              </div>
+
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Breakdown by Feedback Type</div>
+                    <div class="s">Feedback origin mix</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="breakdownList" id="feedbackTypeBreakdown"></div></div>
+              </div>
+            </div>
+
+            <div class="analyticsSplit">
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Top Problem Categories</div>
+                    <div class="s">Highest complaint categories</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="compactList" id="topCategories"></div></div>
+              </div>
+
+              <div class="card">
+                <div class="cardHeader">
+                  <div>
+                    <div class="h">Most Affected Branches</div>
+                    <div class="s">Branches with highest load</div>
+                  </div>
+                </div>
+                <div class="cardBody"><div class="compactList" id="topBranches"></div></div>
               </div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="cardHeader">
-              <div>
-                <div class="h" id="quickActionsTitle">Quick Actions</div>
-                <div class="s" id="quickActionsSub">What do you want to do now?</div>
+          <div class="dashboardSideCol">
+            <div class="card">
+              <div class="cardHeader">
+                <div>
+                  <div class="h" id="quickActionsTitle">Quick Actions</div>
+                  <div class="s" id="quickActionsSub">What do you want to do now?</div>
+                </div>
+              </div>
+
+              <div class="cardBody stack">
+                <button class="btn primary wide" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
+                <button class="btn wide" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
+                <button class="btn wide" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
+
+                <div class="panel">
+                  <div class="ph" id="currentSetupTitle">Current Setup</div>
+                  <div class="panelText" id="currentSetupText">
+                    New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function <b>send-branch-email</b>.
+                  </div>
+                </div>
+
+                <div class="panel">
+                  <div class="ph" id="emailModeTitle">Current Email Mode</div>
+                  <div class="panelText" id="emailModeText">
+                    Direct test mode is active for reliable delivery during setup.
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="cardBody stack">
-              <button class="btn primary wide" id="goTickets">🎫 <span id="goTicketsTxt">Go to Tickets Inbox</span></button>
-              <button class="btn wide" id="goReports">📈 <span id="goReportsTxt">Open Reports</span></button>
-              <button class="btn wide" id="goSettings">⚙️ <span id="goSettingsTxt">Customize UI</span></button>
-
-              <div class="panel">
-                <div class="ph" id="currentSetupTitle">Current Setup</div>
-                <div class="panelText" id="currentSetupText">
-                  New Ticket inserts directly into <b>tickets</b> and sends email via Supabase Edge Function <b>send-branch-email</b>.
+            <div class="card">
+              <div class="cardHeader">
+                <div>
+                  <div class="h">Operational Alerts / SLA Risks</div>
+                  <div class="s">Escalation-focused queue health</div>
                 </div>
               </div>
+              <div class="cardBody">
+                <div class="alertsList" id="dashboardAlerts"></div>
+              </div>
+            </div>
 
-              <div class="panel">
-                <div class="ph" id="emailModeTitle">Current Email Mode</div>
-                <div class="panelText" id="emailModeText">
-                  Direct test mode is active for reliable delivery during setup.
+            <div class="card">
+              <div class="cardHeader">
+                <div>
+                  <div class="h">Recent Ticket Activity</div>
+                  <div class="s">Latest critical and high-priority movement</div>
                 </div>
+              </div>
+              <div class="cardBody">
+                <div class="activityList" id="dashboardRecentActivity"></div>
               </div>
             </div>
           </div>
