@@ -617,6 +617,40 @@ function renderStaticTranslations(){
 
   setStatusOptions();
   setPriorityOptions();
+  renderDashboardFilterCopy();
+}
+
+function renderDashboardFilterCopy(){
+  const isAr = state.lang === "ar";
+  const labels = {
+    period: isAr ? "الفترة" : "Period",
+    status: isAr ? "الحالة" : "Status",
+    priority: isAr ? "الأولوية" : "Priority",
+    branchCity: isAr ? "الفرع / المدينة" : "Branch / City",
+    reset: isAr ? "إعادة تعيين" : "Reset",
+    allTime: isAr ? "كل الوقت" : "All Time",
+    last24: isAr ? "آخر 24 ساعة" : "Last 24h",
+    last7: isAr ? "آخر 7 أيام" : "Last 7 days",
+    last30: isAr ? "آخر 30 يومًا" : "Last 30 days",
+    branchPlaceholder: isAr ? "فلترة حسب الفرع أو المدينة" : "Filter by branch or city"
+  };
+
+  const q = (selector) => document.querySelector(selector);
+
+  if (q('label[for="dashRange"]')) q('label[for="dashRange"]').textContent = labels.period;
+  if (q('label[for="dashStatus"]')) q('label[for="dashStatus"]').textContent = labels.status;
+  if (q('label[for="dashPriority"]')) q('label[for="dashPriority"]').textContent = labels.priority;
+  if (q('label[for="dashBranch"]')) q('label[for="dashBranch"]').textContent = labels.branchCity;
+  if ($("dashResetFilters")) $("dashResetFilters").textContent = labels.reset;
+  if ($("dashBranch")) $("dashBranch").placeholder = labels.branchPlaceholder;
+
+  if ($("dashRange")) {
+    const opts = $("dashRange").options;
+    if (opts[0]) opts[0].text = labels.allTime;
+    if (opts[1]) opts[1].text = labels.last24;
+    if (opts[2]) opts[2].text = labels.last7;
+    if (opts[3]) opts[3].text = labels.last30;
+  }
 }
 
 function applyLang(){
@@ -631,6 +665,7 @@ function applyLang(){
   renderBranchOptions();
   renderSettingsContent();
   renderTickets();
+  computeKPIs();
 }
 
 function statusBadgeClass(s){
@@ -647,31 +682,296 @@ function prioBadgeClass(p){
   return "good";
 }
 
-function computeKPIs(){
-  const t = state.tickets || [];
-  const open = t.filter(x => x.status === "Open" || x.status === "In Progress").length;
-  const replied = t.filter(x => x.status === "Replied").length;
-  const closed = t.filter(x => x.status === "Closed").length;
+function getDashCopy(){
+  return state.lang === "ar"
+    ? {
+        total: "إجمالي التذاكر",
+        open: "التذاكر المفتوحة",
+        closed: "التذاكر المغلقة",
+        near: "قرب انتهاء SLA",
+        overdue: "تذاكر متأخرة",
+        inView: "ضمن العرض الحالي",
+        unresolved: "غير مغلقة",
+        completed: "مغلقة",
+        atRisk: "معرضة للتأخير",
+        breached: "متجاوزة SLA",
+        asOf: "آخر تحديث",
+        chartRight: "تذكرة"
+      }
+    : {
+        total: "Total Tickets",
+        open: "Open Tickets",
+        closed: "Closed Tickets",
+        near: "Near SLA Breach",
+        overdue: "Overdue Tickets",
+        inView: "in current view",
+        unresolved: "unresolved",
+        completed: "completed",
+        atRisk: "at risk",
+        breached: "breached",
+        asOf: "As of",
+        chartRight: "tickets"
+      };
+}
 
-  $("kpiOpen").textContent = open;
-  $("kpiReplied").textContent = replied;
-  $("kpiClosed").textContent = closed;
-  $("kpiAvg").textContent = t.length ? "2h" : "0h";
+function getTicketCity(ticket){
+  const raw = ticket?.raw || {};
+  return raw.city || raw.branch_city || raw.city_name || raw.branch_city_name || "Unspecified";
+}
 
-  $("kpiOpenT").textContent = state.lang === "ar" ? `${open} نشطة` : `${open} active`;
-  $("kpiRepliedT").textContent = state.lang === "ar" ? `${replied} تم الرد` : `${replied} replied`;
-  $("kpiClosedT").textContent = state.lang === "ar" ? `${closed} مغلقة` : `${closed} closed`;
-  $("kpiAvgT").textContent = tr("chartRightLabel");
+function getDashboardFilteredTickets(){
+  const range = $("dashRange")?.value || "7d";
+  const status = $("dashStatus")?.value || "all";
+  const priority = $("dashPriority")?.value || "all";
+  const q = ($("dashBranch")?.value || "").toLowerCase().trim();
+  const now = Date.now();
 
+  let list = [...(state.tickets || [])];
+
+  if (range !== "all") {
+    let ms = 0;
+    if (range === "24h") ms = 24 * 60 * 60 * 1000;
+    if (range === "7d") ms = 7 * 24 * 60 * 60 * 1000;
+    if (range === "30d") ms = 30 * 24 * 60 * 60 * 1000;
+    if (ms > 0) {
+      const threshold = now - ms;
+      list = list.filter(t => (t.createdAt || 0) >= threshold);
+    }
+  }
+
+  if (status !== "all") list = list.filter(t => t.status === status);
+  if (priority !== "all") list = list.filter(t => t.priority === priority);
+
+  if (q) {
+    list = list.filter(t => {
+      const branch = String(t.branch || "").toLowerCase();
+      const city = String(getTicketCity(t) || "").toLowerCase();
+      return branch.includes(q) || city.includes(q);
+    });
+  }
+
+  return list;
+}
+
+function countBy(items, keyGetter, limit = 6){
+  const bucket = {};
+  items.forEach(item => {
+    const label = (keyGetter(item) || "Unspecified").toString().trim() || "Unspecified";
+    bucket[label] = (bucket[label] || 0) + 1;
+  });
+  const total = items.length || 1;
+  return Object.entries(bucket)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([label, count]) => ({
+      label,
+      count,
+      pct: Math.round((count / total) * 100)
+    }));
+}
+
+function renderBreakdown(containerId, rows){
+  const wrap = $(containerId);
+  if (!wrap) return;
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="emptyDash">${state.lang === "ar" ? "لا توجد بيانات" : "No data available"}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = rows.map(r => `
+    <div class="breakdownRow">
+      <div class="breakdownHead">
+        <span>${r.label}</span>
+        <span>${r.count} (${r.pct}%)</span>
+      </div>
+      <div class="breakdownTrack">
+        <div class="breakdownFill" style="width:${Math.max(4, r.pct)}%"></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderCompact(containerId, rows, metaText){
+  const wrap = $(containerId);
+  if (!wrap) return;
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="emptyDash">${state.lang === "ar" ? "لا توجد بيانات" : "No data available"}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = rows.map(r => `
+    <div class="compactRow">
+      <div class="compactHead">
+        <span>${r.label}</span>
+        <span>${r.count}</span>
+      </div>
+      <div class="compactMeta">${metaText(r)}</div>
+    </div>
+  `).join("");
+}
+
+function renderOperationalAlerts(filtered, near, overdue){
+  const wrap = $("dashboardAlerts");
+  if (!wrap) return;
+
+  const highOpen = filtered.filter(t => t.priority === "High" && t.status !== "Closed").length;
+  const missingSla = filtered.filter(t => t.status !== "Closed" && !t.slaDueAt).length;
+  const alerts = [];
+
+  if (overdue > 0) {
+    alerts.push({
+      cls: "bad",
+      title: state.lang === "ar" ? "تذاكر تجاوزت SLA" : "Tickets breached SLA",
+      meta: state.lang === "ar" ? `${overdue} تحتاج تصعيد فوري` : `${overdue} require immediate escalation`
+    });
+  }
+  if (near > 0) {
+    alerts.push({
+      cls: "warn",
+      title: state.lang === "ar" ? "تذاكر قرب انتهاء SLA" : "Tickets near SLA breach",
+      meta: state.lang === "ar" ? `${near} معرضة للتأخير` : `${near} are at risk`
+    });
+  }
+  if (highOpen > 0) {
+    alerts.push({
+      cls: "warn",
+      title: state.lang === "ar" ? "أولوية عالية مفتوحة" : "High priority still open",
+      meta: state.lang === "ar" ? `${highOpen} تذكرة بانتظار المعالجة` : `${highOpen} tickets waiting for action`
+    });
+  }
+  if (missingSla > 0) {
+    alerts.push({
+      cls: "warn",
+      title: state.lang === "ar" ? "تذاكر بدون SLA" : "Tickets missing SLA target",
+      meta: state.lang === "ar" ? `${missingSla} تحتاج تحديد موعد SLA` : `${missingSla} need SLA due date`
+    });
+  }
+
+  if (!alerts.length) {
+    wrap.innerHTML = `<div class="emptyDash">${state.lang === "ar" ? "لا توجد تنبيهات حرجة حالياً" : "No critical alerts at the moment."}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = alerts.map(a => `
+    <div class="alertRow ${a.cls}">
+      <div class="compactHead"><span>${a.title}</span></div>
+      <div class="alertMeta">${a.meta}</div>
+    </div>
+  `).join("");
+}
+
+function renderRecentActivity(filtered){
+  const wrap = $("dashboardRecentActivity");
+  if (!wrap) return;
+
+  const prioritized = [...filtered].sort((a,b) => {
+    const aRisk = (a.slaComputedStatus === "breached" || (a.slaDueAt && a.slaDueAt < Date.now())) ? 1 : 0;
+    const bRisk = (b.slaComputedStatus === "breached" || (b.slaDueAt && b.slaDueAt < Date.now())) ? 1 : 0;
+    if (aRisk !== bRisk) return bRisk - aRisk;
+    if (a.priority !== b.priority) {
+      const rank = { High: 3, Medium: 2, Low: 1 };
+      return (rank[b.priority] || 0) - (rank[a.priority] || 0);
+    }
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  }).slice(0, 8);
+
+  if (!prioritized.length) {
+    wrap.innerHTML = `<div class="emptyDash">${state.lang === "ar" ? "لا توجد أنشطة حديثة" : "No recent activity."}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = prioritized.map(t => `
+    <div class="activityRow">
+      <div class="activityHead">
+        <span>${t.id} - ${t.status}</span>
+        <span>${t.priority}</span>
+      </div>
+      <div class="activityBranch">${t.branch}</div>
+      <div class="activityMeta">${fmtDate(t.createdAt)} ${t.slaRemainingText ? `- ${t.slaRemainingText}` : ""}</div>
+    </div>
+  `).join("");
+}
+
+function renderDashboardBars(filtered){
   const bars = $("bars");
+  if (!bars) return;
   bars.innerHTML = "";
-  const values = [25, 42, 30, 61, 47, 54, 36];
-  values.forEach(v => {
+
+  const now = new Date();
+  const byDay = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const key = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    byDay.push({ key, count: 0 });
+  }
+
+  filtered.forEach(t => {
+    const d = new Date(t.createdAt || 0);
+    const key = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const slot = byDay.find(x => x.key === key);
+    if (slot) slot.count += 1;
+  });
+
+  const peak = Math.max(1, ...byDay.map(x => x.count));
+  byDay.forEach((x, idx) => {
     const el = document.createElement("div");
     el.className = "bar";
-    el.style.height = v + "%";
+    el.style.height = `${Math.max(8, Math.round((x.count / peak) * 100))}%`;
+    el.style.animationDelay = `${0.04 * (idx + 1)}s`;
+    el.title = `${x.key}: ${x.count}`;
     bars.appendChild(el);
   });
+}
+
+function computeKPIs(){
+  const copy = getDashCopy();
+  const filtered = getDashboardFilteredTickets();
+  const now = Date.now();
+
+  const total = filtered.length;
+  const open = filtered.filter(t => t.status !== "Closed").length;
+  const closed = filtered.filter(t => t.status === "Closed").length;
+  const near = filtered.filter(t => {
+    if (t.status === "Closed" || !t.slaDueAt) return false;
+    const diff = t.slaDueAt - now;
+    return diff >= 0 && diff <= 4 * 60 * 60 * 1000;
+  }).length;
+  const overdue = filtered.filter(t => {
+    if (t.status === "Closed") return false;
+    return t.slaComputedStatus === "breached" || (t.slaDueAt && t.slaDueAt < now);
+  }).length;
+
+  if ($("statTotalLabel")) $("statTotalLabel").textContent = copy.total;
+  if ($("statOpenLabel")) $("statOpenLabel").textContent = copy.open;
+  if ($("statClosedLabel")) $("statClosedLabel").textContent = copy.closed;
+  if ($("statRepliedLabel")) $("statRepliedLabel").textContent = copy.near;
+  if ($("statAvgLabel")) $("statAvgLabel").textContent = copy.overdue;
+
+  if ($("kpiTotal")) $("kpiTotal").textContent = total;
+  if ($("kpiOpen")) $("kpiOpen").textContent = open;
+  if ($("kpiClosed")) $("kpiClosed").textContent = closed;
+  if ($("kpiReplied")) $("kpiReplied").textContent = near;
+  if ($("kpiAvg")) $("kpiAvg").textContent = overdue;
+
+  if ($("kpiTotalT")) $("kpiTotalT").textContent = `${total} ${copy.inView}`;
+  if ($("kpiOpenT")) $("kpiOpenT").textContent = `${open} ${copy.unresolved}`;
+  if ($("kpiClosedT")) $("kpiClosedT").textContent = `${closed} ${copy.completed}`;
+  if ($("kpiRepliedT")) $("kpiRepliedT").textContent = `${near} ${copy.atRisk}`;
+  if ($("kpiAvgT")) $("kpiAvgT").textContent = `${overdue} ${copy.breached}`;
+
+  if ($("chartRightLabel")) $("chartRightLabel").textContent = `${total} ${copy.chartRight}`;
+  if ($("dashboardAsOf")) $("dashboardAsOf").textContent = `${copy.asOf} ${fmtDate(Date.now())}`;
+
+  renderDashboardBars(filtered);
+  renderBreakdown("sourceBreakdown", countBy(filtered, t => t.raw?.source || t.source));
+  renderBreakdown("brandBreakdown", countBy(filtered, t => t.brand));
+  renderBreakdown("cityBreakdown", countBy(filtered, t => getTicketCity(t)));
+  renderBreakdown("feedbackTypeBreakdown", countBy(filtered, t => t.raw?.feedback_type || t.source));
+  renderCompact("topCategories", countBy(filtered, t => t.category), r => `${r.pct}%`);
+  renderCompact("topBranches", countBy(filtered, t => t.branch), r => `${r.pct}%`);
+  renderOperationalAlerts(filtered, near, overdue);
+  renderRecentActivity(filtered);
 }
 
 async function loadBranches() {
@@ -1083,6 +1383,8 @@ function renderDetail(){
 }
 
 function setView(view){
+  document.body.classList.toggle("dashboard-active", view === "dashboard");
+
   ["dashboard","tickets","reports","settings"].forEach(v => {
     $("view-" + v).style.display = (v === view) ? "" : "none";
     const btn = document.querySelector(`.nav button[data-view="${v}"]`);
@@ -1092,6 +1394,7 @@ function setView(view){
   if (view === "dashboard") {
     $("pageTitle").textContent = tr("pageDashboardTitle");
     $("pageSub").textContent = tr("pageDashboardSub");
+    computeKPIs();
   }
 
   if (view === "tickets") {
@@ -1553,6 +1856,18 @@ $("goSettings").onclick = () => setView("settings");
 ["filterStatus","filterPriority","filterBranch"].forEach(id => {
   $(id).addEventListener("input", renderTickets);
   $(id).addEventListener("change", renderTickets);
+});
+
+$("dashRange")?.addEventListener("change", computeKPIs);
+$("dashStatus")?.addEventListener("change", computeKPIs);
+$("dashPriority")?.addEventListener("change", computeKPIs);
+$("dashBranch")?.addEventListener("input", computeKPIs);
+$("dashResetFilters")?.addEventListener("click", () => {
+  if ($("dashRange")) $("dashRange").value = "7d";
+  if ($("dashStatus")) $("dashStatus").value = "all";
+  if ($("dashPriority")) $("dashPriority").value = "all";
+  if ($("dashBranch")) $("dashBranch").value = "";
+  computeKPIs();
 });
 
 $("newFeedbackCategory").addEventListener("change", updateSubCategoryOptions);
