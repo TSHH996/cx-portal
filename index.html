@@ -476,26 +476,118 @@
       </section>
 
       <section id="view-reports" style="display:none">
-        <div class="singlePageCard">
-          <div class="card">
-            <div class="cardHeader">
-              <div>
-                <div class="h" id="reportsTitle">Reports</div>
-                <div class="s" id="reportsSub">Analytics area</div>
-              </div>
-            </div>
+  <div class="rptPage">
+    <div class="rptPageHeader">
+      <div class="rptPageTitleArea">
+        <div class="rptPageTitle" id="reportsTitle">Reports</div>
+        <div class="rptPageSub" id="reportsSub">Deep analytics &amp; management reporting workspace</div>
+      </div>
+      <div class="rptPageActions">
+        <span class="badge" id="rptDataCount">— tickets</span>
+        <button class="btn" id="btnQuickExport">⬇ Export CSV</button>
+      </div>
+    </div>
 
-            <div class="cardBody">
-              <div class="panel">
-                <div class="ph" id="reportsReadyTitle">Ready for analytics</div>
-                <div class="panelText" id="reportsReadyText">
-                  Add Power BI, Excel export, SLA reports, complaint categories, and branch performance.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div class="rptFilterBar">
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">From</label>
+        <input type="date" class="rptDateInput" id="rptDateFrom" />
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">To</label>
+        <input type="date" class="rptDateInput" id="rptDateTo" />
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Brand</label>
+        <select class="rptSelect" id="rptFBrand">
+          <option value="all">All Brands</option>
+          <option value="Baytoti">Baytoti</option>
+          <option value="Asian Hub">Asian Hub</option>
+          <option value="Maki House">Maki House</option>
+          <option value="Podo Moro">Podo Moro</option>
+          <option value="Rice&amp;Roll">Rice&amp;Roll</option>
+          <option value="Wok">Wok</option>
+          <option value="Indo Makan">Indo Makan</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Status</label>
+        <select class="rptSelect" id="rptFStatus">
+          <option value="all">All Status</option>
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Replied">Replied</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Source</label>
+        <select class="rptSelect" id="rptFSource">
+          <option value="all">All Sources</option>
+          <option value="Google Review">Google Review</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Call Center">Call Center</option>
+          <option value="Email">Email</option>
+          <option value="Meta Business">Meta Business</option>
+          <option value="Dine In Survey (0-6)">Dine In Survey</option>
+          <option value="App Survey (0-6)">App Survey</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Priority</label>
+        <select class="rptSelect" id="rptFPriority">
+          <option value="all">All Priority</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">SLA</label>
+        <select class="rptSelect" id="rptFSLA">
+          <option value="all">All SLA</option>
+          <option value="pending">Pending</option>
+          <option value="at_risk">At Risk</option>
+          <option value="breached">Breached</option>
+        </select>
+      </div>
+      <div class="rptFilterGroup">
+        <label class="rptFilterLabel">Category</label>
+        <select class="rptSelect" id="rptFCategory">
+          <option value="all">All Categories</option>
+          <option value="Food Quality">Food Quality</option>
+          <option value="Service Quality">Service Quality</option>
+          <option value="Ambiance">Ambiance</option>
+          <option value="Cleanliness">Cleanliness</option>
+          <option value="Overall">Overall</option>
+          <option value="Foreign Object">Foreign Object</option>
+          <option value="Poisoning">Poisoning</option>
+          <option value="Delivery">Delivery</option>
+          <option value="App/Online">App/Online</option>
+          <option value="Pricing">Pricing</option>
+        </select>
+      </div>
+      <button class="btn" id="btnRptReset">↺ Reset</button>
+    </div>
+
+    <nav class="rptNav" id="rptNav">
+      <button class="rptTab active" data-section="executive">Executive Summary</button>
+      <button class="rptTab" data-section="period">Period Comparison</button>
+      <button class="rptTab" data-section="sla">SLA Performance</button>
+      <button class="rptTab" data-section="branch">Branch Report</button>
+      <button class="rptTab" data-section="brand">Brand Report</button>
+      <button class="rptTab" data-section="source">Source Analysis</button>
+      <button class="rptTab" data-section="category">Categories</button>
+      <button class="rptTab" data-section="aging">Ticket Aging</button>
+      <button class="rptTab" data-section="trend">Trend</button>
+      <button class="rptTab rptTabExport" data-section="export">⬇ Export</button>
+    </nav>
+
+    <div class="rptContent" id="rptContent">
+      <div class="rptLoading">Loading report data…</div>
+    </div>
+  </div>
+</section>
 
       <section id="view-settings" style="display:none">
         <div class="settingsLayout">

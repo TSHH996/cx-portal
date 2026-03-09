@@ -1182,3 +1182,279 @@ html[lang="ar"] .inlineActions{justify-content:flex-start}
   .statsGrid{grid-template-columns:1fr}
   .statMeta{min-height:0}
 }
+
+/* ═══════════════════════════════════════
+   REPORTS — Enterprise Reporting Workspace
+   ═══════════════════════════════════════ */
+
+/* ── Page shell ── */
+.rptPage{display:flex;flex-direction:column;gap:14px;padding-top:14px;min-height:calc(100vh - 80px)}
+
+.rptPageHeader{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:18px 22px;
+  background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius3);
+  box-shadow:var(--shadow);
+}
+.rptPageTitle{font-size:22px;font-weight:900;line-height:1.2;color:var(--text)}
+.rptPageSub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.rptPageActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ── Filter Bar ── */
+.rptFilterBar{
+  display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;
+  padding:14px 18px;
+  background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius2);
+  box-shadow:var(--shadow);
+}
+.rptFilterGroup{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rptFilterLabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted2)}
+.rptDateInput,.rptSelect{
+  border:1px solid var(--stroke);background:var(--surface3);color:var(--text);
+  padding:8px 10px;border-radius:10px;font-size:12.5px;font-family:var(--font);
+  transition:var(--t);height:36px;
+}
+.rptDateInput:focus,.rptSelect:focus{border-color:var(--focus);box-shadow:0 0 0 3px rgba(124,58,237,.1);outline:none}
+.rptSelect option{color:#1e293b;background:#f1f5f9}
+[data-theme="light"] .rptDateInput,[data-theme="light"] .rptSelect{background:#fff;color:#131d33}
+
+/* ── Tab Navigation ── */
+.rptNav{
+  display:flex;gap:4px;flex-wrap:wrap;
+  padding:6px;
+  background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius2);
+  box-shadow:var(--shadow);
+}
+.rptTab{
+  border:1px solid transparent;background:transparent;color:var(--muted);
+  padding:8px 14px;border-radius:10px;cursor:pointer;
+  font-size:12.5px;font-weight:600;font-family:var(--font);
+  transition:var(--t);white-space:nowrap;
+}
+.rptTab:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.rptTab.active{
+  background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(56,189,248,.1));
+  border-color:rgba(124,58,237,.28);color:var(--text);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.rptTabExport{margin-left:auto;color:var(--brand2)}
+.rptTabExport:hover{background:rgba(56,189,248,.08);color:var(--brand2)}
+[data-theme="light"] .rptTab:hover{background:rgba(15,23,42,.04)}
+[data-theme="light"] .rptTab.active{background:linear-gradient(135deg,rgba(109,40,217,.1),rgba(14,165,233,.06));border-color:rgba(109,40,217,.2)}
+
+/* ── Content area ── */
+.rptContent{display:flex;flex-direction:column;gap:14px;padding-bottom:24px}
+.rptLoading{display:flex;align-items:center;justify-content:center;min-height:200px;color:var(--muted);font-size:13px}
+
+/* ── Section wrapper ── */
+.rptSection{display:flex;flex-direction:column;gap:14px}
+.rptSectionTitle{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;
+  color:var(--muted2);padding:0 2px;display:flex;align-items:center;gap:8px;
+}
+.rptSectionTitle::after{content:'';flex:1;height:1px;background:var(--stroke)}
+
+/* ── Metric grid (Executive summary) ── */
+.rptMetricGrid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+.rptMetric{
+  border:1px solid var(--stroke);background:var(--card);
+  border-radius:var(--radius2);padding:16px;
+  position:relative;overflow:hidden;transition:var(--t-slow);
+}
+.rptMetric::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--rpt-accent, linear-gradient(90deg,rgba(124,58,237,.8),rgba(56,189,248,.4)));
+}
+.rptMetric:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.rptMetricLabel{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.rptMetricValue{font-size:28px;font-weight:900;line-height:1;color:var(--text);letter-spacing:-.02em}
+.rptMetricSub{font-size:11px;color:var(--muted2);margin-top:6px;line-height:1.5}
+.rptMetric.accent-bad .rptMetricValue{color:var(--bad)}
+.rptMetric.accent-warn .rptMetricValue{color:var(--warn)}
+.rptMetric.accent-good .rptMetricValue{color:var(--good)}
+.rptMetric.accent-blue .rptMetricValue{color:var(--brand2)}
+
+/* ── Two-column layout ── */
+.rptGrid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.rptGrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+
+/* ── Report card ── */
+.rptCard{
+  border:1px solid var(--stroke);background:var(--card);
+  border-radius:var(--radius2);overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.rptCardHead{
+  padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.rptCardTitle{font-size:13px;font-weight:800;color:var(--text)}
+.rptCardMeta{font-size:11.5px;color:var(--muted2)}
+.rptCardBody{padding:14px 18px}
+
+/* ── Breakdown bars ── */
+.rptBarRows{display:flex;flex-direction:column;gap:8px}
+.rptBarRow{display:grid;grid-template-columns:120px 1fr 42px 46px;gap:8px;align-items:center}
+.rptBarLabel{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rptBarTrack{height:8px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
+.rptBar{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .5s cubic-bezier(.4,0,.2,1)}
+.rptBar.bar-bad{background:linear-gradient(90deg,var(--bad),#f97316)}
+.rptBar.bar-warn{background:linear-gradient(90deg,var(--warn),#fbbf24)}
+.rptBar.bar-good{background:linear-gradient(90deg,var(--good),#34d399)}
+.rptBar.bar-blue{background:linear-gradient(90deg,var(--brand2),#818cf8)}
+.rptBarCount{font-size:12px;font-weight:700;color:var(--text);text-align:right}
+.rptBarPct{font-size:11px;color:var(--muted2);text-align:right}
+
+/* ── Table ── */
+.rptTable{width:100%;border-collapse:collapse;font-size:12.5px}
+.rptTable th{
+  padding:9px 12px;text-align:left;font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);
+  border-bottom:1px solid var(--stroke);background:rgba(255,255,255,.02);
+  white-space:nowrap;
+}
+.rptTable td{
+  padding:10px 12px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.03);
+  vertical-align:middle;
+}
+.rptTable tr:last-child td{border-bottom:none}
+.rptTable tr:hover td{background:rgba(255,255,255,.025)}
+.rptTable td.num{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.rptTable td.muted{color:var(--muted)}
+[data-theme="light"] .rptTable th{background:rgba(15,23,42,.02)}
+[data-theme="light"] .rptTable tr:hover td{background:rgba(15,23,42,.02)}
+[dir="rtl"] .rptTable th,[dir="rtl"] .rptTable td{text-align:right}
+[dir="rtl"] .rptTable td.num{text-align:left}
+
+/* ── Delta indicators ── */
+.rptDelta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px}
+.rptDelta.up-bad{background:rgba(239,68,68,.12);color:#fca5a5}
+.rptDelta.down-good{background:rgba(34,197,94,.12);color:#86efac}
+.rptDelta.up-good{background:rgba(34,197,94,.12);color:#86efac}
+.rptDelta.down-bad{background:rgba(239,68,68,.12);color:#fca5a5}
+.rptDelta.neutral{background:rgba(255,255,255,.06);color:var(--muted)}
+
+/* ── Comparison table ── */
+.rptCompareTable{width:100%;border-collapse:collapse;font-size:12.5px}
+.rptCompareTable th{
+  padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);
+  border-bottom:1px solid var(--stroke);
+}
+.rptCompareTable td{
+  padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);
+}
+.rptCompareTable tr:last-child td{border-bottom:none}
+.rptCompareTable .metric-label{font-weight:600;color:var(--muted)}
+.rptCompareTable .val-current{font-weight:800;font-size:14px}
+.rptCompareTable .val-prev{color:var(--muted2)}
+[dir="rtl"] .rptCompareTable th,[dir="rtl"] .rptCompareTable td{text-align:right}
+
+/* ── SLA Indicators ── */
+.rptSlaRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.rptSlaRow:last-child{border-bottom:none}
+.rptSlaDot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.rptSlaLabel{flex:1;font-size:13px;color:var(--text)}
+.rptSlaCount{font-weight:800;font-size:15px;min-width:32px;text-align:right}
+.rptSlaPct{font-size:11.5px;color:var(--muted2);min-width:44px;text-align:right}
+.rptSlaBar{flex:2;height:6px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.rptSlaBarFill{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* ── Aging buckets ── */
+.rptAgingGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rptAgingBucket{
+  border:1px solid var(--stroke);background:var(--surface2);
+  border-radius:var(--radius);padding:16px;text-align:center;
+}
+.rptAgingBucketCount{font-size:30px;font-weight:900;line-height:1;margin-bottom:6px}
+.rptAgingBucketLabel{font-size:11px;color:var(--muted);font-weight:600}
+.rptAgingBucket.age-ok .rptAgingBucketCount{color:var(--good)}
+.rptAgingBucket.age-mild .rptAgingBucketCount{color:var(--warn)}
+.rptAgingBucket.age-warn .rptAgingBucketCount{color:#f97316}
+.rptAgingBucket.age-bad .rptAgingBucketCount{color:var(--bad)}
+
+/* ── Trend mini bars ── */
+.rptTrendChart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:4px 0}
+.rptTrendBar{
+  flex:1;border-radius:4px 4px 2px 2px;min-width:10px;
+  background:linear-gradient(180deg,var(--brand),rgba(56,189,248,.6));
+  opacity:.85;transition:opacity .2s;cursor:default;position:relative;
+}
+.rptTrendBar:hover{opacity:1}
+.rptTrendLabels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted2);margin-top:6px;padding:0 2px}
+
+/* ── Export grid ── */
+.rptExportGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rptExportBtn{
+  display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+  border:1px solid var(--stroke);background:var(--surface2);
+  border-radius:var(--radius2);padding:18px;cursor:pointer;
+  transition:var(--t);font-family:var(--font);text-align:left;color:var(--text);
+}
+.rptExportBtn:hover{border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.06);transform:translateY(-2px);box-shadow:var(--shadow)}
+.rptExportBtnIcon{font-size:22px}
+.rptExportBtnTitle{font-size:13.5px;font-weight:800;color:var(--text)}
+.rptExportBtnSub{font-size:11.5px;color:var(--muted);line-height:1.5}
+[data-theme="light"] .rptExportBtn{background:var(--surface2)}
+[dir="rtl"] .rptExportBtn{text-align:right;align-items:flex-end}
+
+/* ── Rank badge ── */
+.rptRank{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;
+  background:rgba(255,255,255,.07);color:var(--muted2);
+}
+.rptRank.top1{background:rgba(245,158,11,.15);color:#fbbf24}
+.rptRank.top2{background:rgba(148,163,184,.12);color:#94a3b8}
+.rptRank.top3{background:rgba(180,120,60,.12);color:#cd9a6a}
+
+/* ── Compliance KPI ── */
+.rptComplianceRing{
+  width:80px;height:80px;border-radius:50%;
+  border:6px solid rgba(255,255,255,.06);
+  display:grid;place-items:center;flex-shrink:0;
+  position:relative;
+}
+.rptComplianceRingValue{font-size:17px;font-weight:900}
+
+/* ── Empty state for reports ── */
+.rptEmpty{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100px;color:var(--muted2);font-size:13px;
+  border:1px dashed rgba(255,255,255,.08);border-radius:10px;
+}
+
+/* ── RTL ── */
+[dir="rtl"] .rptPageHeader,[dir="rtl"] .rptCardHead,[dir="rtl"] .rptFilterBar{direction:rtl}
+[dir="rtl"] .rptBarRow{direction:rtl}
+[dir="rtl"] .rptBarLabel{text-align:right}
+[dir="rtl"] .rptBarCount,[dir="rtl"] .rptBarPct{text-align:left}
+[dir="rtl"] .rptNav{direction:rtl}
+[dir="rtl"] .rptTabExport{margin-left:0;margin-right:auto}
+[dir="rtl"] .rptSectionTitle::after{display:none}
+[dir="rtl"] .rptSectionTitle::before{content:'';flex:1;height:1px;background:var(--stroke)}
+[dir="rtl"] .rptMetricGrid,[dir="rtl"] .rptAgingGrid,[dir="rtl"] .rptExportGrid{direction:rtl}
+[dir="rtl"] .rptCompareTable th,[dir="rtl"] .rptCompareTable td{text-align:right}
+[dir="rtl"] .rptSlaCount,[dir="rtl"] .rptSlaPct{text-align:left}
+
+/* ── Responsive ── */
+@media(max-width:1100px){
+  .rptMetricGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .rptGrid3{grid-template-columns:1fr}
+  .rptExportGrid{grid-template-columns:1fr 1fr}
+  .rptBarRow{grid-template-columns:100px 1fr 36px 40px}
+}
+@media(max-width:720px){
+  .rptMetricGrid{grid-template-columns:1fr 1fr}
+  .rptGrid2{grid-template-columns:1fr}
+  .rptAgingGrid{grid-template-columns:1fr 1fr}
+  .rptExportGrid{grid-template-columns:1fr}
+  .rptFilterBar{flex-direction:column;align-items:stretch}
+  .rptFilterGroup{flex-direction:row;align-items:center;gap:10px}
+  .rptFilterLabel{min-width:60px}
+  .rptNav{overflow-x:auto;flex-wrap:nowrap;padding:4px}
+}
