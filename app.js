@@ -588,8 +588,8 @@ function renderStaticTranslations(){
   $("timelineTitle").textContent = tr("timelineTitle");
   $("reportsTitle").textContent = tr("reportsTitle");
   $("reportsSub").textContent = tr("reportsSub");
-  $("reportsReadyTitle").textContent = tr("reportsReadyTitle");
-  $("reportsReadyText").textContent = tr("reportsReadyText");
+  if ($("reportsReadyTitle")) $("reportsReadyTitle").textContent = tr("reportsReadyTitle");
+  if ($("reportsReadyText")) $("reportsReadyText").textContent = tr("reportsReadyText");
   $("settingsMainTitle").textContent = tr("settingsMainTitle");
   $("settingsMainSub").textContent = tr("settingsMainSub");
   $("settingsItemProfile").textContent = tr("settingsItemProfile");
